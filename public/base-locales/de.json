@@ -509,5 +509,5 @@
   "scan_error": "Es ist ein Fehler bei der Verarbeitung der Scan-Anfrage aufgetreten...",
   "scan_outside_area": "Dieser Standort liegt außerhalb der Grenzen der zugelassenen Gebiete",
   "scanner": "Scanner",
-  "scan_subtitle": "Ermöglicht on Demand scannen eines Standorts, innerhalb des Scangebietes"
+  "scanner_subtitle": "Ermöglicht on Demand scannen eines Standorts, innerhalb des Scangebietes"
 }
