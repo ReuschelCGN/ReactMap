@@ -10,8 +10,6 @@ import Webhook from './layout/dialogs/webhooks/Webhook'
 import ScanNext from './layout/dialogs/scanner/ScanNext'
 import ScanZone from './layout/dialogs/scanner/ScanZone'
 import ActiveWeather from './layout/general/ActiveWeather'
-import ScanNext from './layout/dialogs/scanner/ScanNext'
-import ScanZone from './layout/dialogs/scanner/ScanZone'
 
 const userSettingsCategory = category => {
   switch (category) {
