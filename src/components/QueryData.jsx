@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect } from 'react'
 import { useQuery } from '@apollo/client'
 
 import Query from '@services/Query'
 import Utility from '@services/Utility'
+import { useStatic } from '@hooks/useStore'
 
 import Clustering from './Clustering'
 import Notification from './layout/general/Notification'
@@ -29,6 +30,7 @@ export default function QueryData({
   category, available, filters, staticFilters, staticUserSettings, sizeKey,
   userSettings, perms, Icons, userIcons, setParams, isNight, setExcludeList,
 }) {
+  const setActiveWeather = useStatic(state => state.setActiveWeather)
   const trimFilters = useCallback(requestedFilters => {
     const trimmed = {
       onlyLegacyExclude: [],
@@ -85,22 +87,30 @@ export default function QueryData({
     }
   }, [filters, userSettings])
 
-  const { data, previousData, refetch, error } = useQuery(Query[category](
-    filters, perms, map.getZoom(), clusteringRules.zoomLevel,
-  ), {
-    context: { timeout: getPolling(category) },
-    variables: {
-      ...bounds,
-      filters: trimFilters(filters),
+  const { data, previousData, refetch, error } = useQuery(
+    Query[category](filters, perms, map.getZoom(), clusteringRules.zoomLevel),
+    {
+      context: { timeout: getPolling(category) },
+      variables: {
+        ...bounds,
+        filters: trimFilters(filters),
+      },
+      fetchPolicy: 'cache-and-network',
+      pollInterval: getPolling(category),
     },
-    fetchPolicy: 'cache-and-network',
-    pollInterval: getPolling(category),
-  })
+  )
 
   useEffect(() => () => setExcludeList([]))
 
   const renderedData = data || previousData || {}
-  if (error && process.env.NODE_ENV === 'development') {
+
+  useLayoutEffect(() => {
+    if (category === 'weather' && renderedData[category]) {
+      setActiveWeather(renderedData[category])
+    }
+  }, [renderedData?.[category]])
+
+  if (error && inject.DEVELOPMENT) {
     return (
       <Notification
         severity="error"
