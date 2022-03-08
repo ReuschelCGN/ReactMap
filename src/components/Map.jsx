@@ -38,6 +38,7 @@ export default function Map({ serverSettings:
   Utility.analytics(window.location.pathname)
 
   const map = useMap()
+  map.attributionControl.setPrefix(config.attributionPrefix || '')
 
   const staticUserSettings = useStatic(state => state.userSettings)
   const ui = useStatic(state => state.ui)
@@ -86,7 +87,7 @@ export default function Map({ serverSettings:
     <>
       <TileLayer
         key={tileServer?.name}
-        attribution={tileServer?.attribution || 'Map tiles by Carto, under CC BY 3.0. Data by  <a href="https://www.openstreetmap.org/">OpenStreetMap</a>, under ODbL.'}
+        attribution={tileServer?.attribution || ''}
         url={tileServer?.url || 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png'}
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
