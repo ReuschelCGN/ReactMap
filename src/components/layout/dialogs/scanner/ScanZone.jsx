@@ -7,9 +7,9 @@ import {
 
 import { useStatic, useStore } from '@hooks/useStore'
 import Query from '@services/Query'
-import ScanZoneTargetMarker from './ScanZoneTarget'
+import ScanZoneTarget from './ScanZoneTarget'
 
-export default function Main({
+export default function ScanZone({
   map, theme, scanZoneMode, setScanZoneMode,
   scanner: { scannerType, scanZoneShowScanCount, scanZoneShowScanQueue, advancedScanZoneOptions,
     scanZoneRadius, scanZoneSpacing, scanZoneMaxSize, scanZoneAreaRestriction },
@@ -72,7 +72,9 @@ export default function Main({
     }
     useEffect(() => {
       const timer = setInterval(() => {
-        getQueue()
+        if (scanZoneMode === 'setLocation') {
+          getQueue()
+        }
       }, 2000)
       return () => clearInterval(timer)
     })
@@ -85,7 +87,7 @@ export default function Main({
   return (
     <>
       {scanZoneMode === 'setLocation' && (
-        <ScanZoneTargetMarker
+        <ScanZoneTarget
           map={map}
           theme={theme}
           scannerType={scannerType}
@@ -114,11 +116,7 @@ export default function Main({
       >
         <DialogTitle>{t(`scan_${scanZoneMode}_title`)}</DialogTitle>
         <DialogContent>
-          <Grid
-            item
-            justify="center"
-            align="center"
-          >
+          <Grid item style={{ textAlign: 'center' }}>
             <Typography variant="subtitle1" align="center">
               {t(`scan_${scanZoneMode}`)}
             </Typography>
