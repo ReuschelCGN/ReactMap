@@ -53,7 +53,7 @@ export default function FloatingButtons({
       alignItems="flex-start"
       className={classes.floatingBtn}
       ref={ref}
-      style={{ width: isMobile ? 50 : 65 }}
+      style={{ width: isMobile ? 50 : 65, zIndex: 5000 }}
     >
       <Grid item>
         <Fab color="primary" size={fabSize} onClick={toggleDrawer(true)} title={t('open_menu')} disabled={Boolean(webhookMode) || Boolean(scanNextMode) || Boolean(scanZoneMode)}>

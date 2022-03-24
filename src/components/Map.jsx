@@ -96,6 +96,7 @@ export default function Map({ serverSettings:
         url={tileServer?.url || 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager_labels_under/{z}/{x}/{y}{r}.png'}
         minZoom={config.minZoom}
         maxZoom={config.maxZoom}
+        zIndex={250}
       />
       {settings.navigationControls === 'leaflet' && <ZoomControl position="bottomright" />}
       {
