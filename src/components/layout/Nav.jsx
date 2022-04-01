@@ -26,6 +26,7 @@ export default function Nav({
   setWebhookMode, webhookMode, settings, webhooks,
   setScanNextMode, scanNextMode, setScanZoneMode, scanZoneMode,
   isMobile, isTablet,
+  setScanNextMode, scanNextMode, setScanZoneMode, scanZoneMode,
 }) {
   const classes = useStyles()
 
