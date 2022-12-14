@@ -1,5 +1,6 @@
 dist
 node_modules
+.github
 public/missing-locales
 public/images/custom
 public/images/uicons
