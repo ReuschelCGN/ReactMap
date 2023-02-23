@@ -236,7 +236,7 @@ module.exports = async function scannerApi(
     }
 
     if (
-      Clients[user.rmStrategy] &&
+      Clients[user.rmStrategy]?.sendMessage &&
       config.scanner.backendConfig.sendDiscordMessage
     ) {
       const capitalized = category.replace('scan', 'Scan ')
@@ -272,10 +272,6 @@ module.exports = async function scannerApi(
                     ? data.scanNextType
                     : data.scanZoneSize
                 }\nCoordinates: ${coords.length}\n`,
-                color:
-                  category === 'scanNext'
-                    ? config.map.theme.primary
-                    : config.map.theme.secondary,
                 fields: [
                   {
                     name: `User History`,
