@@ -25,6 +25,8 @@ const getAreas = require('./services/areas')
 
 Event.clients = Clients
 
+Event.clients = Clients
+
 if (!config.devOptions.skipUpdateCheck) {
   require('./services/checkForUpdates')
 }

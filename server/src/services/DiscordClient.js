@@ -116,6 +116,7 @@ module.exports = class DiscordClient {
         Object.keys(scanner).forEach(
           (x) => scanner[x]?.enabled && perms.scanner.add(x),
         )
+        console.log({ perms })
         console.log(
           `[DISCORD] User ${user.username}#${user.discriminator} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
