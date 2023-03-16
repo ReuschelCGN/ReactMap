@@ -60,6 +60,7 @@
   "pokemon": "Pokemon",
   "wayfarer": "Wayfarer",
   "scan_areas": "Gebiete",
+  "s2cells": "S2 Zellen",
   "weather": "Wetter",
   "admin": "Admin",
   "settings": "Einstellungen",
@@ -577,5 +578,6 @@
   "size_4": "XL",
   "size_5": "XXL",
   "show_size_indicator": "Größen Marker anzeigen",
-  "size": "Größe"
+  "size": "Größe",
+  "gold_stop": "Gold Stop"
 }
