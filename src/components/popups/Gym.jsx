@@ -654,11 +654,7 @@ const ExtraInfo = ({ gym, t, ts }) => {
 
   return (
     <Grid container>
-      <Grid
-        item
-        xs={12}
-        style={{ textAlign: 'center' }}
-      >
+      <Grid item xs={12} style={{ textAlign: 'center' }}>
         <Typography variant="caption" style={{ textAlign: 'center' }}>
           🎯 {gym.lat}, {gym.lon}
         </Typography>
