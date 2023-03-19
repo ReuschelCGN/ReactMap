@@ -1,98 +1,132 @@
 import React from 'react'
-import shallow from 'zustand/shallow'
 import {
+  Divider,
   FormControl,
-  Grid,
   InputLabel,
+  List,
+  ListItem,
+  ListItemIcon,
   MenuItem,
   Select,
 } from '@material-ui/core'
+import TranslateIcon from '@material-ui/icons/Translate'
+import MapIcon from '@material-ui/icons/Map'
+import NavIcon from '@material-ui/icons/Navigation'
+import StyleIcon from '@material-ui/icons/Style'
+import DevicesOtherIcon from '@material-ui/icons/DevicesOther'
+
 import { useTranslation } from 'react-i18next'
 
 import { useStore, useStatic } from '@hooks/useStore'
 import Utility from '@services/Utility'
+import DrawerActions from './Actions'
+
+function FCSelect({ name, label, value, onChange, children, icon, color }) {
+  return (
+    <ListItem dense>
+      {icon && <ListItemIcon>{icon}</ListItemIcon>}
+      <FormControl
+        size="small"
+        color={color || 'primary'}
+        fullWidth
+        style={{ margin: '3px 0' }}
+      >
+        <InputLabel>{label}</InputLabel>
+        <Select
+          autoFocus
+          name={name}
+          value={value}
+          onChange={onChange}
+          fullWidth
+        >
+          {children}
+        </Select>
+      </FormControl>
+    </ListItem>
+  )
+}
+
+const ICON_MAP = {
+  localeSelection: TranslateIcon,
+  navigation: NavIcon,
+  navigationControls: StyleIcon,
+  tileServers: MapIcon,
+}
 
 export default function Settings() {
   const { t, i18n } = useTranslation()
   const { config, setIcons: setStaticIcons } = useStatic.getState()
   const { setIcons, setSettings } = useStore.getState()
 
-  const { Icons, settings: staticSettings } = useStatic((s) => s, shallow)
-  const { settings, icons } = useStore((state) => state, shallow)
+  const Icons = useStatic((s) => s.Icons)
+  const staticSettings = useStatic((s) => s.settings)
 
-  const handleChange = (event) => {
-    setSettings({
-      ...settings,
-      [event.target.name]: config[event.target.name][event.target.value].name,
-    })
-    if (event.target.name === 'localeSelection') {
-      i18n.changeLanguage(event.target.value)
-    }
-  }
-
-  const handleIconChange = (event) => {
-    const { name, value } = event.target
-    Icons.setSelection(name, value)
-    setStaticIcons(Icons)
-    setIcons({ ...icons, [name]: value })
-  }
+  const settings = useStore((s) => s.settings)
+  const icons = useStore((s) => s.icons)
 
   return (
-    <Grid
-      container
-      direction="row"
-      justifyContent="space-evenly"
-      alignItems="center"
-      spacing={1}
-    >
-      {Object.keys(staticSettings).map((setting) => (
-        <Grid item key={setting} xs={10}>
-          <FormControl style={{ width: 200, margin: 5 }}>
-            <InputLabel>{t(Utility.camelToSnake(setting))}</InputLabel>
-            <Select
-              autoFocus
-              name={setting}
-              value={config[setting][settings[setting]]?.name || ''}
-              onChange={handleChange}
-              fullWidth
-            >
-              {Object.keys(config[setting]).map((option) => (
-                <MenuItem key={option} value={option}>
-                  {t(
-                    `${Utility.camelToSnake(setting)}_${option.toLowerCase()}`,
-                    Utility.getProperName(option),
-                  )}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-      ))}
+    <List dense style={{ width: '100%' }}>
+      {Object.keys(staticSettings).map((setting) => {
+        const Icon = ICON_MAP[setting] || DevicesOtherIcon
+        return (
+          <FCSelect
+            key={setting}
+            name={setting}
+            value={config[setting][settings[setting]]?.name || ''}
+            label={t(Utility.camelToSnake(setting))}
+            onChange={({ target }) => {
+              setSettings({
+                ...settings,
+                [target.name]: config[target.name][target.value].name,
+              })
+              if (target.name === 'localeSelection') {
+                i18n.changeLanguage(target.value)
+              }
+            }}
+            icon={<Icon style={{ color: 'white' }} />}
+          >
+            {Object.keys(config[setting]).map((option) => (
+              <MenuItem key={option} value={option}>
+                {t(
+                  `${Utility.camelToSnake(setting)}_${option.toLowerCase()}`,
+                  Utility.getProperName(option),
+                )}
+              </MenuItem>
+            ))}
+          </FCSelect>
+        )
+      })}
+      <Divider style={{ margin: '10px 0' }} />
       {Icons.customizable.map((category) => (
-        <Grid item key={category} xs={10}>
-          <FormControl style={{ width: 200, margin: 5 }}>
-            <InputLabel>
-              {t(`${category}_icons`, `${category} Icons`)}
-            </InputLabel>
-            <Select
-              autoFocus
-              name={category}
-              value={icons[category]}
-              onChange={handleIconChange}
-              fullWidth
-            >
-              {Icons[category].map((option) => (
-                <MenuItem key={option} value={option}>
-                  {t(
-                    `${category.toLowerCase()}_${option.toLowerCase()}`,
-                    Utility.getProperName(option),
-                  )}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
+        <FCSelect
+          key={category}
+          name={category}
+          color="secondary"
+          value={icons[category]}
+          label={t(`${category}_icons`, `${category} Icons`)}
+          onChange={({ target }) => {
+            Icons.setSelection(target.name, target.value)
+            setStaticIcons(Icons)
+            setIcons({ ...icons, [target.name]: target.value })
+          }}
+          icon={<img src={Icons.getMisc(category)} alt={category} width={24} />}
+        >
+          {Icons[category].map((option) => (
+            <MenuItem key={option} value={option}>
+              {t(
+                `${category.toLowerCase()}_${option.toLowerCase()}`,
+                Utility.getProperName(option),
+              )}
+            </MenuItem>
+          ))}
+        </FCSelect>
       ))}
-    </Grid>
+      {!config.map?.separateDrawerActions && (
+        <>
+          <Divider style={{ margin: '10px 0' }} />
+          <DrawerActions />
+        </>
+      )}
+    </List>
   )
 }

@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { Dialog, Snackbar } from '@material-ui/core'
 import { Alert } from '@material-ui/lab'
-import shallow from 'zustand/shallow'
 
 import Utility from '@services/Utility'
 import useStyles from '@hooks/useStyles'
@@ -47,14 +46,15 @@ export default function Nav({
   const { setFilters, setUserSettings, setTutorial, setMotdIndex } =
     useStore.getState()
 
-  const { webhookAlert, userProfile, feedback, resetFilters } = useStatic(
-    (s) => s,
-    shallow,
-  )
-  const { filters, userSettings, tutorial, motdIndex } = useStore(
-    (s) => s,
-    shallow,
-  )
+  const webhookAlert = useStatic((s) => s.webhookAlert)
+  const userProfile = useStatic((s) => s.userProfile)
+  const feedback = useStatic((s) => s.feedback)
+  const resetFilters = useStatic((s) => s.resetFilters)
+
+  const filters = useStore((s) => s.filters)
+  const userSettings = useStore((s) => s.userSettings)
+  const tutorial = useStore((s) => s.tutorial)
+  const motdIndex = useStore((s) => s.motdIndex)
 
   const [drawer, setDrawer] = useState(false)
   const [donorPage, setDonorPage] = useState(false)
@@ -204,7 +204,7 @@ export default function Nav({
       >
         <Search
           toggleDialog={toggleDialog}
-          safeSearch={config.searchable}
+          safeSearch={config.map.searchable}
           isMobile={isMobile}
           Icons={Icons}
         />
@@ -231,7 +231,7 @@ export default function Nav({
         maxWidth={isMobile ? 'sm' : 'xs'}
         onClose={() => setFeedback(false)}
       >
-        <Feedback link={config.feedbackLink} setFeedback={setFeedback} />
+        <Feedback link={config.map.feedbackLink} setFeedback={setFeedback} />
       </Dialog>
       <Dialog
         open={resetFilters}
