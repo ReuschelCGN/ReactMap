@@ -523,13 +523,6 @@ const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
 
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {config.enablePopupCoords && (
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ textAlign: 'center' }}>
-            🎯 {pokemon.lat.toFixed(6)}, {pokemon.lon.toFixed(6)}
-          </Typography>
-        </Grid>
-      )}
       {perms.iv &&
         iv !== null &&
         [move_1, move_2].map((move, i) => {
@@ -591,6 +584,13 @@ const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
             </Grid>
           </Fragment>
         ) : null,
+      )}
+      {config.enablePopupCoords && (
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Typography variant="caption" style={{ textAlign: 'center' }}>
+            🎯 {pokemon.lat.toFixed(6)}, {pokemon.lon.toFixed(6)}
+          </Typography>
+        </Grid>
       )}
     </Grid>
   )
