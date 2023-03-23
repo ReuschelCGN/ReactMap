@@ -137,7 +137,13 @@ export default function PokemonPopup({
           ))}
         </Collapse>
         <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-          <ExtraInfo pokemon={pokemon} perms={pokePerms} config={config} t={t} Icons={Icons} />
+          <ExtraInfo
+            pokemon={pokemon}
+            perms={pokePerms}
+            config={config}
+            t={t}
+            Icons={Icons}
+          />
         </Collapse>
       </Grid>
     </ErrorBoundary>
