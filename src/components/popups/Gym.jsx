@@ -655,13 +655,6 @@ const ExtraInfo = ({ gym, config, t, ts }) => {
 
   return (
     <Grid container>
-      {config.enablePopupCoords && (
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ textAlign: 'center' }}>
-            🎯 {gym.lat}, {gym.lon}
-          </Typography>
-        </Grid>
-      )}
       {extraMetaData.map((meta) => (
         <Fragment key={meta.description}>
           <Grid
@@ -693,6 +686,13 @@ const ExtraInfo = ({ gym, config, t, ts }) => {
           </Grid>
         </Fragment>
       ))}
+      {config.enablePopupCoords && (
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Typography variant="caption" style={{ textAlign: 'center' }}>
+            🎯 {gym.lat}, {gym.lon}
+          </Typography>
+        </Grid>
+      )}
     </Grid>
   )
 }
