@@ -655,7 +655,7 @@ const ExtraInfo = ({ gym, config, t, ts }) => {
 
   return (
     <Grid container>
-      {config.enablePopupCords && (
+      {config.enablePopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Typography variant="caption" style={{ textAlign: 'center' }}>
             🎯 {gym.lat}, {gym.lon}

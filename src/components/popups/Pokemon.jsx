@@ -523,7 +523,7 @@ const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
 
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {config.enablePopupCords && (
+      {config.enablePopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Typography variant="caption" style={{ textAlign: 'center' }}>
             🎯 {pokemon.lat.toFixed(6)}, {pokemon.lon.toFixed(6)}
