@@ -597,13 +597,6 @@ const ExtraInfo = ({ pokestop, config, t, ts }) => {
 
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {config.enablePopupCoords && (
-        <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ textAlign: 'center' }}>
-            🎯 {pokestop.lat}, {pokestop.lon}
-          </Typography>
-        </Grid>
-      )}
       {extraMetaData.map((meta) => (
         <Fragment key={meta.description}>
           <Grid
@@ -629,6 +622,13 @@ const ExtraInfo = ({ pokestop, config, t, ts }) => {
           </Grid>
         </Fragment>
       ))}
+      {config.enablePopupCoords && (
+        <Grid item xs={12} style={{ textAlign: 'center' }}>
+          <Typography variant="caption" style={{ textAlign: 'center' }}>
+            🎯 {pokestop.lat}, {pokestop.lon}
+          </Typography>
+        </Grid>
+      )}
     </Grid>
   )
 }
