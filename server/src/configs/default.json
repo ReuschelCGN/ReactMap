@@ -244,7 +244,7 @@
       "permArrayImages": false,
       "clientTimeoutMinutes": 30,
       "distanceUnit": "km",
-      "enablePopupCords": false
+      "enablePopupCoords": false
     },
     "theme": {
       "style": "dark",
