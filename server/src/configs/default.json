@@ -243,7 +243,8 @@
       "permImageDir": "images/perms",
       "permArrayImages": false,
       "clientTimeoutMinutes": 30,
-      "distanceUnit": "km"
+      "distanceUnit": "km",
+      "enablePopupCords": true
     },
     "theme": {
       "style": "dark",
