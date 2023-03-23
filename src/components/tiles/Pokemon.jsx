@@ -80,6 +80,7 @@ const PokemonTile = ({
   params,
   showCircles,
   setParams,
+  config,
 }) => {
   const markerRef = useRef({ [item.id]: null })
   const [done, setDone] = useState(false)
