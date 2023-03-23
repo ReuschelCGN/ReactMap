@@ -153,6 +153,7 @@ const PokemonTile = ({
             userSettings={userSettings}
             Icons={Icons}
             timeOfDay={timeOfDay}
+            config={config}
           />
         </Popup>
         {(showTimer || userSettings.pokemonTimers) && (
