@@ -414,8 +414,8 @@
         "__format": "number"
       },
       "distanceUnit": "MAP_MISC_DISTANCE_UNIT",
-      "enablePopupCords": {
-        "__name": "MAP_MISC_ENABLE_POPUP_CORDS",
+      "enablePopupCoords": {
+        "__name": "MAP_MISC_ENABLE_POPUP_COORDS",
         "__format": "boolean"
       }
     },
