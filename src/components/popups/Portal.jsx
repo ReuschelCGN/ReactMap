@@ -97,7 +97,7 @@ export default function PortalPopup({ portal, config, ts, Icons }) {
             <Map style={{ color: 'white' }} />
           </IconButton>
         </Grid>
-        {config.enablePopupCoords && (
+        {config.enablePortalPopupCoords && (
           <Grid item xs={12} style={{ textAlign: 'center' }}>
             <Typography variant="caption" style={{ textAlign: 'center' }}>
               🎯 {portal.lat}, {portal.lon}
