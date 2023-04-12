@@ -417,7 +417,23 @@
         "__name": "MAP_MISC_CLIENT_TIMEOUT_MINUTES",
         "__format": "number"
       },
-      "distanceUnit": "MAP_MISC_DISTANCE_UNIT"
+      "distanceUnit": "MAP_MISC_DISTANCE_UNIT",
+      "enablePokemonPopupCoords": {
+        "__name": "MAP_MISC_ENABLE_POKEMON_POPUP_COORDS",
+        "__format": "boolean"
+      },
+      "enableGymPopupCoords": {
+        "__name": "MAP_MISC_ENABLE_GYM_POPUP_COORDS",
+        "__format": "boolean"
+      },
+      "enablePokestopPopupCoords": {
+        "__name": "MAP_MISC_ENABLE_POKESTOP_POPUP_COORDS",
+        "__format": "boolean"
+      },
+      "enablePortalPopupCoords": {
+        "__name": "MAP_MISC_ENABLE_PORTAL_POPUP_COORDS",
+        "__format": "boolean"
+      }
     },
     "theme": {
       "style": "MAP_THEME_STYLE",
