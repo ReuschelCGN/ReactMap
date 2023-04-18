@@ -248,7 +248,8 @@
       "enablePokemonPopupCoords": false,
       "enableGymPopupCoords": false,
       "enablePokestopPopupCoords": false,
-      "enablePortalPopupCoords": false
+      "enablePortalPopupCoords": false,
+      "customFloatingIcons": []
     },
     "theme": {
       "style": "dark",

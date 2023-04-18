@@ -433,6 +433,10 @@
       "enablePortalPopupCoords": {
         "__name": "MAP_MISC_ENABLE_PORTAL_POPUP_COORDS",
         "__format": "boolean"
+      },
+      "customFloatingIcons": {
+        "__name": "MAP_MISC_CUSTOM_FLOATING_ICONS",
+        "__format": "json"
       }
     },
     "theme": {
