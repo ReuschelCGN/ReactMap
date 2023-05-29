@@ -585,6 +585,10 @@ const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
           </Fragment>
         ) : null,
       )}
+      {process.env.NODE_ENV === 'development' && (
+        <Grid item xs={12} style={{ paddingTop: 10 }}>
+          <Typography variant="subtitle1" align="center">
+            {pokemon.id}
       {config.enablePokemonPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Typography variant="caption" style={{ textAlign: 'center' }}>
