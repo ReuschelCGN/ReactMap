@@ -591,6 +591,7 @@ const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
             {pokemon.id}
           </Typography>
         </Grid>
+      )}
       {config.enablePokemonPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
           <Typography variant="caption" style={{ textAlign: 'center' }}>
