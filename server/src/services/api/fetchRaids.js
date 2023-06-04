@@ -5,7 +5,7 @@ const { log, HELPERS } = require('../logger')
 module.exports = async function fetchRaids() {
   try {
     const pogoInfoResults = await fetchJson(
-      'https://raw.githubusercontent.com/ccev/pogoinfo/v2/active/raids.json',
+      'https://raw.githubusercontent.com/ReuschelCGN/pogoinfo/v2/active/raids.json',
     )
     const raidsInfo = []
     Object.entries(pogoInfoResults).forEach((raidTier) => {
