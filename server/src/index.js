@@ -53,7 +53,11 @@ const apolloServer = new ApolloServer({
     if (e?.message.includes('skipUndefined()') || e?.message === 'old_client') {
       log.info(
         HELPERS.gql,
-        'Old client detected, forcing user to refresh, no need to report this error unless it continues to happen\nClient:',
+        'Old client detected, forcing user to refresh, no need to report this error unless it continues to happen',
+      )
+      log.info(
+        HELPERS.gql,
+        'Client:',
         e.extensions.clientV,
         'Server:',
         e.extensions.serverV,
@@ -86,6 +90,10 @@ const apolloServer = new ApolloServer({
     {
       async requestDidStart(requestContext) {
         requestContext.contextValue.startTime = Date.now()
+        const filterCount = Object.keys(
+          requestContext.request?.variables?.filters || {},
+        ).length
+
         return {
           async willSendResponse(context) {
             const { response, contextValue } = context
@@ -103,11 +111,15 @@ const apolloServer = new ApolloServer({
                 '|',
                 context.operationName,
                 '|',
+                'Returning:',
                 returned || 0,
                 '|',
                 `${Date.now() - contextValue.startTime}ms`,
                 '|',
                 contextValue.user || 'Not Logged In',
+                '|',
+                'Filters:',
+                filterCount || 0,
               )
 
               const { transaction } = contextValue
