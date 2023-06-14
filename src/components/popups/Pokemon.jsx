@@ -2,7 +2,6 @@ import React, { Fragment, useCallback, useState, useEffect } from 'react'
 import Check from '@material-ui/icons/Check'
 import Clear from '@material-ui/icons/Clear'
 import ExpandMore from '@material-ui/icons/ExpandMore'
-import Map from '@material-ui/icons/Map'
 import MoreVert from '@material-ui/icons/MoreVert'
 import {
   Grid,
@@ -26,6 +25,8 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import GenericTimer from './common/Timer'
 import NameTT from './common/NameTT'
 import GenderIcon from './common/GenderIcon'
+import Navigation from './common/Navigation'
+import Coords from './common/Coords'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -453,13 +454,6 @@ const Timer = ({ pokemon, hasStats, t }) => {
 }
 
 const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
-  const { navigation } = useStore((state) => state.settings)
-  const {
-    navigation: {
-      [navigation]: { url },
-    },
-  } = useStatic((state) => state.config)
-
   const { lat, lon } = pokemon
 
   const handleExpandClick = (category) => {
@@ -491,16 +485,7 @@ const Footer = ({ pokemon, popups, setPopups, hasPvp, classes, Icons }) => {
         </Grid>
       )}
       <Grid item xs={4} style={{ textAlign: 'center' }}>
-        <IconButton>
-          <a
-            href={url.replace('{x}', lat).replace('{y}', lon)}
-            target="_blank"
-            rel="noreferrer"
-            style={{ color: 'white' }}
-          >
-            <Map />
-          </a>
-        </IconButton>
+        <Navigation lat={lat} lon={lon} />
       </Grid>
       <Grid item xs={4}>
         <IconButton
@@ -594,9 +579,7 @@ const ExtraInfo = ({ pokemon, perms, config, t, Icons }) => {
       )}
       {config.enablePokemonPopupCoords && (
         <Grid item xs={12} style={{ textAlign: 'center' }}>
-          <Typography variant="caption" style={{ textAlign: 'center' }}>
-            🎯 {pokemon.lat.toFixed(6)}, {pokemon.lon.toFixed(6)}
-          </Typography>
+          <Coords lat={pokemon.lat.toFixed(6)} lon={pokemon.lon.toFixed(6)} />
         </Grid>
       )}
     </Grid>
