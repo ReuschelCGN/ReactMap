@@ -27,7 +27,9 @@ module.exports = function clientOptions(perms) {
       showArBadge: { type: 'bool', perm: ['gyms'] },
       raidLevelBadges: { type: 'bool', perm: ['raids'] },
       gymBadgeDiamonds: { type: 'bool', perm: ['gymBadges'] },
-      enableGymPopupCoords: { type: 'bool', perm: ['gyms'] },
+      if (enableGymPopupCoords) {
+        enableGymPopupCoords: { type: 'bool', perm: ['gyms'] },
+      }
     },
     pokestops: {
       clustering: { type: 'bool', perm: ['pokestops', 'quests', 'invasions'] },
@@ -44,7 +46,9 @@ module.exports = function clientOptions(perms) {
       },
       hasQuestIndicator: { type: 'bool', perm: ['quests'] },
       showArBadge: { type: 'bool', perm: ['pokestops'] },
-      enablePokestopPopupCoords: { type: 'bool', perm: ['pokestops'] },
+      if (enablePokestopPopupCoords) {
+        enablePokestopPopupCoords: { type: 'bool', perm: ['pokestops'] },
+      }
     },
     pokemon: {
       clustering: { type: 'bool', perm: ['pokemon'] },
@@ -58,7 +62,9 @@ module.exports = function clientOptions(perms) {
       pvpMega: { type: 'bool', perm: ['pvp'] },
       showAllPvpRanks: { type: 'bool', perm: ['pvp'] },
       showSizeIndicator: { type: 'bool', perm: ['pokemon'] },
-      enablePokemonPopupCoords: { type: 'bool', perm: ['pokemon'] },
+      if (enablePokemonPopupCoords) {
+        enablePokemonPopupCoords: { type: 'bool', perm: ['pokemon'] },
+      }
     },
     wayfarer: {
       clustering: { type: 'bool', perm: ['portals'] },
@@ -71,7 +77,9 @@ module.exports = function clientOptions(perms) {
       darkMapBorder: { type: 'color', perm: ['submissionCells'] },
       cellBlocked: { type: 'color', perm: ['submissionCells'] },
       poiColor: { type: 'color', perm: ['submissionCells'] },
-      enablePortalPopupCoords: { type: 'bool', perm: ['portals'] },
+      if (enablePortalPopupCoords) {
+        enablePortalPopupCoords: { type: 'bool', perm: ['portals'] },
+      }
     },
     s2cells: {
       lightMapBorder: { type: 'color', perm: ['s2cells'] },
