@@ -289,7 +289,11 @@ const PoiImage = ({ gym, Icons }) => {
       <img
         src={src}
         alt={name || 'unknown'}
-        className={`circle-image team-${team_id}`}
+        className={`${
+          gym.badge
+            ? `badge badge-${gym.badge}`
+            : `circle-image team-${team_id}`
+        }`}
         style={{
           maxHeight: 75,
           maxWidth: 75,
@@ -382,6 +386,7 @@ const GymInfo = ({ gym, t, Icons }) => {
     ex_raid_eligible,
     ar_scan_eligible,
     updated,
+    badge,
   } = gym
   const { gymValidDataLimit } = useStatic((state) => state.config)
 
@@ -394,6 +399,13 @@ const GymInfo = ({ gym, t, Icons }) => {
       justifyContent="space-around"
       alignItems="center"
     >
+      {!!badge && (
+        <Grid item xs={12}>
+          <Typography variant="h6" align="center">
+            {t(`badge_${badge}`)}
+          </Typography>
+        </Grid>
+      )}
       {updated > gymValidDataLimit && (
           <Grid item xs={12}>
             <Typography variant="h6" align="center">
@@ -402,7 +414,7 @@ const GymInfo = ({ gym, t, Icons }) => {
           </Grid>
         ) && (
           <Grid item xs={12}>
-            <Typography variant="subtitle1" align="center">
+            <Typography variant="h6" align="center">
               {available_slots} {t('slots')}
             </Typography>
           </Grid>
@@ -410,25 +422,38 @@ const GymInfo = ({ gym, t, Icons }) => {
       {ex_raid_eligible && (
         <Grid
           item
-          xs={6}
+          xs={4}
           className="grid-item"
           style={{
             height: 24,
             backgroundImage: `url(${Icons.getMisc('ex')})`,
+            backgroundSize: 'contain',
           }}
         />
       )}
       {ar_scan_eligible && (
         <Grid
           item
-          xs={6}
+          xs={4}
           className="grid-item"
           style={{
             height: 24,
             backgroundImage: `url(${Icons.getMisc('ar')})`,
+            backgroundSize: 'contain',
           }}
         />
       )}
+      <Grid
+        item
+        xs={4}
+        style={{
+          background: `url(${Icons.getTeams(team_id)})`,
+          height: 24,
+          backgroundSize: 'contain',
+          backgroundRepeat: 'no-repeat',
+          backgroundPosition: 'center',
+        }}
+      />
     </Grid>
   )
 }
@@ -439,9 +464,9 @@ const RaidInfo = ({ gym, t, Icons }) => {
     raid_level,
     raid_pokemon_id,
     raid_pokemon_form,
+    raid_pokemon_costume,
     raid_pokemon_move_1,
     raid_pokemon_move_2,
-    raid_pokemon_evolution,
   } = gym
 
   if (!raid_pokemon_id) {
@@ -455,9 +480,9 @@ const RaidInfo = ({ gym, t, Icons }) => {
     return `${t('tier')} ${raidLevel}`
   }
 
-  const getRaidForm = (id, form, evo) => {
-    if (evo) {
-      return t('mega')
+  const getRaidForm = (id, form, costume) => {
+    if (costume) {
+      return t(`costume_${costume}`, 'Unknown Costume')
     }
     if (form) {
       const raidForm = pokemon[id].forms[form].name
@@ -481,13 +506,15 @@ const RaidInfo = ({ gym, t, Icons }) => {
           {getRaidName(raid_level, raid_pokemon_id)}
         </Typography>
       </Grid>
-      <Grid item xs={12}>
-        <Typography variant="subtitle2" align="center">
+      <Grid item xs={12} style={{ paddingBottom: 4, textAlign: 'center' }}>
+        <Typography variant="caption" align="center">
+          (
           {getRaidForm(
             raid_pokemon_id,
             raid_pokemon_form,
-            raid_pokemon_evolution,
+            raid_pokemon_costume,
           )}
+          )
         </Typography>
       </Grid>
       {raid_pokemon_move_1 && raid_pokemon_move_1 !== 1 && (
