@@ -82,7 +82,8 @@ module.exports = class DbCheck {
           log: {
             warn: (message) => log.warn(HELPERS.knex, message),
             error: (message) => log.error(HELPERS.knex, message),
-            debug: (message) => log.debug(HELPERS.knex, message),
+            debug: (message) =>
+              log[queryDebug ? 'info' : 'debug'](HELPERS.knex, message),
             enableColors: true,
           },
         })
@@ -334,7 +335,7 @@ module.exports = class DbCheck {
       log.error(
         HELPERS.db,
         e,
-        `| Only ${[this.validModels].join(
+        `\n\nOnly ${[this.validModels].join(
           ', ',
         )} are valid options in the useFor arrays`,
       )
