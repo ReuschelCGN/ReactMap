@@ -1,6 +1,11 @@
 process.title = 'ReactMap'
 process.env.FORCE_COLOR = 3
 
+if (!process.env.NODE_CONFIG_DIR) {
+  process.env.NODE_CONFIG_DIR = `${__dirname}/configs`
+  process.env.ALLOW_CONFIG_MUTATIONS = 'true'
+}
+
 require('dotenv').config()
 const path = require('path')
 const express = require('express')
@@ -383,6 +388,7 @@ connection.migrate.latest().then(async () => {
   await Db.getDbContext()
   await Promise.all([
     Db.historicalRarity(),
+    Db.getFilterContext(),
     Event.setAvailable('gyms', 'Gym', Db),
     Event.setAvailable('pokestops', 'Pokestop', Db),
     Event.setAvailable('pokemon', 'Pokemon', Db),
