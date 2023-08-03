@@ -48,8 +48,8 @@ const RouteTile = ({ item, Icons }) => {
 
   const [color, darkened] = React.useMemo(
     () => [
-      darken(`#${item.image_border_color}`, 0.4),
-      darken(`#${item.image_border_color}`, 0.56),
+      darken(`#${item.image_border_color}`, 0.5),
+      darken(`#${item.image_border_color}`, 0.65),
     ],
     [item.image_border_color],
   )
