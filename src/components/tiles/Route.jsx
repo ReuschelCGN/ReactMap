@@ -11,7 +11,7 @@ import routeMarker from '../markers/route'
 
 const POSITIONS = /** @type {const} */ (['start', 'end'])
 
-const OPACITY = 0.66
+const OPACITY = 0.72
 
 /**
  *
