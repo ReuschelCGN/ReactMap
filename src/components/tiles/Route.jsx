@@ -11,7 +11,7 @@ import routeMarker from '../markers/route'
 
 const POSITIONS = /** @type {const} */ (['start', 'end'])
 
-const OPACITY = 0.66
+const OPACITY = 0.72
 
 /**
  *
@@ -48,8 +48,8 @@ const RouteTile = ({ item, Icons }) => {
 
   const [color, darkened] = React.useMemo(
     () => [
-      `#${item.image_border_color}`,
-      darken(`#${item.image_border_color}`, 0.2),
+      darken(`#${item.image_border_color}`, 0.5),
+      darken(`#${item.image_border_color}`, 0.65),
     ],
     [item.image_border_color],
   )
