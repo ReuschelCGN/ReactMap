@@ -642,5 +642,9 @@
   "description": "Beschreibung",
   "additional_info": "zusätzliche Infos",
   "duration": "Dauer",
-  "elevation": "Höhenunterschied"
+  "elevation": "Höhenunterschied",
+  "tth": "TTH",
+  "tth_0": "alle",
+  "tth_1": "bekannt",
+  "tth_2": "unbekannt"
 }
