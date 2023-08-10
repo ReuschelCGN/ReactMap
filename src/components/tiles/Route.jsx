@@ -4,14 +4,14 @@ import * as React from 'react'
 import { Marker, Polyline, useMapEvents } from 'react-leaflet'
 import { darken } from '@mui/material'
 
-import ErrorBoundary from '@components/ErrorBoundary'
 import RoutePopup from '@components/popups/Route'
 
 import routeMarker from '../markers/route'
 
 const POSITIONS = /** @type {const} */ (['start', 'end'])
 
-const OPACITY = 0.66
+const LINE_OPACITY = 0.33
+const MARKER_OPACITY = LINE_OPACITY * 2
 
 /**
  *
@@ -61,13 +61,6 @@ const RouteTile = ({ item, Icons }) => {
         setHover('')
       }
     },
-    /** @param {{ target: import('leaflet').Map }} args */
-    zoom: ({ target }) => {
-      const pane = target.getPane('routes')
-      if (pane) {
-        pane.hidden = target.getZoom() < 13
-      }
-    },
   })
 
   return (
@@ -75,7 +68,7 @@ const RouteTile = ({ item, Icons }) => {
       {POSITIONS.map((position) => (
         <Marker
           key={position}
-          opacity={hover || clicked ? 1 : OPACITY}
+          opacity={hover || clicked ? 1 : MARKER_OPACITY}
           zIndexOffset={hover === position ? 2000 : hover || clicked ? 1000 : 0}
           position={[item[`${position}_lat`], item[`${position}_lon`]]}
           icon={routeMarker(Icons.getMisc(`route-${position}`), position)}
@@ -90,7 +83,7 @@ const RouteTile = ({ item, Icons }) => {
             },
             mouseout: () => {
               if (lineRef.current && !clicked) {
-                lineRef.current.setStyle({ color, opacity: OPACITY })
+                lineRef.current.setStyle({ color, opacity: MARKER_OPACITY })
               }
               setHover('')
             },
@@ -103,37 +96,35 @@ const RouteTile = ({ item, Icons }) => {
           />
         </Marker>
       ))}
-      <ErrorBoundary>
-        <Polyline
-          ref={lineRef}
-          pane="routes"
-          eventHandlers={{
-            click: ({ originalEvent }) => {
-              originalEvent.preventDefault()
-              setClicked((prev) => !prev)
-            },
-            mouseover: ({ target }) => {
-              if (target && !clicked) {
-                target.setStyle({ color: darkened, opacity: 1 })
-              }
-            },
-            mouseout: ({ target }) => {
-              if (target && !clicked) {
-                target.setStyle({ color, opacity: OPACITY })
-              }
-            },
-          }}
-          dashArray={item.reversible ? undefined : '5, 5'}
-          positions={waypoints.map((waypoint) => [
-            waypoint.lat_degrees,
-            waypoint.lng_degrees,
-          ])}
-          pathOptions={{
-            color: clicked || hover ? darkened : color,
-            opacity: clicked || hover ? 1 : OPACITY,
-          }}
-        />
-      </ErrorBoundary>
+      <Polyline
+        ref={lineRef}
+        eventHandlers={{
+          click: ({ originalEvent }) => {
+            originalEvent.preventDefault()
+            setClicked((prev) => !prev)
+          },
+          mouseover: ({ target }) => {
+            if (target && !clicked) {
+              target.setStyle({ color: darkened, opacity: 1 })
+            }
+          },
+          mouseout: ({ target }) => {
+            if (target && !clicked) {
+              target.setStyle({ color, opacity: LINE_OPACITY })
+            }
+          },
+        }}
+        dashArray={item.reversible ? undefined : '5, 5'}
+        positions={waypoints.map((waypoint) => [
+          waypoint.lat_degrees,
+          waypoint.lng_degrees,
+        ])}
+        pathOptions={{
+          color: clicked || hover ? darkened : color,
+          opacity: clicked || hover ? 1 : LINE_OPACITY,
+          weight: 4,
+        }}
+      />
     </>
   )
 }
