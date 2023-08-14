@@ -1,4 +1,4 @@
-name: Config
+name: Locales
 on:
   push:
     branches:
@@ -18,9 +18,14 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
+      - name: Install dependencies
+        run: |
+          yarn
       - name: Run generating script
         run: |
           yarn generate-locales
+        env:
+          OPENAI_API_KEY: ${{secrets.OPENAI_API_KEY}}
       - name: Configure git
         run: |
           git config --global user.name "turtlesocks-bot"
@@ -36,5 +41,5 @@ jobs:
         if: ${{ env.changes_exist == 'true' }}
         run: |
           git add --all
-          git commit --message "Sync CI/CD Config Items"
+          git commit --message "sync locales"
           git push
