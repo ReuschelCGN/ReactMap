@@ -16,6 +16,5 @@ COPY yarn.lock .
 RUN apk add git
 RUN npm install -g yarn
 COPY . .
-RUN git config --global --add safe.directory /home/node
 RUN yarn install --ignore-optional
 RUN yarn build
