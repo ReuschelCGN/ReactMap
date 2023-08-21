@@ -766,10 +766,8 @@ const Invasion = ({ invasion, Icons, t }) => {
         </Typography>
       </Grid>
       <Grid item xs={3} style={{ alignItems: 'center', display: 'flex' }}>
-        {invasion.confirmed ? (
+        {invasion.confirmed && (
           <Check fontSize="medium" color="success" />
-        ) : (
-          <Help fontSize="medium" />
         )}
       </Grid>
       <Grid item xs={12}>
