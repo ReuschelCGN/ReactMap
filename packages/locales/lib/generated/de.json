@@ -652,5 +652,7 @@
   "total_entries": "Gesamteinträge",
   "showcase_rankings": "Showcase-Ranking",
   "showcase_rankings_subtitle": "Zeigt die Top-Rankingliste für einen Showcase an einem Pokestop an.",
-  "no_access": "Kein Zugriff"
+  "no_access": "Kein Zugriff".
+  "admin": "Admin",
+  "admin_subtitle": "codebasierter WYSIWYG-Editor für benutzerdefinierten Komponenten" 
 }
