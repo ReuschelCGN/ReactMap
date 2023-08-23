@@ -6,6 +6,7 @@ on:
       - develop
       - developmod
       - developmod2
+      - dm-playground
 
 env:
   REGISTRY: ghcr.io
