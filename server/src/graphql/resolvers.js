@@ -581,6 +581,10 @@ const resolvers = {
       }
       return {}
     },
+    validateUser: (_, __, { user, perms }) => ({
+      loggedIn: !!user,
+      admin: perms?.admin,
+    }),
   },
   Mutation: {
     createBackup: async (_, args, { req, perms, Db }) => {
