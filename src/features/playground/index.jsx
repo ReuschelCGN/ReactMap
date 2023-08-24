@@ -1,4 +1,5 @@
 /* eslint-disable react/no-array-index-key */
+// @ts-check
 import * as React from 'react'
 import Grid2 from '@mui/material/Unstable_Grid2'
 import Box from '@mui/material/Box'
@@ -7,7 +8,7 @@ import { useQuery } from '@apollo/client'
 import { VALIDATE_USER } from '@services/queries/config'
 
 import { CodeWrapper } from './components/Editor'
-import { Toolbar } from './components/Toolbar'
+import { MuiToolbar } from './components/Toolbar'
 import { Viewer } from './components/Viewer'
 
 export default function Playground() {
@@ -24,7 +25,7 @@ export default function Playground() {
 
   return (
     <Box height="100vh">
-      <Toolbar />
+      <MuiToolbar />
       <Grid2 container>
         <CodeWrapper />
         <Viewer />

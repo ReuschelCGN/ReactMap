@@ -1,3 +1,4 @@
+// @ts-check
 import * as React from 'react'
 import { useTheme } from '@mui/material/styles'
 import Grid2 from '@mui/material/Unstable_Grid2'
@@ -29,9 +30,9 @@ export function CodeEditor() {
       theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs-light'}
       defaultLanguage="json"
       value={code}
-      height="100%"
-      width="100%"
       onChange={setCode}
     />
   )
 }
+
+export const MemoizedCodeWrapper = React.memo(CodeWrapper)
