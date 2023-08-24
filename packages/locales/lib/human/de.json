@@ -666,6 +666,6 @@
   "download": "download",
   "playground": "Playground",
   "locale": "lokal",
-  "admin": "Admin",
+  "admin": "WYSIWYG-Editor",
   "admin_subtitle": "codebasierter WYSIWYG-Editor für benutzerdefinierten Komponenten"
 }
