@@ -521,7 +521,6 @@
         "parentAlignItems": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_PARENT_ALIGN_ITEMS",
         "parentJustifyContent": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_PARENT_JUSTIFY_CONTENT",
         "parentStyle": {},
-        "parentSx": {},
         "permanent": {
           "__name": "MAP_MESSAGE_OF_THE_DAY_SETTINGS_PERMANENT",
           "__format": "boolean"
@@ -569,8 +568,7 @@
         },
         "parentAlignItems": "MAP_DONATION_PAGE_SETTINGS_PARENT_ALIGN_ITEMS",
         "parentJustifyContent": "MAP_DONATION_PAGE_SETTINGS_PARENT_JUSTIFY_CONTENT",
-        "parentStyle": {},
-        "parentSx": {}
+        "parentStyle": {}
       },
       "titles": {
         "__name": "MAP_DONATION_PAGE_TITLES",
@@ -593,8 +591,7 @@
         },
         "parentAlignItems": "MAP_LOGIN_PAGE_SETTINGS_PARENT_ALIGN_ITEMS",
         "parentJustifyContent": "MAP_LOGIN_PAGE_SETTINGS_PARENT_JUSTIFY_CONTENT",
-        "parentStyle": {},
-        "parentSx": {}
+        "parentStyle": {}
       },
       "components": {
         "__name": "MAP_LOGIN_PAGE_COMPONENTS",
