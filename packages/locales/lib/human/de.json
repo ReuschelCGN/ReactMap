@@ -660,6 +660,7 @@
   "theme": "Theme",
   "exit": "verlassen",
   "hide_editor": "Editor ausblenden",
+  "show_editor": "Editor anzeigen",
   "component": "Elemente",
   "component_login_page": "Login Seite",
   "component_donation_page": "Spenden Seite",
