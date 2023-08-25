@@ -659,6 +659,7 @@
   "menu": "Menü",
   "theme": "Theme",
   "exit": "verlassen",
+  "hide_editor": "Editor ausblenden",
   "component": "Elemente",
   "component_login_page": "Login Seite",
   "component_donation_page": "Spenden Seite",
