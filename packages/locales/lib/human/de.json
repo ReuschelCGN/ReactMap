@@ -669,5 +669,6 @@
   "playground": "Playground",
   "locale": "Sprachen",
   "admin_subtitle": "codebasierter WYSIWYG-Editor für benutzerdefinierten Komponenten",
-  "dark_mode": "Dunkelmodus"
+  "dark_mode": "Dunkelmodus",
+  "gold_coins": "Goldstops"
 }
