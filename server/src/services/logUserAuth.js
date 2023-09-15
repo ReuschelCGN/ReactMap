@@ -209,9 +209,9 @@ async function getAuthInfo(req, user, hidePii, strategy = 'custom') {
     )
   }
   if (hidePii) {
-    embed.fields = embed.fields.filter(
-      (field) => !PII_FIELDS.includes(field.name),
-    )
+    embed.fields = embed.fields.filter(field => {
+      return !PII_FIELDS.includes(field.name)
+    });
   }
   return embed
 }
