@@ -7,7 +7,7 @@ on:
       - main
       - develop
       - developmod
-      - developmod2
+      - developmod3
 
 permissions: write-all
 
