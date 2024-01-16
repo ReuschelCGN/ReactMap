@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - developmod
+      - developmod3
 
 env:
   REGISTRY: ghcr.io
