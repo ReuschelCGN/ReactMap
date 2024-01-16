@@ -692,5 +692,7 @@
   "audio_always_on": "Audio immer abspielen",
   "volume_level": "Lautstärkepegel",
   "notifications_status": "Benachrichtigungsstatus",
-  "granted": "genehmigt"
+  "granted": "genehmigt",
+  "searching": "suche...",
+  "no_options": "Keine Treffer..."
 }
