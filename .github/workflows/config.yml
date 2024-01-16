@@ -5,7 +5,7 @@ on:
       - main
       - develop
       - developmod
-      - developmod2
+      - developmod3
 
 env:
   REGISTRY: ghcr.io
