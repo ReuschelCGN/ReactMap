@@ -1,3 +1,29 @@
+# [1.29.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.7...v1.29.0-develop.8) (2024-01-17)
+
+
+### Bug Fixes
+
+* mega energy icons by id ([ced7d7c](https://github.com/WatWowMap/ReactMap/commit/ced7d7c51401c96e2264e7028f83abe59f2c7fd7))
+
+# [1.29.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.6...v1.29.0-develop.7) (2024-01-17)
+
+
+### Performance Improvements
+
+* improve pokestop querying perf by 10x ([f696b67](https://github.com/WatWowMap/ReactMap/commit/f696b6722436bd3145b59766f3f81a08dd6151e7))
+
+# [1.29.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.5...v1.29.0-develop.6) (2024-01-17)
+
+
+### Bug Fixes
+
+* remove old eslint heading ([768affc](https://github.com/WatWowMap/ReactMap/commit/768affc24ac06edaffdd109ce39042dfc46a732e))
+
+
+### Features
+
+* rework how often available is updated ([ed35dcd](https://github.com/WatWowMap/ReactMap/commit/ed35dcdf325becfdf408b70dfc968137c82ada36))
+
 # [1.29.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.4...v1.29.0-develop.5) (2024-01-16)
 
 
