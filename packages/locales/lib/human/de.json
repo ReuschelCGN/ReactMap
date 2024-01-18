@@ -29,7 +29,7 @@
   "min": "Min",
   "max": "Max",
   "set_size": "Symbolgröße einstellen",
-  "slot_selection": "Slot Auswahl",
+  "slot_selection": "Platz Auswahl",
   "generations": "Generation",
   "types": "Type",
   "forms": "Form",
@@ -676,7 +676,7 @@
   "notifications_status": "Benachrichtigungsstatus",
   "granted": "gewährt",
   "set_all": "alle wählen",
-  "set_filtered": "gefilterte setzen",
+  "set_filtered": "gefilterte wählen",
   "only_show_available": "nur verfügbare anzeigen",
   "easy_mode": "Easy Mode",
   "quick_select": "Globale Schnellauswahl",
@@ -684,7 +684,7 @@
   "basic": "Einfach",
   "intermediate": "Fortgeschritten",
   "expert": "Experte",
-  "basic_description": "Wähle einfach Pokémon aus und wenden einen globalen Filter an",
+  "basic_description": "Wähle einfach Pokémon aus und wende einen globalen Filter an",
   "intermediate_description": "Lege individuelle Filter global und pro Pokémon fest (traditionell)",
   "expert_description": "Manuelle Eingabeabfragen für größtmögliche Anpassungsfähigkeit",
   "icon_size": "Icon Größe",
@@ -693,5 +693,7 @@
   "search_rocket_pokemon": "Crypto Pokémon suchen",
   "main": "Haupt",
   "extra": "Extra",
-  "select": "Auswählen"
+  "select": "Auswählen",
+  "searching": "suche...",
+  "no_options": "Keine Treffer..."
 }
