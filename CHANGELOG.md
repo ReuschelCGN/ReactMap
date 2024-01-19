@@ -1,3 +1,17 @@
+# [1.29.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.9...v1.29.0-develop.10) (2024-01-18)
+
+
+### Bug Fixes
+
+* remove `excludeList` - no longer needed ([bc3adba](https://github.com/WatWowMap/ReactMap/commit/bc3adbafd16fd01000cbd2a6779244a2725615e2))
+
+# [1.29.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.8...v1.29.0-develop.9) (2024-01-17)
+
+
+### Bug Fixes
+
+* gym badge fixes ([1cadea0](https://github.com/WatWowMap/ReactMap/commit/1cadea0e4c4bfa3894ffd2629ef09c7ba2e2ed79))
+
 # [1.29.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.29.0-develop.7...v1.29.0-develop.8) (2024-01-17)
 
 
