@@ -415,14 +415,6 @@
         "__name": "MAP_MISC_ENABLE_USER_PROFILE",
         "__format": "boolean"
       },
-      "enableQuestSetSelector": {
-        "__name": "MAP_MISC_ENABLE_QUEST_SET_SELECTOR",
-        "__format": "boolean"
-      },
-      "enableConfirmedInvasions": {
-        "__name": "MAP_MISC_ENABLE_CONFIRMED_INVASIONS",
-        "__format": "boolean"
-      },
       "noScanAreaOverlay": {
         "__name": "MAP_MISC_NO_SCAN_AREA_OVERLAY",
         "__format": "boolean"
@@ -1249,6 +1241,10 @@
       },
       "sendDiscordMessage": {
         "__name": "SCANNER_BACKEND_CONFIG_SEND_DISCORD_MESSAGE",
+        "__format": "boolean"
+      },
+      "sendTelegramMessage": {
+        "__name": "SCANNER_BACKEND_CONFIG_SEND_TELEGRAM_MESSAGE",
         "__format": "boolean"
       }
     },
