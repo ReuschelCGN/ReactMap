@@ -207,6 +207,7 @@ class Pokestop extends Model {
       const general = []
       const rocketPokemon = []
       const displayTypes = []
+      let hasShowcase = false
       // preps arrays for interested objects
       Object.keys(args.filters).forEach((pokestop) => {
         switch (pokestop.charAt(0)) {
@@ -214,7 +215,7 @@ class Pokestop extends Model {
             break
           case 'f':
           case 'h':
-            // do nothing
+            hasShowcase = true
             break
           case 'd':
             stardust.push(pokestop.slice(1).split('-')[0])
@@ -254,6 +255,7 @@ class Pokestop extends Model {
             break
         }
       })
+      if (hasShowcase && !displayTypes.includes('9')) displayTypes.push('9')
 
       // builds the query
       query.andWhere((stops) => {
@@ -705,8 +707,8 @@ class Pokestop extends Model {
           .filter((event) =>
             isMad && !hasMultiInvasions
               ? MADE_UP_MAD_INVASIONS.includes(event.grunt_type) ||
-                (!event.grunt_type && filters[`b${event.display_type}`])
-              : !event.grunt_type && filters[`b${event.display_type}`],
+                !event.grunt_type
+              : !event.grunt_type,
           )
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
@@ -739,7 +741,7 @@ class Pokestop extends Model {
                 ]
               : event.showcase_pokemon_type_id
               ? filters[`h${event.showcase_pokemon_type_id}`]
-              : true,
+              : filters[`b${event.display_type}`],
           )
       }
       if (
@@ -1320,7 +1322,6 @@ class Pokestop extends Model {
             '>=',
             ts * (multiInvasionMs ? 1000 : 1),
           )
-          .andWhereNot('incident.display_type', 9)
           .groupBy('incident.character', 'incident.display_type')
           .orderBy('incident.character', 'incident.display_type')
       }
@@ -1335,7 +1336,6 @@ class Pokestop extends Model {
         .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
         .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
         .andWhere('incident_expire_timestamp', '>=', ts)
-        .andWhereNot('incident.display_type', 9)
         .orderBy('grunt_type')
     }
     if (isMad && !hasMultiInvasions) {

@@ -595,13 +595,14 @@
   },
   "scanner": {
     "backendConfig": {
-      "platform": "rdm/mad",
+      "platform": "rdm/mad/custom",
       "apiEndpoint": "http://ip:port/api/",
       "headers": [],
       "apiUsername": "username",
       "apiPassword": "password",
       "queueRefreshInterval": 5,
-      "sendDiscordMessage": true
+      "sendDiscordMessage": true,
+      "sendTelegramMessage": true
     },
     "scanNext": {
       "enabled": false,
@@ -681,6 +682,10 @@
       {
         "name": "telegram",
         "type": "telegram",
+        "logGroupId": "",
+        "scanNextLogGroupId": "",
+        "scanZoneLogGroupId": "",
+        "eventLogGroupId": "",
         "enabled": false,
         "botToken": "",
         "groups": [],
@@ -878,7 +883,7 @@
   "navigation": [
     {
       "name": "Google Maps",
-      "url": "https://www.google.com/maps/place/{x},{y}"
+      "url": "https://maps.google.com/maps/place/{x},{y}"
     },
     {
       "name": "Apple Maps",
