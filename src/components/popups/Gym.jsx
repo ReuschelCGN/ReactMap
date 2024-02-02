@@ -287,7 +287,7 @@ const DropdownOptions = ({
     })
   }
 
-  return options.map((option) => (
+  return options.filter(Boolean).map((option) => (
     <MenuItem key={option.key || option.name} onClick={option.action} dense>
       {typeof option.name === 'string' ? t(option.name) : option.name}
     </MenuItem>
@@ -368,7 +368,9 @@ const RaidImage = ({
         />
       </Grid>
       <Grid item xs={12} style={{ textAlign: 'center' }}>
-        <Typography variant="caption">{t(`raid_${raid_level}`)}</Typography>
+        <Typography variant="caption">
+          {t(`raid_${raid_level}`)} ({raid_level})
+        </Typography>
       </Grid>
       {raid_pokemon_id > 0 &&
         getRaidTypes(raid_pokemon_id, raid_pokemon_form).map((type) => (
@@ -506,8 +508,8 @@ const RaidInfo = ({
       return t(`costume_${costume}`, 'Unknown Costume')
     }
     if (form) {
-      const raidForm = pokemon[id].forms[form].name
-      if (raidForm === 'Normal') {
+      const raidForm = pokemon[id].forms[form]?.name
+      if (raidForm === 'Normal' || !raidForm) {
         return ''
       }
       return `${raidForm} ${t('form')}`

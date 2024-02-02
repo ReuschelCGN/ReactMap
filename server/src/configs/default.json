@@ -244,7 +244,8 @@
       "enablePokestopPopupCoordsSelector": false,
       "enablePortalPopupCoordsSelector": false,
       "customFloatingIcons": [],
-      "expandAllScanAreas": false
+      "expandAllScanAreas": false,
+      "enableRouteDownload": false
     },
     "theme": {
       "style": "dark",
@@ -411,6 +412,8 @@
       "darkMapBorder": "#ff0000",
       "cellBlocked": "#000000",
       "poiColor": "#03ffff",
+      "showcaseColor": "#D365F5",
+      "partnerColor": "#F60042",
       "enablePortalPopupCoords": false
     },
     "s2cells": {
@@ -425,6 +428,14 @@
       "clickableIcon": false,
       "darkMapBorder": "#ff0000",
       "lightMapBorder": "#246377"
+    },
+    "notifications": {
+      "enabled": false,
+      "audio": false,
+      "audioAlwaysOn": false,
+      "volumeLevel": 50,
+      "pokemon": false,
+      "raids": false
     }
   },
   "defaultFilters": {
@@ -467,6 +478,7 @@
       "lures": true,
       "quests": true,
       "eventStops": false,
+      "showcasePokemon": true,
       "questSet": "both",
       "confirmed": false,
       "items": true,
@@ -553,7 +565,8 @@
       "enabled": false,
       "rings": true,
       "s17Cells": true,
-      "s14Cells": true
+      "s14Cells": true,
+      "includeSponsored": true
     },
     "s2cells": {
       "enabled": false,
@@ -875,6 +888,10 @@
     {
       "name": "Intel",
       "url": "https://intel.ingress.com/intel?pll={x},{y}"
+    },
+    {
+      "name": "GeoURI",
+      "url": "geo:{x},{y}"
     }
   ],
   "icons": {
@@ -939,6 +956,17 @@
         "xl": 3
       }
     }
+  },
+  "audio": {
+    "cacheHrs": 1,
+    "defaultAudio": {},
+    "customizable": [],
+    "styles": [
+      {
+        "name": "Default",
+        "path": "https://raw.githubusercontent.com/WatWowMap/wwm-uaudio/main"
+      }
+    ]
   },
   "rarity": {
     "percents": {

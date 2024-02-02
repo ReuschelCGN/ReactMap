@@ -82,6 +82,8 @@ function clientOptions(perms) {
       darkMapBorder: { type: 'color', perm: ['submissionCells'] },
       cellBlocked: { type: 'color', perm: ['submissionCells'] },
       poiColor: { type: 'color', perm: ['submissionCells'] },
+      partnerColor: { type: 'color', perm: ['submissionCells'] },
+      showcaseColor: { type: 'color', perm: ['submissionCells'] },
     },
     s2cells: {
       lightMapBorder: { type: 'color', perm: ['s2cells'] },
@@ -95,6 +97,60 @@ function clientOptions(perms) {
       clickableIcon: { type: 'bool', perm: ['weather'] },
       lightMapBorder: { type: 'color', perm: ['weather'] },
       darkMapBorder: { type: 'color', perm: ['weather'] },
+    },
+    notifications: {
+      enabled: {
+        type: 'bool',
+        perm: [
+          'pokemon',
+          'raids',
+          'invasions',
+          'quests',
+          'eventStops',
+          'lures',
+        ],
+      },
+      audio: {
+        type: 'bool',
+        perm: [
+          'pokemon',
+          'raids',
+          'invasions',
+          'quests',
+          'eventStops',
+          'lures',
+        ],
+      },
+      audioAlwaysOn: {
+        type: 'bool',
+        perm: [
+          'pokemon',
+          'raids',
+          'invasions',
+          'quests',
+          'eventStops',
+          'lures',
+        ],
+      },
+      volumeLevel: {
+        type: 'number',
+        perm: [
+          'pokemon',
+          'raids',
+          'invasions',
+          'quests',
+          'eventStops',
+          'lures',
+        ],
+        min: 0,
+        max: 100,
+      },
+      pokemon: { type: 'bool', perm: ['pokemon'] },
+      raids: { type: 'bool', perm: ['raids'] },
+      // invasions: { type: 'bool', perm: ['invasions'] },
+      // quests: { type: 'bool', perm: ['quests'] },
+      // eventStops: { type: 'bool', perm: ['eventStops'] },
+      // lures: { type: 'bool', perm: ['lures'] },
     },
   }
 

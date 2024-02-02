@@ -1,6 +1,6 @@
 import Utility from '@services/Utility'
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { persist, createJSONStorage } from 'zustand/middleware'
 
 /**
  * TODO: Finish this
@@ -17,14 +17,17 @@ import { persist } from 'zustand/middleware'
  *    tileServers: string
  *   },
  *   menus: Record<string, boolean>,
+ *   holidayEffects: Record<string, boolean>,
  *   motdIndex: number
  *   tutorial: boolean,
  *   searchTab: string,
  *   search: string,
  *   filters: object,
- *   scannerCooldown: number
  *   icons: Record<string, string>
+ *   audio: Record<string, string>
  *   userSettings: Record<string, any>
+ *   profiling: boolean
+ *   desktopNotifications: boolean
  *   setAreas: (areas: string | string[], validAreas: string[], unselectAll?: boolean) => void,
  * }} UseStore
  * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseStore>>}
@@ -69,9 +72,11 @@ export const useStore = create(
           })
         }
       },
+      holidayEffects: {},
       settings: {},
       userSettings: {},
       icons: {},
+      audio: {},
       menus: {},
       tutorial: true,
       sidebar: '',
@@ -98,11 +103,12 @@ export const useStore = create(
         names: true,
       },
       motdIndex: 0,
-      scannerCooldown: 0,
+      profiling: false,
+      desktopNotifications: false,
     }),
     {
       name: 'local-state',
-      getStorage: () => localStorage,
+      storage: createJSONStorage(() => localStorage),
     },
   ),
 )
@@ -116,6 +122,7 @@ export const useStore = create(
  *   online: boolean,
  *   searchLoading: boolean,
  *   Icons: InstanceType<typeof import("../services/Icons").default>,
+ *   Audio: InstanceType<typeof import("../services/Icons").default>,
  *   config: import('@rm/types').Config['map'],
  *   ui: object
  *   auth: { perms: Partial<import('@rm/types').Permissions>, loggedIn: boolean, methods: string[], strategy: import('@rm/types').Strategy | '' },
@@ -189,7 +196,6 @@ export const useStatic = create((set) => ({
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
-  holidayEffects: [],
   available: {
     gyms: [],
     pokemon: [],
@@ -197,7 +203,8 @@ export const useStatic = create((set) => ({
     nests: [],
     questConditions: {},
   },
-  Icons: undefined,
+  Icons: null,
+  Audio: null,
   ui: {},
   masterfile: {
     invasions: {},
@@ -278,57 +285,6 @@ export const toggleDialog = (open, category, type, filter) => (event) => {
     }))
   }
 }
-
-/**
- * @typedef {'scanNext' | 'scanZone'} ScanMode
- * @typedef {'' | 'mad' | 'rdm' | 'custom'} ScannerType
- * @typedef {{
- *   scannerType: ScannerType,
- *   showScanCount: boolean,
- *   showScanQueue: boolean,
- *   advancedOptions: boolean,
- *   pokemonRadius: number,
- *   gymRadius: number,
- *   spacing: number,
- *   maxSize: number,
- *   cooldown: number,
- *   refreshQueue: number
- *   enabled: boolean,
- * }} ScanConfig
- * @typedef {{
- *  scanNextMode: '' | 'setLocation' | 'sendCoords' | 'loading' | 'confirmed' | 'error',
- *  scanZoneMode: UseScanStore['scanNextMode']
- *  queue: 'init' | '...' | number,
- *  scanLocation: [number, number],
- *  scanCoords: [number, number][],
- *  validCoords: boolean[],
- *  scanNextSize: 'S' | 'M' | 'L' | 'XL',
- *  scanZoneSize: number,
- *  userRadius: number,
- *  userSpacing: number,
- *  valid: 'none' | 'some' | 'all',
- *  estimatedDelay: number,
- *  setScanMode: <T extends `${ScanMode}Mode`>(mode: T, nextMode?: UseScanStore[T]) => void,
- *  setScanSize: <T extends `${ScanMode}Size`>(mode: T, size: UseScanStore[T]) => void,
- * }} UseScanStore
- * @type {import("zustand").UseBoundStore<import("zustand").StoreApi<UseScanStore>>}
- */
-export const useScanStore = create((set) => ({
-  scanNextMode: '',
-  scanZoneMode: '',
-  queue: 'init',
-  scanLocation: [0, 0],
-  scanCoords: [],
-  validCoords: [],
-  scanNextSize: 'S',
-  scanZoneSize: 1,
-  userRadius: 70,
-  userSpacing: 1,
-  valid: 'none',
-  estimatedDelay: 0,
-  setScanMode: (mode, nextMode = '') => set({ [mode]: nextMode }),
-  setScanSize: (mode, size) => set({ [mode]: size }),
-}))
 
 /**
  * @template {string | number | boolean} T

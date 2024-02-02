@@ -26,12 +26,8 @@ import { DomEvent } from 'leaflet'
 
 import { FAB_BUTTONS } from '@services/queries/config'
 import useLocation from '@hooks/useLocation'
-import {
-  useLayoutStore,
-  useScanStore,
-  useStatic,
-  useStore,
-} from '@hooks/useStore'
+import { useLayoutStore, useStatic, useStore } from '@hooks/useStore'
+import { useScanStore } from './dialogs/scanner/store'
 
 import { I } from './general/I'
 import { setModeBtn, useWebhookStore } from './dialogs/webhooks/store'
@@ -174,7 +170,7 @@ export default function FloatingButtons() {
       )}
       {fabButtons.scanNext && (
         <Fab
-          color={scanNextMode === 'setLocation' ? 'error' : 'secondary'}
+          color={scanNextMode === 'setLocation' ? 'primary' : 'secondary'}
           size={fabSize}
           onClick={handleClick('scanNextMode')}
           title={t('scan_next')}
@@ -185,7 +181,7 @@ export default function FloatingButtons() {
       )}
       {fabButtons.scanZone && (
         <Fab
-          color={scanZoneMode === 'setLocation' ? 'error' : 'secondary'}
+          color={scanZoneMode === 'setLocation' ? 'primary' : 'secondary'}
           size={fabSize}
           onClick={handleClick('scanZoneMode')}
           title={t('scan_zone')}
