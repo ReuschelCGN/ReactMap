@@ -1,0 +1,37 @@
+name: Config
+on: workflow_call
+
+jobs:
+  config:
+    if: ${{ github.ref_name == 'main' || github.ref_name == 'develop'}}
+    name: Config Sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        id: checkout-code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: Run script
+        run: |
+          yarn config:check
+      - name: Generate latest env vars
+        run: |
+          yarn config:env
+      - name: Configure git
+        run: |
+          git config --global user.name "turtlesocks-bot"
+          git config --global user.email "turtlesocks-bot@users.noreply.github.com"
+      - name: Check for changes
+        run: |
+          if git diff --quiet; then
+            echo "changes_exist=false" >> $GITHUB_ENV
+          else
+            echo "changes_exist=true" >> $GITHUB_ENV
+          fi
+      - name: Commit and push changes
+        if: ${{ env.changes_exist == 'true' }}
+        run: |
+          git add --all
+          git commit --message "chore: Sync Config [skip ci]"
+          git push
