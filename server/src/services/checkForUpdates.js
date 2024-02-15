@@ -52,7 +52,7 @@ async function getCurrentSha() {
 async function getRemoteSha(branch) {
   try {
     const { stdout } = await execPromise(
-      `git ls-remote https://github.com/WatWowMap/ReactMap/ refs/heads/${branch}`,
+      `git ls-remote https://github.com/ReuschelCGN/ReactMap/ refs/heads/${branch}`,
     )
     return stdout.split('\t')[0]
   } catch (e) {
