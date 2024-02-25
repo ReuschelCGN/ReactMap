@@ -1,3 +1,17 @@
+# [1.2.0-develop.13](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.12...v1.2.0-develop.13) (2024-02-25)
+
+
+### Bug Fixes
+
+* safe 0 fallback ([45795a8](https://github.com/ReuschelCGN/ReactMap/commit/45795a80d114f7b638ff6a7a0d0438811dd86511))
+
+# [1.30.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.5...v1.30.0-develop.6) (2024-02-23)
+
+
+### Bug Fixes
+
+* refine ci ([515de64](https://github.com/WatWowMap/ReactMap/commit/515de64e6a7275b6b7afbdb287e18be15f373e4d))
+
 # [1.30.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.4...v1.30.0-develop.5) (2024-02-23)
 
 
