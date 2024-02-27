@@ -38,7 +38,7 @@ export function ResetFilters() {
       <StyledDivider />
       <ButtonWithNotification
         onClick={resetFilters}
-        label="Reset All"
+        label={t('reset_all')}
         color="error.main"
         category="filter"
         all
