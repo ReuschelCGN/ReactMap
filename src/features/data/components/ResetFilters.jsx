@@ -22,7 +22,7 @@ export function ResetFilters() {
 
   return (
     <ChildContainer>
-      <StyledSubHeader>Filters</StyledSubHeader>
+      <StyledSubHeader>{t('reset_filters')}</StyledSubHeader>
       {Object.keys(filters)
         .filter((perm) => perms[perm])
         .map((/** @type {import('@rm/types').Categories} */ key) => (
