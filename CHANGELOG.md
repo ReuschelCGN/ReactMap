@@ -1,3 +1,10 @@
+# [1.2.0-develop.16](https://github.com/ReuschelCGN/ReactMap/compare/v1.2.0-develop.15...v1.2.0-develop.16) (2024-03-01)
+
+
+### Bug Fixes
+
+* add missing `key` prop & simplify ([05be65c](https://github.com/ReuschelCGN/ReactMap/commit/05be65c93537c061c91db870f9f39a59da2684d1))
+
 # [1.30.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.12...v1.30.0-develop.13) (2024-03-01)
 
 
