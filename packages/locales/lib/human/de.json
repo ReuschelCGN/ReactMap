@@ -735,5 +735,6 @@
   "reset_s2cells": "S2 Zellen zurücksetzen",
   "reset_spawnpoints": "Spawnpoints zurücksetzen",
   "reset_submission_cells": "Submission Zellen zurücksetzen",
-  "hisuian": "Hisui"
+  "hisuian": "Hisui",
+  "spacial_rend_range": "Umfang Raum Bereich"
 }
