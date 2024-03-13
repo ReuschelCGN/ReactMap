@@ -745,10 +745,8 @@ const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
         </Typography>
       </Grid>
       <Grid xs={3} style={{ alignItems: 'center', display: 'flex' }}>
-        {confirmed ? (
+        {confirmed && (
           <Check fontSize="medium" color="success" />
-        ) : (
-          <Help fontSize="medium" />
         )}
       </Grid>
       <Grid xs={12}>
