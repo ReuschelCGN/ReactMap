@@ -1,3 +1,25 @@
+# [1.31.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.4...v1.31.0-develop.5) (2024-03-16)
+
+
+### Bug Fixes
+
+* local assets ([615c3b8](https://github.com/WatWowMap/ReactMap/commit/615c3b81244925c1860ea7c48b00f8ee38c697d1))
+* pass ref props for tooltip ([9d55d4c](https://github.com/WatWowMap/ReactMap/commit/9d55d4c445c106626149319df1db8dd3017e99b6))
+
+# [1.31.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.3...v1.31.0-develop.4) (2024-03-16)
+
+
+### Bug Fixes
+
+* ai generated locales ([2d0e7fb](https://github.com/WatWowMap/ReactMap/commit/2d0e7fb2ab9b33b020a016ce9654338975c18dd7))
+
+# [1.31.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.2...v1.31.0-develop.3) (2024-03-16)
+
+
+### Bug Fixes
+
+* clipped classname ([2563fb7](https://github.com/WatWowMap/ReactMap/commit/2563fb70e5ef6500e5929325279ad390138f33c0))
+
 # [1.31.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.1...v1.31.0-develop.2) (2024-03-14)
 
 
