@@ -4,6 +4,7 @@ on:
     branches:
       - main
       - develop
+      - developmod3
 
 jobs:
   lint:
