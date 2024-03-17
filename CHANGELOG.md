@@ -1,3 +1,25 @@
+# [1.31.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.6...v1.31.0-develop.7) (2024-03-17)
+
+
+### Bug Fixes
+
+* better selector tiles for colorblind users ([0256b5b](https://github.com/WatWowMap/ReactMap/commit/0256b5b9b0db60ef9ab1b9e1b922db2030f2575d))
+
+# [1.31.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.5...v1.31.0-develop.6) (2024-03-16)
+
+
+### Bug Fixes
+
+* mobile friendly :| ([b259e42](https://github.com/WatWowMap/ReactMap/commit/b259e4274cab22bfee450ef950b3c54616dca1e7))
+* no floats ([b8f645e](https://github.com/WatWowMap/ReactMap/commit/b8f645e8847f301be60ebffcc235f047669b48ed))
+* rounding & icon for missing ai ([4ed05ff](https://github.com/WatWowMap/ReactMap/commit/4ed05ff5d53435880d7388eaa11faac69a0ab77f))
+* server side routes ([77eafa9](https://github.com/WatWowMap/ReactMap/commit/77eafa91c492e6a25ce63918ad46226899b96d6c))
+
+
+### Features
+
+* locales editing page ([bfbd15a](https://github.com/WatWowMap/ReactMap/commit/bfbd15a55605505da7753a664f8257b243f28d18))
+
 # [1.31.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.31.0-develop.4...v1.31.0-develop.5) (2024-03-16)
 
 
