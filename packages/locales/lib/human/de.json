@@ -735,5 +735,20 @@
   "reset_spawnpoints": "Spawnpoints zurücksetzen",
   "reset_submission_cells": "Submission Zellen zurücksetzen",
   "hisuian": "Hisui",
-  "spacial_rend_range": "Raumschlag Effekt Bereich"
+  "spacial_rend_range": "Raumschlag Effekt Bereich",
+  "key": "Schlüssel",
+  "ai": "KI",
+  "human": "menschliche",
+  "locales": "Lokalisierung",
+  "instructions": "Anleitung",
+  "locale_instructions_1": "Wählen im Dropdown-Menü eine Sprache aus.",
+  "locale_instructions_2": "Gib in der Spalte \"menschlich\" die gewünschten Übersetzungen ein.",
+  "locale_instructions_3": "Klicke auf die Schaltfläche \"$t(download)\", um eine JSON-Datei herunterzuladen.",
+  "locale_instructions_4": "Fork den GitHub-Repo-Link unten",
+  "locale_instructions_5": "Erstelle einen neuen Branch und benennen ihn mit der Sprache, die werden soll.",
+  "locale_instructions_6": "Ersetze den Inhalt von \"packages/locales/lib/human/{{lng}}.json\" durch die heruntergeladene Datei.",
+  "locale_instructions_7": "Erstellen eine Pull-Anfrage",
+  "locale_instructions_8": "Warte bis die Pull-Anfrage überprüft und gemerged wurde.",
+  "enter_translation": "Übersetzung eingeben",
+  "individual_filters": "Teilweise gefiltert"
 }
