@@ -745,7 +745,7 @@
   "locale_instructions_2": "Gib in der Spalte \"Human\" die gewünschten Übersetzungen ein.",
   "locale_instructions_3": "Klicke auf die Schaltfläche \"$t(download)\", um eine JSON-Datei herunterzuladen.",
   "locale_instructions_4": "Fork den GitHub-Repo-Link unten",
-  "locale_instructions_5": "Erstelle einen neuen Branch und benennen ihn mit der Sprache, die werden soll.",
+  "locale_instructions_5": "Erstelle einen neuen Branch und benennen ihn mit der Sprache, die übersetzt werden soll.",
   "locale_instructions_6": "Ersetze den Inhalt von \"packages/locales/lib/human/{{lng}}.json\" durch die heruntergeladene Datei.",
   "locale_instructions_7": "Erstellen eine Pull-Anfrage",
   "locale_instructions_8": "Warte bis die Pull-Anfrage überprüft und gemerged wurde.",
