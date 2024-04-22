@@ -1,3 +1,43 @@
+# [1.33.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.32.1-develop.1...v1.33.0-develop.1) (2024-04-21)
+
+
+### Bug Fixes
+
+* added migration for gym badges, fixed gold badge count not appearing on profile ([e9f9474](https://github.com/WatWowMap/ReactMap/commit/e9f947436d62e68b46ade0948441d2507dbf01d5))
+* fixed new badge type in profile, refactored ternary in a positive way ([8bd1f90](https://github.com/WatWowMap/ReactMap/commit/8bd1f905347933e68dd00d8708067cb7ea29dfe8))
+* updating translations based on feedback from Fabio1988 and lenisko ([7d9ec75](https://github.com/WatWowMap/ReactMap/commit/7d9ec75886b0fa0365b37d86c4377011ec39cd6c))
+
+
+### Features
+
+* added "basic" level gym badge ([4c4d3a4](https://github.com/WatWowMap/ReactMap/commit/4c4d3a4ee131a65c5c55f1c42f3972245de54f0f))
+
+## [1.32.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.32.0...v1.32.1-develop.1) (2024-04-12)
+
+
+### Bug Fixes
+
+* ci ([6b4fa8a](https://github.com/WatWowMap/ReactMap/commit/6b4fa8a5316454d2da32c1999271835f83822a99))
+
+# [1.32.0](https://github.com/WatWowMap/ReactMap/compare/v1.31.0...v1.32.0) (2024-04-12)
+
+
+### Bug Fixes
+
+* hopefully final fix for leaflet.locatecontrol ([e08e3f2](https://github.com/WatWowMap/ReactMap/commit/e08e3f2cd3c6f219d8b2d6c4c448f6a86f333a1e))
+* **lint:** prettier lint ([5f87694](https://github.com/WatWowMap/ReactMap/commit/5f8769481d723d2a7e6040b63c08ba8c96ce99cb))
+* locate translations / unit of measurement ([704423b](https://github.com/WatWowMap/ReactMap/commit/704423b46cff627d902c2d2b905497f9bc941469))
+* react leaflet locate control fixes ([d01beb0](https://github.com/WatWowMap/ReactMap/commit/d01beb0ab4c1e096fb613f398bc7766970b88258))
+* remove useeffect dep ([00d9bfc](https://github.com/WatWowMap/ReactMap/commit/00d9bfc6d662b5bdb825c4af9954ee79ddb19ce6))
+* semi fix for the leaflet.locatecontrol issue ([4cb5882](https://github.com/WatWowMap/ReactMap/commit/4cb5882a79bfd7e55a79848d03f5d3a6ef6a55c4))
+* tutorial crash issue ([4fcc100](https://github.com/WatWowMap/ReactMap/commit/4fcc100cb6532aa55536bb41b87c60efd8fa8f46))
+* unnecessary call ([3c983d3](https://github.com/WatWowMap/ReactMap/commit/3c983d370e292e6cfd3b7b79f7acdeb76a39a4ed))
+
+
+### Features
+
+* add icon overrides in config for troubleshooting/trolling ([d34b69a](https://github.com/WatWowMap/ReactMap/commit/d34b69a444aae78cc7c8818a5c0a6ad3254a90af))
+
 # [1.31.0](https://github.com/WatWowMap/ReactMap/compare/v1.30.0...v1.31.0) (2024-03-17)
 
 
