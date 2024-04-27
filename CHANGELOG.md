@@ -1,3 +1,31 @@
+# [1.33.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.2...v1.33.0-develop.3) (2024-04-27)
+
+
+### Bug Fixes
+
+* pvp filter in when `all` is set ([2acf75f](https://github.com/WatWowMap/ReactMap/commit/2acf75fb107f2b06f31a9e195b1d3ae158c8368a))
+
+# [1.33.0-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.1...v1.33.0-develop.2) (2024-04-23)
+
+
+### Bug Fixes
+
+* gym badge counts ([67f3b0d](https://github.com/WatWowMap/ReactMap/commit/67f3b0de9837924b0e6e37645a199f2b0b54e795))
+
+# [1.33.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.32.1-develop.1...v1.33.0-develop.1) (2024-04-21)
+
+
+### Bug Fixes
+
+* added migration for gym badges, fixed gold badge count not appearing on profile ([e9f9474](https://github.com/WatWowMap/ReactMap/commit/e9f947436d62e68b46ade0948441d2507dbf01d5))
+* fixed new badge type in profile, refactored ternary in a positive way ([8bd1f90](https://github.com/WatWowMap/ReactMap/commit/8bd1f905347933e68dd00d8708067cb7ea29dfe8))
+* updating translations based on feedback from Fabio1988 and lenisko ([7d9ec75](https://github.com/WatWowMap/ReactMap/commit/7d9ec75886b0fa0365b37d86c4377011ec39cd6c))
+
+
+### Features
+
+* added "basic" level gym badge ([4c4d3a4](https://github.com/WatWowMap/ReactMap/commit/4c4d3a4ee131a65c5c55f1c42f3972245de54f0f))
+
 ## [1.32.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.32.0...v1.32.1-develop.1) (2024-04-12)
 
 
