@@ -1,3 +1,49 @@
+# [1.33.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.6...v1.33.0-develop.7) (2024-05-11)
+
+
+### Bug Fixes
+
+* update uicons lib ([8c82e8d](https://github.com/WatWowMap/ReactMap/commit/8c82e8dfe93f3341fdf76a8b925dda02e3519a1f))
+
+# [1.33.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.5...v1.33.0-develop.6) (2024-05-11)
+
+
+### Bug Fixes
+
+* add &nbsp; ([0cd5f0f](https://github.com/WatWowMap/ReactMap/commit/0cd5f0f3fc77464b6a175e277ef5fe6341c72b42))
+* add type to gpd object ([0501b8d](https://github.com/WatWowMap/ReactMap/commit/0501b8d8c531a46cc794760291b8a81f9240eea4))
+* no more react components ([1469280](https://github.com/WatWowMap/ReactMap/commit/1469280d98c2c530ec008b9555e02cd891ba7228))
+* use number instead ([38c3542](https://github.com/WatWowMap/ReactMap/commit/38c3542e4faff6507b3273cb68dee59e4fac064a))
+
+
+### Features
+
+* support displaying best buddy badge in gym defenders ([5f53b8f](https://github.com/WatWowMap/ReactMap/commit/5f53b8f512539a971a9ffbe1c3561e40a901b660))
+
+# [1.33.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.4...v1.33.0-develop.5) (2024-05-11)
+
+
+### Bug Fixes
+
+* possible fix edgecase scenario for missing `selectedWebhook` ([5f8d1c9](https://github.com/WatWowMap/ReactMap/commit/5f8d1c9a2ade62959894f1dda6d71e8d659aeefa))
+
+# [1.33.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.3...v1.33.0-develop.4) (2024-05-09)
+
+
+### Bug Fixes
+
+* add JSON.parse as requested ([cadf5e9](https://github.com/WatWowMap/ReactMap/commit/cadf5e98accef4bc5ba3cd7dea65fefbbd8872ec))
+* add temp_evo to display as well ([02ce747](https://github.com/WatWowMap/ReactMap/commit/02ce747811a4c8ac3d505403e95ee475da1e234d))
+* assign to the correct object ([fffb64f](https://github.com/WatWowMap/ReactMap/commit/fffb64f164cc7ae13e8a70ea5ab7673e4f89e30b))
+* fix nullability as requested ([9e6692a](https://github.com/WatWowMap/ReactMap/commit/9e6692af8f75d145fe776154460652ea481d642d))
+* new variable just4u ([6fdc152](https://github.com/WatWowMap/ReactMap/commit/6fdc15267734fd247d98ebde4a38b4bac902e99d))
+* tyie ([0634d89](https://github.com/WatWowMap/ReactMap/commit/0634d8959a3543933a3f31e0817589c53e68272a))
+
+
+### Features
+
+* add support for guarding_pokemon_display ([0579fc4](https://github.com/WatWowMap/ReactMap/commit/0579fc451f48795aa41f7253cb17592aa669ed31))
+
 # [1.33.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.2...v1.33.0-develop.3) (2024-04-27)
 
 
