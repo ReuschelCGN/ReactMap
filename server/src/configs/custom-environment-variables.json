@@ -23,6 +23,10 @@
     "skipMinified": {
       "__name": "DEV_OPTIONS_SKIP_MINIFIED",
       "__format": "boolean"
+    },
+    "skipUpdateCheck": {
+      "__name": "DEV_OPTIONS_SKIP_UPDATE_CHECK",
+      "__format": "boolean"
     }
   },
   "api": {
@@ -989,6 +993,14 @@
         "__name": "DEFAULT_FILTERS_POKESTOPS_CONFIRMED",
         "__format": "boolean"
       },
+      "excludeGrunts": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_EXCLUDE_GRUNTS",
+        "__format": "boolean"
+      },
+      "excludeLeaders": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_EXCLUDE_LEADERS",
+        "__format": "boolean"
+      },
       "items": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_ITEMS",
         "__format": "boolean"
@@ -999,6 +1011,10 @@
       },
       "candy": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_CANDY",
+        "__format": "boolean"
+      },
+      "xlCandy": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_XL_CANDY",
         "__format": "boolean"
       },
       "pokemon": {
