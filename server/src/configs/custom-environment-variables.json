@@ -23,6 +23,10 @@
     "skipMinified": {
       "__name": "DEV_OPTIONS_SKIP_MINIFIED",
       "__format": "boolean"
+    },
+    "skipUpdateCheck": {
+      "__name": "DEV_OPTIONS_SKIP_UPDATE_CHECK",
+      "__format": "boolean"
     }
   },
   "api": {
@@ -987,6 +991,14 @@
       "questSet": "DEFAULT_FILTERS_POKESTOPS_QUEST_SET",
       "confirmed": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_CONFIRMED",
+        "__format": "boolean"
+      },
+      "excludeGrunts": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_EXCLUDE_GRUNTS",
+        "__format": "boolean"
+      },
+      "excludeLeaders": {
+        "__name": "DEFAULT_FILTERS_POKESTOPS_EXCLUDE_LEADERS",
         "__format": "boolean"
       },
       "items": {
