@@ -760,5 +760,6 @@
   "locale_instructions_7": "Erstellen eine neue Pull Request auf den \"develop\" Branch.",
   "locale_instructions_8": "Warte bis die Pull-Anfrage überprüft und gemerged wurde.",
   "enter_translation": "Übersetzung eingeben",
-  "individual_filters": "Teilweise gefiltert"
+  "individual_filters": "individuell gefiltert",
+  "best_buddy": "Bester Kumpel"
 }
