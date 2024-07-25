@@ -135,6 +135,8 @@ class Pokestop extends Model {
         onlyEventStops,
         onlyConfirmed,
         onlyAreas = [],
+        onlyExcludeGrunts,
+        onlyExcludeLeaders,
       },
     } = args
     const midnight = getUserMidnight(args)
@@ -573,6 +575,19 @@ class Pokestop extends Model {
                   )
                 }
               })
+              if (onlyExcludeGrunts) {
+                invasion.whereNotIn(
+                  isMad ? 'character_display' : 'character',
+                  Event.rocketGruntIDs,
+                )
+              }
+
+              if (onlyExcludeLeaders) {
+                invasion.whereNotIn(
+                  isMad ? 'character_display' : 'character',
+                  Event.rocketLeaderIDs,
+                )
+              }
             })
           } else {
             stops.orWhere((invasion) => {
@@ -879,7 +894,9 @@ class Pokestop extends Model {
               (filters.onlyAllPokestops ||
                 (filters[newQuest.key] &&
                   (filters[newQuest.key].adv && !filters[newQuest.key].all
-                    ? filters[newQuest.key].adv.includes(quest.quest_title)
+                    ? filters[newQuest.key].adv.includes(
+                        `${quest.quest_title}__${quest.quest_target}`,
+                      )
                     : true)) ||
                 filters[`u${quest.quest_reward_type}`])
             ) {

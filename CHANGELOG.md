@@ -1,3 +1,25 @@
+# [1.33.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.9...v1.33.0-develop.10) (2024-07-21)
+
+
+### Bug Fixes
+
+* quest conditions with similar quest titles ([af0efbe](https://github.com/WatWowMap/ReactMap/commit/af0efbebe90d0ab50fe269769a3401e0916be4d9))
+
+# [1.33.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.8...v1.33.0-develop.9) (2024-07-20)
+
+
+### Bug Fixes
+
+* **config:** Add missing environment variable for devOptions.skipUpdateCheck parameter ([14eca4c](https://github.com/WatWowMap/ReactMap/commit/14eca4cc3a1e7cbd6193b80dd06f21413fa008ee))
+* prevent users from loading too many s2 cells ([8f8a03d](https://github.com/WatWowMap/ReactMap/commit/8f8a03dfbdcdad5d79e9c9c4e6e199bafdf64429))
+
+# [1.33.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.7...v1.33.0-develop.8) (2024-06-19)
+
+
+### Bug Fixes
+
+* avail quest filters ([fb4498e](https://github.com/WatWowMap/ReactMap/commit/fb4498e94f25f670cbac5e16f1878bac2985cf51))
+
 # [1.33.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.6...v1.33.0-develop.7) (2024-05-11)
 
 
