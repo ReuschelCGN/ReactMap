@@ -6,8 +6,6 @@ if (!process.env.FORCE_COLOR) {
 const logger = require('loglevel')
 const chalk = require('chalk')
 
-const config = require('@rm/config')
-
 const HELPERS = /** @type {const} */ ({
   trace: chalk.gray('☰'),
   debug: chalk.green('☯'),
@@ -59,31 +57,45 @@ const HELPERS = /** @type {const} */ ({
   routes: chalk.hex('#9e9e9e')('[ROUTES]'),
   search: chalk.hex('#795548')('[SEARCH]'),
 
+  upload: (size = '0B') => chalk.greenBright(`↑ ${size}`),
+  download: (size = '0B') => chalk.redBright(`↓ ${size}`),
+  url: (url = '') => chalk.hex('#00d7ac')(`[${url.toUpperCase()}]`),
+  statusCode: (code = 200) => {
+    if (code >= 500) {
+      return chalk.red(code)
+    }
+    if (code >= 400) {
+      return chalk.yellow(code)
+    }
+    if (code >= 300) {
+      return chalk.cyan(code)
+    }
+    return chalk.green(code)
+  },
   custom: (text = '', color = '#64b5f6') =>
     chalk.hex(color)(`[${text.toUpperCase()}]`),
 })
 
 const log = logger.getLogger('logger')
 
+const getTimestamp = () =>
+  new Date().toISOString().split('.')[0].split('T').join(' ')
+
 /** @type {typeof log['methodFactory']} */
 log.methodFactory = (methodName, logLevel, loggerName) => {
   const rawMethod = logger.methodFactory(methodName, logLevel, loggerName)
   return (...args) => {
-    rawMethod(
-      HELPERS[methodName] ?? '',
-      new Date().toISOString().split('.')[0].split('T').join(' '),
-      ...args,
-    )
+    rawMethod(HELPERS[methodName] ?? '', getTimestamp(), ...args)
   }
 }
 
-if (
-  config.has('devOptions.logLevel') &&
-  config.getSafe('devOptions.logLevel').toUpperCase() in logger.levels
-) {
-  log.setLevel(config.getSafe('devOptions.logLevel'))
-}
+/** @param {import('loglevel').LogLevelNames} logLevel */
+const setLogLevel = (logLevel = 'info') => log.setLevel(logLevel)
 
 module.exports.log = log
 
 module.exports.HELPERS = HELPERS
+
+module.exports.getTimeStamp = getTimestamp
+
+module.exports.setLogLevel = setLogLevel

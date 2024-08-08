@@ -1,3 +1,59 @@
+# [1.33.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.12...v1.33.0-develop.13) (2024-08-04)
+
+
+### Bug Fixes
+
+* update middleware deps ([eb30cbf](https://github.com/WatWowMap/ReactMap/commit/eb30cbfa2831e46049e42c68f6eb84cd7cb417af))
+
+# [1.33.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.11...v1.33.0-develop.12) (2024-08-04)
+
+
+### Bug Fixes
+
+* setting res headers ([fb63ddc](https://github.com/WatWowMap/ReactMap/commit/fb63ddc47760d4ac03cc93e70ff0c7be5f282e16))
+
+# [1.33.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.10...v1.33.0-develop.11) (2024-08-04)
+
+
+### Bug Fixes
+
+* add list of non-hot-reloadable config values ([803aa9a](https://github.com/WatWowMap/ReactMap/commit/803aa9a7ed66c8e895146ad62dbe9ee386c749f1))
+* client stuff ([cb2145b](https://github.com/WatWowMap/ReactMap/commit/cb2145ba364b08297380d862684bfa1dd28d4506))
+* hot reloading auth strategies ([c1cad7a](https://github.com/WatWowMap/ReactMap/commit/c1cad7a8dd6b048e93c37ab9fe84b2ea649b0823))
+* middleware order ([309ea1b](https://github.com/WatWowMap/ReactMap/commit/309ea1b27f5945e95fb997fb63653a95c9a5a81c))
+* missing multi domain file reload ([7593754](https://github.com/WatWowMap/ReactMap/commit/7593754384c74b3edb645c36c9075f03235744b5))
+* more config typings ([fa18399](https://github.com/WatWowMap/ReactMap/commit/fa1839963b7117080b4c8a7de26c3075c03126a9))
+* only reload the services that need to be reloaded ([3782faf](https://github.com/WatWowMap/ReactMap/commit/3782faf2ef54bb6620d8cd13b8397faa557cecef))
+* order of declarations for req.logout ([3869ab2](https://github.com/WatWowMap/ReactMap/commit/3869ab207d71967372573004db8ad0e3efb67cbd))
+* order of middleware ([430cd19](https://github.com/WatWowMap/ReactMap/commit/430cd1938b65502f6b8eaf5e16d8bb11b22d9ea0))
+* pokemon filtering gender/size ([06dc373](https://github.com/WatWowMap/ReactMap/commit/06dc373fc250e5265140d08ac91ff246c044c91f))
+* text split ([2ca3ae8](https://github.com/WatWowMap/ReactMap/commit/2ca3ae89d8490f573cbc36b567145910bbdc7e40))
+* types ([4f28f49](https://github.com/WatWowMap/ReactMap/commit/4f28f49ea7e73dbb3700b1294460fd81e9635d07))
+
+
+### Features
+
+* add `helmet` middleware ([109c214](https://github.com/WatWowMap/ReactMap/commit/109c21487a46d995423d5b1e6909e1ae7ac48eb8))
+* add `reloadConfigOnSave` as config value ([270b36f](https://github.com/WatWowMap/ReactMap/commit/270b36f7a2b474c3d2cd6567bc0d33ff5778896c))
+* backend data limits ([82d1494](https://github.com/WatWowMap/ReactMap/commit/82d1494920cd2057fe5088668717b05d5189f406))
+* hot reloadable config ([8cc56b6](https://github.com/WatWowMap/ReactMap/commit/8cc56b694e543c055b994ef85673b3f63b6e6b1c))
+* send message to auth clients ([61ac3f5](https://github.com/WatWowMap/ReactMap/commit/61ac3f5c1a3e6b7ddb2636827c758bb07291ead3))
+
+# [1.33.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.9...v1.33.0-develop.10) (2024-07-21)
+
+
+### Bug Fixes
+
+* quest conditions with similar quest titles ([af0efbe](https://github.com/WatWowMap/ReactMap/commit/af0efbebe90d0ab50fe269769a3401e0916be4d9))
+
+# [1.33.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.8...v1.33.0-develop.9) (2024-07-20)
+
+
+### Bug Fixes
+
+* **config:** Add missing environment variable for devOptions.skipUpdateCheck parameter ([14eca4c](https://github.com/WatWowMap/ReactMap/commit/14eca4cc3a1e7cbd6193b80dd06f21413fa008ee))
+* prevent users from loading too many s2 cells ([8f8a03d](https://github.com/WatWowMap/ReactMap/commit/8f8a03dfbdcdad5d79e9c9c4e6e199bafdf64429))
+
 # [1.33.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.7...v1.33.0-develop.8) (2024-06-19)
 
 
