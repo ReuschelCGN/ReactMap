@@ -1,3 +1,17 @@
+# [1.33.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.14...v1.33.0-develop.15) (2024-08-09)
+
+
+### Bug Fixes
+
+* playground editor w/ helmet ([33fa336](https://github.com/WatWowMap/ReactMap/commit/33fa3368904cca6ff345303e29bd8a582b8cff54))
+
+# [1.33.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.13...v1.33.0-develop.14) (2024-08-09)
+
+
+### Bug Fixes
+
+* move loading locales script to external script file ([4960a9f](https://github.com/WatWowMap/ReactMap/commit/4960a9fb723afa65c384435c6d2ab3d50829d55a))
+
 # [1.33.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.12...v1.33.0-develop.13) (2024-08-04)
 
 
