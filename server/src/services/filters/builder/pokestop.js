@@ -1,8 +1,8 @@
 // @ts-check
-const { log, HELPERS } = require('@rm/logger')
+const { log, TAGS } = require('@rm/logger')
 
 const BaseFilter = require('../Base')
-const { Event, Db } = require('../../initialization')
+const state = require('../../state')
 
 /**
  *
@@ -13,9 +13,12 @@ const { Event, Db } = require('../../initialization')
 function buildPokestops(perms, defaults) {
   const quests = { s0: new BaseFilter() }
   if (perms.quests) {
-    Object.keys(Event.masterfile.items).forEach((item) => {
+    Object.keys(state.event.masterfile.items).forEach((item) => {
       quests[`q${item}`] = new BaseFilter(defaults.items)
-      if (Event.masterfile.items[item]?.includes('Troy Disk') && perms.lures) {
+      if (
+        state.event.masterfile.items[item]?.includes('Troy Disk') &&
+        perms.lures
+      ) {
         quests[`l${item}`] = new BaseFilter(defaults.lures)
       }
     })
@@ -26,7 +29,7 @@ function buildPokestops(perms, defaults) {
     ) {
       quests[`d${i}`] = new BaseFilter(defaults.stardust.enabled)
     }
-    Object.keys(Event.masterfile.questRewardTypes).forEach((type) => {
+    Object.keys(state.event.masterfile.questRewardTypes).forEach((type) => {
       if (type !== '0') {
         quests[`u${type}`] = new BaseFilter(defaults.rewardTypes)
       }
@@ -38,20 +41,20 @@ function buildPokestops(perms, defaults) {
     ) {
       quests[`p${i}`] = new BaseFilter(defaults.xp.enabled)
     }
-    Object.keys(Event.masterfile.questRewardTypes).forEach((type) => {
+    Object.keys(state.event.masterfile.questRewardTypes).forEach((type) => {
       if (type !== '0') {
         quests[`u${type}`] = new BaseFilter(defaults.rewardTypes)
       }
     })
   }
   if (perms.invasions) {
-    Object.keys(Event.invasions).forEach((type) => {
+    Object.keys(state.event.invasions).forEach((type) => {
       if (type !== '0') {
         quests[`i${type}`] = new BaseFilter(defaults.allInvasions)
       }
     })
   }
-  Event.getAvailable('pokestops').forEach((avail) => {
+  state.event.getAvailable('pokestops').forEach((avail) => {
     if (perms.lures && avail.startsWith('l')) {
       quests[avail] = new BaseFilter(defaults.lures)
     }
@@ -80,7 +83,7 @@ function buildPokestops(perms, defaults) {
         !Number.isInteger(+avail.charAt(0))
       ) {
         log.warn(
-          HELPERS.available,
+          TAGS.available,
           `Unknown quest type: ${avail} probably should open a PR or issue`,
         )
         quests[avail] = new BaseFilter(true)
@@ -92,7 +95,7 @@ function buildPokestops(perms, defaults) {
       }
       if (
         avail.startsWith('a') &&
-        Db.filterContext.Pokestop.hasConfirmedInvasions
+        state.db.filterContext.Pokestop.hasConfirmedInvasions
       ) {
         quests[avail] = new BaseFilter(defaults.invasionPokemon)
       }
