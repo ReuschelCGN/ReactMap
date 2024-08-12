@@ -14,7 +14,7 @@ const { json } = require('body-parser')
 const http = require('http')
 const { default: helmet } = require('helmet')
 
-const { log, HELPERS, getTimeStamp } = require('@rm/logger')
+const { log, TAGS, Logger } = require('@rm/logger')
 const config = require('@rm/config')
 
 const state = require('./services/state')
@@ -40,7 +40,7 @@ const rootRouter = require('./routes/rootRouter')
 const startServer = async () => {
   if (!config.getSafe('devOptions.skipUpdateCheck')) {
     await checkForUpdates()
-    log.info(HELPERS.update, 'Completed')
+    log.info(TAGS.update, 'Completed')
   }
   config.setAreas(loadCachedAreas())
 
@@ -74,8 +74,28 @@ const startServer = async () => {
         req.bodySize = (req.bodySize || 0) + buf.length
       },
     }),
-    helmet(),
   )
+
+  if (config.getSafe('api.enableHelmet')) {
+    app.use(
+      helmet({
+        hidePoweredBy: true,
+        contentSecurityPolicy: {
+          directives: {
+            scriptSrc: [
+              "'self'",
+              'https://cdn.jsdelivr.net',
+              'https://telegram.org',
+              'https://static.cloudflareinsights.com',
+            ],
+            frameSrc: ["'self'", 'https://*.telegram.org'],
+            workerSrc: ["'self'", 'blob:'],
+          },
+        },
+      }),
+    )
+  }
+
   initPassport(app)
 
   const sentryErrorMiddleware = initSentry(app)
@@ -107,7 +127,7 @@ const startServer = async () => {
   const serverPort = config.getSafe('port')
   httpServer.listen(serverPort, serverInterface)
   log.info(
-    HELPERS.ReactMap,
+    TAGS.ReactMap,
     `Server is now listening at http://${serverInterface}:${serverPort}`,
   )
 
@@ -116,7 +136,9 @@ const startServer = async () => {
   const newAreas = await loadLatestAreas()
   config.setAreas(newAreas)
 
-  const text = rainbow(`ℹ ${getTimeStamp()} [ReactMap] has fully started`)
+  const text = rainbow(
+    `ℹ ${Logger.getTimestamp()} [ReactMap] has fully started`,
+  )
   setTimeout(() => text.stop(), 1_000)
 
   return httpServer

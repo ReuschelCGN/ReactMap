@@ -1,3 +1,28 @@
+# [1.33.0-develop.16](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.15...v1.33.0-develop.16) (2024-08-10)
+
+
+### Bug Fixes
+
+* lint ([adbaec6](https://github.com/WatWowMap/ReactMap/commit/adbaec677a48be2e89efec09d9c75ff6b9a0453f))
+* lint ([081c153](https://github.com/WatWowMap/ReactMap/commit/081c15360a4c0d84e2d66d751bdae7d47d7e3040))
+* oauth telegram /w helmet ([d892000](https://github.com/WatWowMap/ReactMap/commit/d892000f8adaf1b5e70b21d22258e1239b1f485c))
+* telegram frame source /w helmet ([26c12de](https://github.com/WatWowMap/ReactMap/commit/26c12de6d9cdfcd4db68c1c0804fd32e90477f24))
+* telegram login w/ helmet ([7c0e925](https://github.com/WatWowMap/ReactMap/commit/7c0e925b309c87068f4a6a07944b4af686f7bbd0))
+
+# [1.33.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.14...v1.33.0-develop.15) (2024-08-09)
+
+
+### Bug Fixes
+
+* playground editor w/ helmet ([33fa336](https://github.com/WatWowMap/ReactMap/commit/33fa3368904cca6ff345303e29bd8a582b8cff54))
+
+# [1.33.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.13...v1.33.0-develop.14) (2024-08-09)
+
+
+### Bug Fixes
+
+* move loading locales script to external script file ([4960a9f](https://github.com/WatWowMap/ReactMap/commit/4960a9fb723afa65c384435c6d2ab3d50829d55a))
+
 # [1.33.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.33.0-develop.12...v1.33.0-develop.13) (2024-08-04)
 
 
