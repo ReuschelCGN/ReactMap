@@ -1,4 +1,6 @@
 // @ts-check
+const dlv = require('dlv')
+
 const { log, TAGS } = require('@rm/logger')
 
 const state = require('../services/state')
@@ -78,15 +80,33 @@ async function reloadConfig() {
     const valid = changed.filter((key) => !NO_RELOAD.has(key))
     const invalid = changed.filter((key) => NO_RELOAD.has(key))
 
+    /** @param {string} key */
+    const print = (key) => {
+      let newValue
+      let oldValue
+      try {
+        oldValue = dlv(oldWithoutAreas, key)
+      } catch {
+        // do nothing
+      }
+      try {
+        newValue = newConfig.get(key)
+      } catch {
+        // do nothing
+      }
+      log.info(TAGS.config, `'${key}' -`, 'old:', oldValue, 'new:', newValue)
+    }
+
     if (valid.length) {
-      log.info(TAGS.config, 'updating the following config values:', valid)
+      log.info(TAGS.config, 'updating the following config values:')
+      valid.forEach(print)
     }
     if (invalid.length) {
       log.warn(
         TAGS.config,
-        'unfortunately the following config values cannot be hot reloaded and will require a full process restart:',
-        invalid,
+        'the following config values cannot be hot reloaded and will require a full process restart:',
       )
+      invalid.forEach(print)
     }
 
     const stateReport = /** @type {import('@rm/types').StateReportObj} */ ({

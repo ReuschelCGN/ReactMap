@@ -7,7 +7,7 @@ const { log, TAGS } = require('@rm/logger')
 
 const DbCheck = require('./DbCheck')
 const EventManager = require('./EventManager')
-const PvpWrapper = require('./PvpWrapper')
+const { PvpWrapper } = require('./PvpWrapper')
 const { setCache } = require('./cache')
 const { migrate } = require('../db/migrate')
 const { Stats } = require('./Stats')
@@ -36,7 +36,7 @@ const serverState = {
           try {
             if (this.event.authClients[name]) {
               // Clear any existing trials before we reinitialize
-              this.event.authClients[name].trialManager.end()
+              this.event.authClients[name]?.trialManager?.end()
             }
             const buildStrategy = fs.existsSync(
               path.resolve(__dirname, `../strategies/${name}.js`),
@@ -62,14 +62,14 @@ const serverState = {
   getTrialStatus(strategy) {
     if (strategy) {
       if (strategy in this.event.authClients) {
-        return this.event.authClients[strategy].trialManager.status()
+        return this.event.authClients[strategy]?.trialManager?.status() ?? null
       }
       throw new Error(`Strategy ${strategy} not found`)
     } else {
       return Object.fromEntries(
         Object.entries(this.event.authClients).map(([k, v]) => [
           k,
-          v.trialManager.status(),
+          v.trialManager?.status() ?? null,
         ]),
       )
     }
@@ -81,13 +81,13 @@ const serverState = {
   setTrials(active, strategy) {
     if (strategy) {
       if (strategy in this.event.authClients) {
-        this.event.authClients[strategy].trialManager.setActive(active)
+        this.event.authClients[strategy]?.trialManager?.setActive(active)
       } else {
         throw new Error(`Strategy ${strategy} not found`)
       }
     } else {
       Object.values(this.event.authClients).forEach((client) => {
-        client.trialManager.setActive(active)
+        client?.trialManager?.setActive(active)
       })
     }
   },
@@ -121,6 +121,9 @@ const serverState = {
       promises.push(
         this.event.getMasterfile(this.db.historical, this.db.rarity),
       )
+    }
+    if ((!reloadReport || reloadReport.pvp) && this.pvp) {
+      promises.push(this.pvp.fetchLatestPokemon())
     }
     if (!reloadReport || reloadReport.invasions) {
       promises.push(this.event.getInvasions())
