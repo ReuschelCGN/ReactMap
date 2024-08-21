@@ -1,16 +1,14 @@
 /* eslint-disable import/order */
 // @ts-check
+const path = require('path')
+
 if (!process.env.NODE_CONFIG_DIR) {
-  process.env.NODE_CONFIG_DIR = require('path').join(
-    __dirname,
-    '..',
-    '..',
-    '..',
-    'server',
-    'src',
-    'configs',
-  )
+  process.env.NODE_CONFIG_DIR =
+    path.join(__dirname, '..', '..', '..', 'config') +
+    path.delimiter +
+    path.join(__dirname, '..', '..', '..', 'server', 'src', 'configs')
   process.env.ALLOW_CONFIG_MUTATIONS = 'true'
+  process.env.SUPPRESS_NO_CONFIG_WARNING = 'true'
 }
 
 if (process.env.NODE_CONFIG_ENV) {

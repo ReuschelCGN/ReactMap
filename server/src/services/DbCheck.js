@@ -1,7 +1,6 @@
 /* eslint-disable no-await-in-loop */
 const { knex } = require('knex')
 const { raw } = require('objection')
-const extend = require('extend')
 const config = require('@rm/config')
 const { Logger, TAGS } = require('@rm/logger')
 
@@ -71,7 +70,7 @@ module.exports = class DbCheck extends Logger {
           this.endpoints[i] = schema
           return null
         }
-        const logger = new Logger('knex', schema.database)
+        const { log } = new Logger('knex', schema.database)
         return knex({
           client: 'mysql2',
           connection: {
@@ -89,12 +88,12 @@ module.exports = class DbCheck extends Logger {
               conn.query('SET time_zone="+00:00";', (err) => done(err, conn)),
           },
           log: {
-            warn: (message) => logger.warn(message),
-            error: (message) => logger.error(message),
+            warn: (message) => log.warn(message),
+            error: (message) => log.error(message),
             debug: (message) =>
-              logger[
-                config.getSafe('devOptions.queryDebug') ? 'info' : 'debug'
-              ](message),
+              log[config.getSafe('devOptions.queryDebug') ? 'info' : 'debug'](
+                message,
+              ),
             enableColors: true,
           },
         })
@@ -575,17 +574,14 @@ module.exports = class DbCheck extends Logger {
         )
         this.log.info(`Setting available for ${model}`)
         if (model === 'Pokestop') {
+          const newQuestConditions = {}
           results.forEach((result) => {
             if ('conditions' in result) {
-              this.questConditions = extend(
-                true,
-                this.questConditions,
-                result.conditions,
-              )
+              config.util.extendDeep(newQuestConditions, result.conditions)
             }
           })
           this.questConditions = Object.fromEntries(
-            Object.entries(this.questConditions).map(([key, titles]) => [
+            Object.entries(newQuestConditions).map(([key, titles]) => [
               key,
               Object.values(titles),
             ]),
