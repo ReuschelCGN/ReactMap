@@ -1,4 +1,3 @@
-import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
 import type {
   ScannerModels,
   ScannerModelKeys,
@@ -8,11 +7,10 @@ import type {
 } from 'server/src/models'
 import { Knex } from 'knex'
 import { Model } from 'objection'
-import { Request, Response } from 'express'
-import { Transaction } from '@sentry/node'
+import { NextFunction, Request, Response } from 'express'
 import { VerifyCallback } from 'passport-oauth2'
 
-import DbCheck = require('server/src/services/DbCheck')
+import DbManager = require('server/src/services/DbManager')
 import EventManager = require('server/src/services/EventManager')
 import Pokemon = require('server/src/models/Pokemon')
 import Gym = require('server/src/models/Gym')
@@ -25,6 +23,7 @@ import { ModelReturn, OnlyType } from './utility'
 import { Profile } from 'passport-discord'
 import { User } from './models'
 import { Config } from '@rm/types'
+import { OperationTypeNode } from 'graphql'
 
 export interface DbContext {
   isMad: boolean
@@ -45,7 +44,7 @@ export interface DbContext {
   hasAlignment: boolean
   hasShowcaseData: boolean
   hasShowcaseForm: boolean
-  hasShowcaseTypes: boolean
+  hasShowcaseType: boolean
 }
 
 export interface ExpressUser extends User {
@@ -87,7 +86,7 @@ export interface DbConnection {
 
 export type Schema = ApiEndpoint | DbConnection
 
-export interface DbCheckClass {
+export interface DbManagerClass {
   models: {
     [key in ScannerModelKeys]?: (DbContext & {
       connection: number
@@ -131,14 +130,14 @@ export interface BaseRecord {
 }
 
 export interface GqlContext {
+  userId: number
   req: Request
   res: Response
-  Db: DbCheck
-  Event: EventManager
+  Db: DbManager.DbManager
+  Event: EventManager.EventManager
   perms: Permissions
-  user: string
-  transaction: Transaction
-  operation: 'query' | 'mutation'
+  username: string
+  operation: OperationTypeNode
   startTime?: number
 }
 
@@ -174,6 +173,7 @@ export interface Permissions {
   scanner: string[]
   areaRestrictions: string[]
   webhooks: string[]
+  trial: boolean
 }
 
 export interface Waypoint {
@@ -216,7 +216,7 @@ export interface DnfMinMax {
 }
 
 export interface DnfFilter {
-  pokemon?: FilterId
+  pokemon?: FilterId | FilterId[]
   iv?: DnfMinMax
   level?: DnfMinMax
   cp?: DnfMinMax
@@ -238,13 +238,13 @@ export type DiscordVerifyFunction = (
   done: VerifyCallback,
 ) => void
 
-export type BaseFilter = import('server/src/services/filters/Base')
+export type BaseFilter = import('server/src/filters/Base').BaseFilter
 
 export type PokemonFilter =
-  import('server/src/services/filters/pokemon/Frontend')
+  import('server/src/filters/pokemon/Frontend').PokemonFilter
 
 export type AllFilters = ReturnType<
-  typeof import('server/src/services/filters/builder/base')
+  (typeof import('server/src/filters/builder/base'))['buildDefaultFilters']
 >
 
 export type Categories = keyof AllFilters
@@ -252,7 +252,7 @@ export type Categories = keyof AllFilters
 export type AdvCategories = 'pokemon' | 'gyms' | 'pokestops' | 'nests'
 
 export type UIObject = ReturnType<
-  typeof import('server/src/services/ui/primary')
+  (typeof import('server/src/ui/drawer'))['drawer']
 >
 
 export interface PokemonGlow
@@ -266,4 +266,30 @@ export interface PokemonGlow
 export interface ClientOptions
   extends Partial<Omit<Config['clientSideOptions'], 'pokemon'>> {
   pokemon: PokemonGlow
+}
+
+export type ExpressMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => any
+
+export type ExpressErrorMiddleware = (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => any
+
+export interface StateReportObj {
+  database: boolean
+  pvp: boolean
+  icons: boolean
+  audio: boolean
+  historical: boolean
+  masterfile: boolean
+  invasions: boolean
+  webhooks: boolean
+  events: boolean
+  strategies: boolean
 }

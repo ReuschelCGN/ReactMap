@@ -1,4 +1,3 @@
-import { LEAGUES } from 'server/src/services/filters/pokemon/constants'
 import { FullModel } from './utility'
 import DeviceModel = require('server/src/models/Device')
 import GymModel = require('server/src/models/Gym')
@@ -34,6 +33,7 @@ export interface PokemonDisplay {
   gender: number
   shiny: boolean
   temp_evolution: number
+  temp_evolution_finish_ms?: number
   alignment: number
   badge: number
   location_card: number
@@ -197,20 +197,7 @@ export interface Pokestop {
 
 export type FullPokestop = FullModel<Pokestop, PokestopModel>
 
-export interface PvpEntry {
-  pokemon: number
-  form: number
-  cap: number
-  value: number
-  level: number
-  cp: number
-  percentage: number
-  rank: number
-  capped: boolean
-  evolution: number
-}
-
-export type CleanPvp = { [league in (typeof LEAGUES)[number]]?: PvpEntry }
+export type CleanPvp = Record<string, import('ohbem').PvPRankEntry[]>
 
 export interface Pokemon {
   id: string
@@ -247,9 +234,9 @@ export interface Pokemon {
   first_seen_timestamp: number
   expire_timestamp_verified: boolean
   updated: number
-  pvp: { [league in (typeof LEAGUES)[number]]?: PvpEntry[] }
-  pvp_rankings_great_league?: PvpEntry[]
-  pvp_rankings_ultra_league?: PvpEntry[]
+  pvp: CleanPvp
+  pvp_rankings_great_league?: import('ohbem').PvPRankEntry[]
+  pvp_rankings_ultra_league?: import('ohbem').PvPRankEntry[]
   distance?: number
   shiny?: boolean
 }

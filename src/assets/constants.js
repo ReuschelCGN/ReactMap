@@ -1,3 +1,5 @@
+// @ts-check
+
 export const ICON_SIZES = /** @type {const} */ (['sm', 'md', 'lg', 'xl'])
 
 export const XXS_XXL = /** @type {const} */ (['xxs', 'xxl'])
@@ -49,6 +51,6 @@ export const FILTER_SKIP_LIST = ['filter', 'enabled', 'legacy']
 
 export const ALWAYS_EXCLUDED = new Set(['donor', 'blockedGuildNames', 'admin'])
 
-export const SCAN_MODES = /** @type */ (['confirmed', 'loading', 'error'])
+export const SCAN_MODES = ['confirmed', 'loading', 'error']
 
 export const SCAN_SIZES = /** @type {const} */ (['S', 'M', 'XL'])
