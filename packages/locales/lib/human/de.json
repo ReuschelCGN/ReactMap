@@ -762,5 +762,6 @@
   "locale_instructions_8": "Warte bis die Pull-Anfrage überprüft und gemerged wurde.",
   "enter_translation": "Übersetzung eingeben",
   "individual_filters": "individuell gefiltert",
-  "best_buddy": "Bester Kumpel"
+  "best_buddy": "Bester Kumpel",
+  "data_limit_reached": "Du hast kürzlich zu viele Daten angefordert und befindest dich im Cooldown bis {{until}}"
 }
