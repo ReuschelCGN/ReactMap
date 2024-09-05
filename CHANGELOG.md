@@ -1,3 +1,52 @@
+## [1.34.1-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.4...v1.34.1-develop.5) (2024-09-04)
+
+
+### Bug Fixes
+
+* properly support gym defender temp evolutions ([4595820](https://github.com/WatWowMap/ReactMap/commit/45958204c9de795d12cb0a0e241982edcd1f5973))
+* set proper type for compat golbat ([0d5b5f7](https://github.com/WatWowMap/ReactMap/commit/0d5b5f79128887fca18e3032773504784e5365d0))
+
+## [1.34.1-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.3...v1.34.1-develop.4) (2024-08-30)
+
+
+### Bug Fixes
+
+* revert url fallback in navigation ([eddf8bd](https://github.com/WatWowMap/ReactMap/commit/eddf8bd478d47221eb85ae2b50b7a8e709dbe6b7))
+
+## [1.34.1-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.2...v1.34.1-develop.3) (2024-08-29)
+
+
+### Bug Fixes
+
+* backup if a user has an invalid nav option ([744ca90](https://github.com/WatWowMap/ReactMap/commit/744ca90a86dcd89d679c8e605f0b1061e8d611cb))
+* the travesty that was the nest popup ([d19fc74](https://github.com/WatWowMap/ReactMap/commit/d19fc74edbd4f83f736273f38e2da08bb3739dec))
+
+## [1.34.1-develop.2](https://github.com/WatWowMap/ReactMap/compare/v1.34.1-develop.1...v1.34.1-develop.2) (2024-08-29)
+
+
+### Bug Fixes
+
+* order of items for the `scanAreas` section of the drawer ([6be6b3b](https://github.com/WatWowMap/ReactMap/commit/6be6b3b339daf01d7c953053755ffdd65f246123))
+
+## [1.34.1-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.34.0...v1.34.1-develop.1) (2024-08-29)
+
+
+### Bug Fixes
+
+* various type adjustments ([ab51750](https://github.com/WatWowMap/ReactMap/commit/ab51750d93411cf959af8a3b556c81f4da50f91d))
+
+# [1.34.0](https://github.com/WatWowMap/ReactMap/compare/v1.33.1...v1.34.0) (2024-08-23)
+
+
+### Bug Fixes
+
+* `GET /api/v1/trial/status/:strategy` endpoint ([78862b6](https://github.com/WatWowMap/ReactMap/commit/78862b60237c103de91bdeca6f04d93c9566bc86))
+
+
+### Features
+
+* more nest viewing options ([959116d](https://github.com/WatWowMap/ReactMap/commit/959116db9caffd7ffa0236237397b18d36a36559))
+
 # [1.34.0-develop.1](https://github.com/WatWowMap/ReactMap/compare/v1.33.1...v1.34.0-develop.1) (2024-08-20)
 
 
