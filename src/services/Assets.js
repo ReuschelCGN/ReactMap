@@ -579,7 +579,7 @@ export class UAssets {
       return `${this[this.selected.station]?.path}/station/${active ? 1 : 0}.png`
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
-      return `${this.fallback}/station/0.${this.fallbackExt}`
+      return `${this.fallback}/station/${active ? 1 : 0}.${this.fallbackExt}`
     }
   }
 }
