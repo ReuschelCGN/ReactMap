@@ -780,5 +780,6 @@
   "dynamax": "Dynamax",
   "stations_subtitle": "Kraftquellen auf der Map anzeigen",
   "dynamax_subtitle": "Dyna-Raids auf der Map anzeigen",
-  "override": "Dyna-Raid Filter"
+  "override": "Dyna-Raid Filter",
+  "enable_station_popup_coords": "Kraftquellen Koordinaten anzeigen"
 }
