@@ -56,6 +56,7 @@ export class UAssets {
         sizeMultiplier: 1,
         popupX: 0,
         popupY: 0,
+        manualPopup: 0,
       },
     }
 
@@ -197,6 +198,7 @@ export class UAssets {
   /**
    * @param {string} category
    * @param {'sm' | 'md' | 'lg' | 'xl'} [size]
+   * @returns {number}
    */
   getSize(category, size = 'md') {
     const baseSize = this.sizes[category]?.[size] || 20
@@ -254,6 +256,9 @@ export class UAssets {
       case 'i':
         // invasions
         return this.getInvasions(id.slice(1), true)
+      case 'j':
+        // stations
+        return this.getStation()
       case 'l':
         // lures
         return this.getPokestops(id.slice(1))
@@ -318,7 +323,7 @@ export class UAssets {
    * @param {string | number} [costume]
    * @param {string | number} [alignment]
    * @param {boolean} [shiny]
-   * @returns
+   * @returns {string}
    */
   getPokemon(
     pokemonId = 0,
@@ -345,7 +350,10 @@ export class UAssets {
     }
   }
 
-  /** @param {number | string} [typeId] */
+  /**
+   * @param {number | string} [typeId]
+   * @returns {string}
+   */
   getTypes(typeId = 0) {
     try {
       return this[this.selected.type]?.class?.type(typeId)
@@ -513,15 +521,12 @@ export class UAssets {
   getMisc(fileName = '') {
     try {
       const miscClass = this[this.selected.misc]?.class
-
+      const singular = fileName.slice(0, -1)
       if (miscClass.has('misc', fileName)) {
         return miscClass.misc(fileName)
       }
-      if (
-        fileName.endsWith('s') &&
-        miscClass.has('misc', fileName.slice(0, -1))
-      ) {
-        return miscClass.misc(fileName.slice(0, -1))
+      if (fileName.endsWith('s') && miscClass.has('misc', singular)) {
+        return miscClass.misc(singular)
       }
       if (!fileName.endsWith('s') && miscClass.has('misc', `${fileName}s`)) {
         return miscClass.misc(`${fileName}s`)
@@ -531,6 +536,12 @@ export class UAssets {
         this[this.selected[fileName]].class.has(fileName, `0`)
       ) {
         return this[this.selected[fileName]].class[fileName]('0')
+      }
+      if (
+        this[this.selected[singular]]?.path &&
+        this[this.selected[singular]].class.has(singular, `0`)
+      ) {
+        return this[this.selected[singular]].class[singular]('0')
       }
       return miscClass.misc('0')
     } catch (e) {
@@ -556,6 +567,17 @@ export class UAssets {
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/spawnpoint/0.${this.fallbackExt}`
+    }
+  }
+
+  /** @param {boolean} [active] */
+  getStation(active = false) {
+    try {
+      // TODO: replace with lib method when it has been updated
+      return `${this.fallback}/station/${active ? 1 : 0}.${this.fallbackExt}`
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+      return `${this.fallback}/station/0.${this.fallbackExt}`
     }
   }
 }
