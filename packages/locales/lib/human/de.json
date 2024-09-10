@@ -764,5 +764,22 @@
   "enter_translation": "Übersetzung eingeben",
   "individual_filters": "individuell gefiltert",
   "best_buddy": "Bester Kumpel",
-  "data_limit_reached": "Du hast kürzlich zu viele Daten angefordert und befindest dich im Cooldown bis {{until}}"
+  "data_limit_reached": "Du hast kürzlich zu viele Daten angefordert und befindest dich im Cooldown bis {{until}}",
+  "unknown_station": "unbekannte Kraftquelle",
+  "exclude_battle": "Dynamaxkämpfe ausschließen",
+  "station": "Kraftquelle",
+  "stations": "Kraftquellen",
+  "stations_options": "Kraftquellen Optionen",
+  "all_stations": "alle Kraftquelle",
+  "search_battles": "Suche Dynamaxkämpfe",
+  "started": "gestartet",
+  "ended": "beendet",
+  "global_search_stations": "Füge den Namen der Kraftquelle ein...",
+  "station_timers": "Kraftquellen Timer",
+  "station_opacity": "Kraftquellen Durchsichtigkeit",
+  "max_battles": "Dynamaxkämpfe",
+  "dynamax": "Dynamax",
+  "stations_subtitle": "Kraftquellen auf der Map anzeigen",
+  "dynamax_subtitle": "Dynamaxkämpfe auf der Map anzeigen",
+  "override": "nicht berücksichtigen"
 }
