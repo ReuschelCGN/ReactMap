@@ -18,7 +18,7 @@ function StationLevels() {
   const available = useMemory((s) => s.available.stations)
   const enabled = useStorage(
     (s) =>
-      !!s.filters?.stations?.maxBattles && !s.filters?.stations?.allStations,
+      !!s.filters?.stations?.maxBattles,
   )
   const [filters, setFilters] = useDeepStore(
     'filters.stations.battleTier',
