@@ -52,7 +52,7 @@ class Station extends Model {
         'battle_pokemon_alignment',
       )
 
-      if (!onlyAllStations) {
+      if (onlyMaxBattles) {
         query
           .whereNotNull('battle_pokemon_id')
           .andWhere('is_battle_available', true)
