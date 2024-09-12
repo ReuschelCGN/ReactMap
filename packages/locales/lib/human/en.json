@@ -805,6 +805,7 @@
   "stations_subtitle": "Displays Power Spots on the map",
   "dynamax_subtitle": "Displays Dynamax Battles on the map",
   "override": "Override",
+  "station_icons": "Power Spot Icons",
   "stationed_pokemon": "Stationed Pokémon",
   "attack_bonus": "Attack Bonus",
   "no_stationed_pokemon": "No Pokémon Have Been Set",
