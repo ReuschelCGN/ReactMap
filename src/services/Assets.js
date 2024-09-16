@@ -373,7 +373,7 @@ export class UAssets {
    * @param {boolean} [questActive]
    * @param {boolean} [ar]
    * @param {string | number} [power]
-   * @param {string | number} [displayTypeId]
+   * @param {string | number} [display]
    * @returns
    */
   getPokestops(
@@ -382,12 +382,12 @@ export class UAssets {
     questActive = false,
     ar = false,
     power = 0,
-    displayTypeId = '',
+    display = '',
   ) {
     try {
       return this[this.selected.pokestop]?.class?.pokestop(
         lureId,
-        displayTypeId || !!invasionActive,
+        display || !!invasionActive,
         questActive,
         ar,
         power,
