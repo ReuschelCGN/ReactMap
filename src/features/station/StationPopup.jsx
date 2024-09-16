@@ -196,7 +196,7 @@ function StationMenu({
             {t(option.name)}
           </MenuItem>
         ))}
-        {copyCoords && <CopyCoords lat={lat} lon={lon} />}
+        {copyCoords && <CopyCoords lat={lat} lon={lon} onClick={handleClose} />}
       </Menu>
     </>
   )
@@ -220,6 +220,8 @@ function StationMedia({
       battle_pokemon_gender,
       battle_pokemon_costume,
       battle_pokemon_alignment,
+      false,
+      1,
     ),
   )
   const stationImage = useMemory((s) => s.Icons.getStation(true))
@@ -316,7 +318,7 @@ function StationMons({ id }) {
   return (
     <CardContent sx={{ my: 1, p: 0, height: 130 }}>
       <Typography variant="h6" align="center">
-        {t('stationed_pokemon')}
+        {t('placed_pokemon')}
       </Typography>
       <VirtualGrid data={mons} xs={6}>
         {(index, mon) => {
@@ -338,6 +340,9 @@ function StationMons({ id }) {
                   0,
                   mon.gender,
                   mon.costume,
+                  0,
+                  false,
+                  mon.bread_mode,
                 )}
                 alt={caption}
                 maxHeight="100%"
