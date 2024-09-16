@@ -387,10 +387,11 @@ export class UAssets {
     try {
       return this[this.selected.pokestop]?.class?.pokestop(
         lureId,
-        display || !!invasionActive,
+        power,
+        display,
+        invasionActive,
         questActive,
         ar,
-        power,
       )
     } catch (e) {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
