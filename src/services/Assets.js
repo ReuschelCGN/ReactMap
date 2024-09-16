@@ -382,12 +382,12 @@ export class UAssets {
     questActive = false,
     ar = false,
     power = 0,
-    display = '',
+    displayTypeId = '',
   ) {
     try {
       return this[this.selected.pokestop]?.class?.pokestop(
         lureId,
-        display || !!invasionActive,
+        displayTypeId || !!invasionActive,
         questActive,
         ar,
         power,
