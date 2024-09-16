@@ -373,7 +373,7 @@ export class UAssets {
    * @param {boolean} [questActive]
    * @param {boolean} [ar]
    * @param {string | number} [power]
-   * @param {string | number} [display]
+   * @param {string | number} [displayTypeId]
    * @returns
    */
   getPokestops(
