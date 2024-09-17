@@ -19,8 +19,9 @@ import LockOpenIcon from '@mui/icons-material/LockOpen'
 import LockIcon from '@mui/icons-material/Lock'
 
 import { useMemory } from '@store/useMemory'
-import { setDeepStore, useGetDeepStore } from '@store/useStorage'
+import { setDeepStore, useStorage } from '@store/useStorage'
 import { Navigation } from '@components/popups/Navigation'
+import { Coords } from '@components/popups/Coords'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { PokeType } from '@components/popups/PokeType'
 import { GenderIcon } from '@components/popups/GenderIcon'
@@ -36,13 +37,15 @@ import {
 } from '@components/inputs/ExpandCollapse'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationAttackBonus } from '@utils/getAttackBonus'
-import { CopyCoords } from '@components/popups/Coords'
 
 import { useGetStationMons } from './useGetStationMons'
 
 /** @param {import('@rm/types').Station} station */
 export function StationPopup(station) {
   useAnalytics('Popup', 'Station')
+  const enableStationPopupCoords = useStorage(
+    (s) => s.userSettings?.stations?.enableStationPopupCoords,
+  )
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
@@ -74,6 +77,11 @@ export function StationPopup(station) {
         <Navigation lat={station.lat} lon={station.lon} />
         <StationMenu {...station} />
       </Box>
+      {enableStationPopupCoords && (
+        <Box className="flex-center">
+          <Coords lat={station.lat} lon={station.lon} />
+        </Box>
+      )}
     </Card>
   )
 }
@@ -127,13 +135,7 @@ function StationMenu({
   battle_level,
   battle_pokemon_id,
   battle_pokemon_form,
-  lat,
-  lon,
 }) {
-  const copyCoords = useGetDeepStore(
-    'userSettings.stations.enableStationPopupCoords',
-    false,
-  )
   const [anchorEl, setAnchorEl] = React.useState(null)
   const { t } = useTranslation()
 
@@ -196,7 +198,6 @@ function StationMenu({
             {t(option.name)}
           </MenuItem>
         ))}
-        {copyCoords && <CopyCoords lat={lat} lon={lon} />}
       </Menu>
     </>
   )
