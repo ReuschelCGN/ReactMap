@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - develop
-      - developmod-stationed-mon
+      - developmod-stationed-mon2
 
 jobs:
   lint:
