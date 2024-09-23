@@ -784,8 +784,14 @@
   "dynamax_subtitle": "Dyna-Raids auf der Map anzeigen",
   "override": "Dyna Override",
   "station_icons": "Kraftquellen Icons",
-  "stationed_pokemon": "platzierte Pokémon",
+  "placed_pokemon": "platzierte Pokémon",
   "attack_bonus": "Angriffsbonus",
   "battle_bonus": "Kampfbonus",
-  "copy_coordinates": "Koordinaten kopieren"
+  "copy_coordinates": "Koordinaten kopieren",
+  "enable_station_popup_coords": "Kraftquellen Koordinaten anzeigen",
+  "station_icons": "Kraftquellen Icons",
+  "dynamic_opacity": "dynamische Durchsichtigkeit",
+  "tooltips": "Tooltips",
+  "markers": "Marker",
+  "filters": "Filter"
 }
