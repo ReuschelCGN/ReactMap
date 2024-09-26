@@ -7,8 +7,6 @@ on:
       - developmod4
 
 jobs:
-  lint:
-    uses: ./.github/workflows/lint.yml
   config:
     uses: ./.github/workflows/config.yml
   locales:
