@@ -354,9 +354,9 @@ export function usePokestopMarker({
                     width: ${showcaseSizes[i]}px;
                     height: ${showcaseSizes[i]}px;
                     bottom: ${
-                      baseSize * 0.6 * eventMod.offsetY + showcaseSizes[i] * i
+                      baseSize * 0.8 * eventMod.offsetY + showcaseSizes[i] * i
                     }px;
-                    left: ${eventMod.offsetX * 50}%;
+                    left: ${eventMod.offsetX * 10}%;
                     transform: translateX(-50%);
                   "
                 />
