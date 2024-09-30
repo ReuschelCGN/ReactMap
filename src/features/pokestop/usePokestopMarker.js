@@ -351,8 +351,8 @@ export function usePokestopMarker({
                   src="${icon.url}"
                   alt="${icon.url}"
                   style="
-                    width: ${showcaseSizes[i]}px;
-                    height: ${showcaseSizes[i]}px;
+                    width: ${0.8 * showcaseSizes[i]}px;
+                    height: ${0.8 * showcaseSizes[i]}px;
                     bottom: ${
                       baseSize * 0.8 * eventMod.offsetY + showcaseSizes[i] * i
                     }px;
