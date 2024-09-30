@@ -356,8 +356,8 @@ export function usePokestopMarker({
                     bottom: ${
                       baseSize * 0.6 * eventMod.offsetY + showcaseSizes[i] * i
                     }px;
-                    left: ${eventMod.offsetX * 5}%;
-                    transform: translateX(-50%);
+                    left: ${eventMod.offsetX * 10}%;
+                    transform: translateX(-70%);
                   "
                 />
                 ${
