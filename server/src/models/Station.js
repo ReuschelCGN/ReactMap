@@ -226,6 +226,7 @@ class Station extends Model {
         '>',
         Date.now() / 1000 - stationUpdateLimit * 60 * 60 * 24,
       )
+      .andWhere('end_time', '>', ts)
       .andWhere((builder) => {
         if (perms.stations) {
           builder.orWhereILike('name', `%${search}%`)
