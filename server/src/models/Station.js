@@ -194,6 +194,7 @@ class Station extends Model {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '', locale } = args
     const { searchResultsLimit, stationUpdateLimit } = config.getSafe('api')
+    const ts = getEpoch()
 
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
       (pkmn) =>
