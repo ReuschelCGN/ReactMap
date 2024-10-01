@@ -160,6 +160,7 @@ class Station extends Model {
 
   static async getAvailable() {
     /** @type {import('@rm/types').FullStation[]} */
+    const ts = getEpoch()
     const results = await this.query()
       .distinct(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .where('is_inactive', false)
