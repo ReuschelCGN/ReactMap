@@ -18,6 +18,6 @@ jobs:
     if: needs.locales.outputs.made_commit != 'true' && needs.config.outputs.made_commit != 'true' && always()
     uses: ./.github/workflows/release.yml
   docker:
-    needs: [config, locales, lint]
+    needs: [config, locales]
     if: needs.locales.outputs.made_commit != 'true' && needs.config.outputs.made_commit != 'true' && always()
     uses: ./.github/workflows/docker.yml
