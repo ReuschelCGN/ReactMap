@@ -217,9 +217,10 @@ function StationMedia({
   battle_pokemon_bread_mode,
   battle_pokemon_move_1,
   battle_pokemon_move_2,
+  start_time,
 }) {
   const { t } = useTranslateById()
-  const stationImage = useMemory((s) => s.Icons.getStation(true))
+  const stationImage = useMemory((s) => s.Icons.getStation(start_time < Date.now() / 1000))
   const types = useMemory((s) => {
     if (!battle_pokemon_id) return []
     const poke = s.masterfile.pokemon[battle_pokemon_id]
