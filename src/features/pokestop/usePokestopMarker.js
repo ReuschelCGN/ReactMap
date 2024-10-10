@@ -351,13 +351,13 @@ export function usePokestopMarker({
                   src="${icon.url}"
                   alt="${icon.url}"
                   style="
-                    width: ${showcaseSizes[i]}px;
-                    height: ${showcaseSizes[i]}px;
+                    width: ${0.8 * showcaseSizes[i]}px;
+                    height: ${0.8 * showcaseSizes[i]}px;
                     bottom: ${
-                      baseSize * 0.8 * eventMod.offsetY + showcaseSizes[i] * i
+                      baseSize * 0.6 * eventMod.offsetY + showcaseSizes[i] * i
                     }px;
                     left: ${eventMod.offsetX * 10}%;
-                    transform: translateX(-50%);
+                    transform: translateX(-70%);
                   "
                 />
                 ${
