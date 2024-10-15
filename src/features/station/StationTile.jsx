@@ -30,11 +30,11 @@ const BaseStationTile = (station) => {
   const timers = React.useMemo(() => {
     const now = Date.now() / 1000
     const internalTimers = /** @type {number[]} */ ([])
-    if (showTimer && station.start_time && station.start_time < now) {
-      internalTimers.push(station.start_time)
-    }
-    if (showTimer && station.end_time && station.end_time > now && (station.start_time < now || 0)) {
+    if (showTimer && station.end_time && station.end_time > now) {
       internalTimers.push(station.end_time)
+    }
+    if (showTimer && station.start_time && station.start_time > now) {
+      internalTimers.push(station.start_time)
     }
     return internalTimers
   }, [showTimer])
