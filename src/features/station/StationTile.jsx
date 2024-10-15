@@ -33,7 +33,7 @@ const BaseStationTile = (station) => {
     if (showTimer && station.start_time && station.start_time < now) {
       internalTimers.push(station.start_time)
     }
-    if (showTimer && station.end_time && station.end_time > now) {
+    if (showTimer && station.end_time && station.end_time > now && (station.start_time < now || 0)) {
       internalTimers.push(station.end_time)
     }
     return internalTimers
