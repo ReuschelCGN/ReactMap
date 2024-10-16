@@ -7,7 +7,10 @@ import CardMedia from '@mui/material/CardMedia'
 import CardContent from '@mui/material/CardContent'
 import CardActions from '@mui/material/CardActions'
 import CardHeader from '@mui/material/CardHeader'
+import Collapse from '@mui/material/Collapse'
+import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVertIcon from '@mui/icons-material/MoreVert'
+import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
@@ -19,7 +22,7 @@ import LockOpenIcon from '@mui/icons-material/LockOpen'
 import LockIcon from '@mui/icons-material/Lock'
 
 import { useMemory } from '@store/useMemory'
-import { setDeepStore, useGetDeepStore } from '@store/useStorage'
+import { setDeepStore, useGetDeepStore, useStorage } from '@store/useStorage'
 import { Navigation } from '@components/popups/Navigation'
 import { useTranslateById } from '@hooks/useTranslateById'
 import { PokeType } from '@components/popups/PokeType'
@@ -47,7 +50,14 @@ export function StationPopup(station) {
 
   return (
     <Card sx={{ width: 200 }} elevation={0}>
-      <StationHeader {...station} />
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-evenly"
+      >
+        <StationHeader {...station} />
+        <StationMenu {...station} />
+      </Box>
       {!!station.battle_level && <StationRating {...station} />}
       <StationMedia {...station} />
       {!!station.is_battle_available && station.battle_start < Date.now() / 1000 && (
@@ -66,23 +76,15 @@ export function StationPopup(station) {
         </ExpandCollapse>
       )}
       <StationContent {...station} />
-      <Box
-        component={CardActions}
-        display="flex"
-        alignItems="center"
-        justifyContent="space-evenly"
-      >
-        <Navigation lat={station.lat} lon={station.lon} />
-        <StationMenu {...station} />
-      </Box>
+      <Footer lat={station.lat} lon={station.lon} />
+      <ExtraInfo {...station} />
     </Card>
   )
 }
 
 /** @param {import('@rm/types').Station} props */
-function StationHeader({ name, updated }) {
+function StationHeader({ name }) {
   const { t } = useTranslation()
-  const dateFormatter = useFormatStore((s) => s.dateFormat)
 
   return (
     <CardHeader
@@ -96,11 +98,6 @@ function StationHeader({ name, updated }) {
         >
           {name}
         </Title>
-      }
-      subheader={
-        <Typography variant="caption">
-          {dateFormatter.format(new Date(updated * 1000))}
-        </Typography>
       }
       sx={{ p: 0 }}
     />
@@ -122,6 +119,47 @@ function StationRating({ battle_level, battle_start, battle_end }) {
         <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
       </Stack>
     </CardContent>
+  )
+}
+
+/** @param {import('@rm/types').Station} props */
+const Footer = ({ lat, lon }) => {
+  const open = useStorage((s) => !!s.popups.extras)
+
+  return (
+    <Grid container xs={12} justifyContent="space-evenly" alignItems="center">
+      <Grid xs={3}>
+        <Navigation lat={lat} lon={lon} />
+      </Grid>
+      <Grid xs={3} textAlign="center">
+        <IconButton
+          className={open ? 'expanded' : 'closed'}
+          onClick={() =>
+            useStorage.setState((prev) => ({
+              popups: { ...prev.popups, extras: !open },
+            }))
+          }
+          size="large"
+        >
+          <ExpandMore />
+        </IconButton>
+      </Grid>
+    </Grid>
+  )
+}
+
+/** @param {import('@rm/types').Station} props */
+const ExtraInfo = ({ updated, lat, lon }) => {
+  const open = useStorage((s) => s.popups.extras)
+  const { t } = useTranslation()
+  const dateFormatter = useFormatStore((s) => s.dateFormat)
+
+  return (
+    <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
+      <Grid container alignItems="center" justifyContent="center">
+        &nbsp;{t('last_seen')}:<br />{dateFormatter.format(new Date(updated * 1000))}
+      </Grid>
+    </Collapse>
   )
 }
 
@@ -308,9 +346,9 @@ function StationContent({ start_time, end_time, id }) {
     <CardContent sx={{ p: 0 }}>
       <Stack alignItems="center" justifyContent="center">
         {start_time > Date.now() / 1000 ? (
-          <LiveTimeStamp start epoch={epoch} id={id} />
+          <StationTimeStamp start epoch={epoch} id={id} />
         ) : (
-          <LiveTimeStamp epoch={epoch} id={id} />
+          <StationTimeStamp epoch={epoch} id={id} />
         )}
         <StaticTimeStamp date epoch={epoch} />
       </Stack>
@@ -380,6 +418,25 @@ function LiveTimeStamp({ start = false, epoch, ...props }) {
       {start
         ? t(pastTense ? 'started' : 'starts')
         : t(pastTense ? 'ended' : 'ends')}
+      &nbsp;
+      {relativeTime}
+    </Typography>
+  )
+}
+
+/**
+ * @param {{ start?: boolean, epoch: number } & import('@mui/material').TypographyProps} props
+ */
+function StationTimeStamp({ start = false, epoch, ...props }) {
+  const { t } = useTranslation()
+  const relativeTime = useRelativeTimer(epoch || 0)
+  const pastTense = epoch * 1000 < Date.now()
+
+  return (
+    <Typography variant="subtitle2" {...props}>
+      {start
+        ? t('active')
+        : t('inactive')}
       &nbsp;
       {relativeTime}
     </Typography>
