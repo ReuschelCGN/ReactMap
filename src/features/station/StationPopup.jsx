@@ -108,7 +108,7 @@ function StationHeader({ name }) {
 function StationRating({ battle_level, battle_start, battle_end }) {
   const { t } = useTranslation()
   const isStarting = battle_start > Date.now() / 1000
-  const epoch = isStarting ? battle_start : battle_end
+  const epoch = isStarting ? battle_start + 60 * 60 * 1000 : battle_end - 60 * 60 * 8 * 1000
   return (
     <CardContent sx={{ p: 0, py: 1 }}>
       <Stack alignItems="center" justifyContent="center">
