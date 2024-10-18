@@ -796,5 +796,6 @@
   "markers": "Marker",
   "filters": "Filter",
   "active": "aktiv",
-  "inactive": "inaktiv"
+  "inactive": "inaktiv",
+  "max_battles_duration_info": "Du kannst von 6h bis 21h an Dyna-Kämpfen teilnehmen."
 }
