@@ -40,6 +40,11 @@ class Station extends Model {
       .whereBetween('lat', [args.minLat, args.maxLat])
       .andWhereBetween('lon', [args.minLon, args.maxLon])
       .andWhere('end_time', '>', ts)
+      .andWhere(
+        'updated',
+        '>',
+        Date.now() / 1000 - 60 * 60 * 6,
+      )
     // .where('is_inactive', false)
 
     if (perms.dynamax && onlyMaxBattles) {
@@ -165,6 +170,11 @@ class Station extends Model {
       .distinct(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .where('is_inactive', false)
       .andWhere('end_time', '>', ts)
+      .andWhere(
+        'updated',
+        '>',
+        Date.now() / 1000 - 60 * 60 * 6,
+      )
       .groupBy(['battle_pokemon_id', 'battle_pokemon_form', 'battle_level'])
       .orderBy('battle_pokemon_id', 'asc')
     return {
@@ -227,6 +237,11 @@ class Station extends Model {
         Date.now() / 1000 - stationUpdateLimit * 60 * 60 * 24,
       )
       .andWhere('end_time', '>', ts)
+      .andWhere(
+        'updated',
+        '>',
+        Date.now() / 1000 - 60 * 60 * 6,
+      )
       .andWhere((builder) => {
         if (perms.stations) {
           builder.orWhereILike('name', `%${search}%`)
