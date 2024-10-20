@@ -105,7 +105,7 @@ function StationHeader({ name }) {
 }
 
 /** @param {import('@rm/types').Station} props */
-function StationRating({ battle_level, battle_start, battle_end }) {
+function StationRating({ battle_level, battle_start, battle_end, is_battle_available }) {
   const { t } = useTranslation()
   const isStarting = battle_start > Date.now() / 1000
   const epoch = isStarting ? battle_start + 60 * 60 : battle_end - 60 * 60 * 8
@@ -117,6 +117,13 @@ function StationRating({ battle_level, battle_start, battle_end }) {
           {t(`max_battle_${battle_level}`)}
         </Typography>
         <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
+        {!is_battle_available &&
+          battle_start + 60 * 60 < Date.now() / 1000 &&
+          battle_end - 60 * 60 * 8 > Date.now() / 1000 && (
+            <Typography variant="caption" align="center">
+              {t('max_battles_duration_info')}
+            </Typography>
+        )}
       </Stack>
     </CardContent>
   )
