@@ -54,10 +54,10 @@ export function useStationMarker({
   return divIcon({
     popupAnchor: [
       0 + stationMod.popupX + stationMod.offsetX,
-      (-baseSize - (is_battle_available ? battleSize : 0)) * 0.67 +
+      (-baseSize - (is_battle_available && isActive ? battleSize : 0)) * 0.67 +
         stationMod.popupY +
         stationMod.offsetY +
-        (battleMod.offsetY + battleMod.popupY),
+        (-5 + battleMod.offsetY + battleMod.popupY),
     ],
     className: 'station-marker',
     html: /* html */ `
