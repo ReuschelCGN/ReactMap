@@ -797,5 +797,5 @@
   "filters": "Filter",
   "active": "aktiv",
   "inactive": "inaktiv",
-  "max_battles_duration_info": "Du kannst von 6h bis 21h an Dyna-Kämpfen teilnehmen."
+  "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen."
 }
