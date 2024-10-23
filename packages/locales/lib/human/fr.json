@@ -774,5 +774,5 @@
   "weather_audio": "Son de météo",
   "active": "Actif",
   "inactive": "Inactif",
-  "max_battles_duration_info": "Vous pouvez participer à des batailles Max entre 6h et 21h."
+  "bread_time_window": "Tu peux participer à des Combats Dynamax entre 6h et 21h."
 }
