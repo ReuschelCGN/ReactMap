@@ -121,7 +121,7 @@ function StationRating({ battle_level, battle_start, battle_end, is_battle_avail
           battle_start + 60 * 60 < Date.now() / 1000 &&
           battle_end - 60 * 60 * 8 > Date.now() / 1000 && (
             <Typography variant="caption" align="center">
-              {t('max_battles_duration_info')}
+              {t('bread_time_window')}
             </Typography>
         )}
       </Stack>
