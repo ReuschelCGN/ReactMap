@@ -818,5 +818,5 @@
   "filters": "Filters",
   "active": "Active",
   "inactive": "Inactive",
-  "max_battles_duration_info": "You can take on Max Battles between 6AM and 9 PM."
+  "bread_time_window": "You can take on Max Battles between 6AM and 9PM."
 }
