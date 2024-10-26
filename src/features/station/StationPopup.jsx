@@ -105,10 +105,19 @@ function StationHeader({ name }) {
 }
 
 /** @param {import('@rm/types').Station} props */
-function StationRating({ battle_level, battle_start, battle_end, is_battle_available }) {
+function StationRating({
+  battle_level,
+  battle_start,
+  battle_end,
+  is_battle_available,
+  start_time,
+  end_time,
+}) {
   const { t } = useTranslation()
   const isStarting = battle_start > Date.now() / 1000
-  const epoch = isStarting ? battle_start + 60 * 60 : battle_end - 60 * 60 * 8
+  const battle_start_time = (battle_start == start_time) ? battle_start + 60 * 60 : battle_start
+  const battle_end_time = ((battle_end == end_time) && (battle_end > Date.now() / 1000 + 60 * 60)) ? battle_end - 60 * 60 * 8 : battle_end
+  const epoch = isStarting ? battle_start_time : battle_end_time
   return (
     <CardContent sx={{ p: 0, py: 1 }}>
       <Stack alignItems="center" justifyContent="center">
@@ -118,8 +127,8 @@ function StationRating({ battle_level, battle_start, battle_end, is_battle_avail
         </Typography>
         <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
         {!is_battle_available &&
-          battle_start + 60 * 60 < Date.now() / 1000 &&
-          battle_end - 60 * 60 * 8 > Date.now() / 1000 && (
+          battle_start_time < Date.now() / 1000 &&
+          battle_end_time > Date.now() / 1000 && (
             <Typography variant="caption" align="center">
               {t('bread_time_window')}
             </Typography>
