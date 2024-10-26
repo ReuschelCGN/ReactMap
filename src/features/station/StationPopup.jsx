@@ -112,7 +112,7 @@ function StationRating({ battle_level, battle_start, battle_end, is_battle_avail
   return (
     <CardContent sx={{ p: 0, py: 1 }}>
       <Stack alignItems="center" justifyContent="center">
-        <Rating value={battle_level} max={Math.max(6, battle_level)} readOnly />
+        <Rating value={battle_level} max={Math.max(5, battle_level)} readOnly />
         <Typography variant="caption">
           {t(`max_battle_${battle_level}`)}
         </Typography>
