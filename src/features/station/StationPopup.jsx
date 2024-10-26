@@ -127,7 +127,7 @@ function StationRating({
         </Typography>
         <LiveTimeStamp start={isStarting} epoch={epoch} variant="caption" />
         {!is_battle_available &&
-          battle_start_time < Date.now() / 1000 &&
+          battle_start < Date.now() / 1000 &&
           battle_end_time > Date.now() / 1000 && (
             <Typography variant="caption" align="center">
               {t('bread_time_window')}
