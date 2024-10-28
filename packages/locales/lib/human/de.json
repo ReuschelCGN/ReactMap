@@ -796,5 +796,6 @@
   "markers": "Marker",
   "filters": "Filter",
   "active": "aktiv",
-  "inactive": "inaktiv"
+  "inactive": "inaktiv",
+  "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen."
 }
