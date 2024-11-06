@@ -811,6 +811,7 @@
 
 * data management page ([561c031](https://github.com/WatWowMap/ReactMap/commit/561c031e0f290d7c63e17b6a645e8b145cf2e4d1))
 
+
 # [1.30.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.30.0-develop.5...v1.30.0-develop.6) (2024-02-23)
 
 ### Bug Fixes
