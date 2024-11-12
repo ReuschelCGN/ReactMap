@@ -60,8 +60,7 @@ export function StationPopup(station) {
       </Box>
       {!!station.battle_level && station.battle_end > Date.now() / 1000 && <StationRating {...station} />}
       <StationMedia {...station} />
-      {!!station.is_battle_available &&
-        station.battle_start < Date.now() / 1000 &&
+      {station.battle_start < Date.now() / 1000 &&
         station.battle_end > Date.now() / 1000 && (
           <ExpandCollapse>
             <StationAttackBonus {...station} />
@@ -287,7 +286,7 @@ function StationMedia({
     return poke?.types || []
   })
 
-  return is_battle_available && battle_end > Date.now() / 1000 ? (
+  return battle_end > Date.now() / 1000 ? (
     <CardMedia>
       <Box className="popup-card-media">
         <Stack className="flex-center">
