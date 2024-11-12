@@ -247,7 +247,6 @@ class Station extends Model {
           builder.orWhere((builder2) => {
             builder2
               .whereIn('battle_pokemon_id', pokemonIds)
-              .andWhere('is_battle_available', true)
               .andWhere('battle_end', '>', ts)
           })
         }
