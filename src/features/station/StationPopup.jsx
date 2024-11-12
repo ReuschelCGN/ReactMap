@@ -61,21 +61,21 @@ export function StationPopup(station) {
       {!!station.battle_level && <StationRating {...station} />}
       <StationMedia {...station} />
       {!!station.is_battle_available &&
-       station.battle_start < Date.now() / 1000 &&
-       station.battle_end > Date.now() / 1000 && (
-        <ExpandCollapse>
-          <StationAttackBonus {...station} />
-          <ExpandWithState
-            field="popups.stationExtras"
-            disabled={!station.total_stationed_pokemon}
-          />
-          <CollapseWithState
-            field="popups.stationExtras"
-            in={!!station.total_stationed_pokemon}
-          >
-            <StationMons {...station} />
-          </CollapseWithState>
-        </ExpandCollapse>
+        station.battle_start < Date.now() / 1000 &&
+        station.battle_end > Date.now() / 1000 && (
+          <ExpandCollapse>
+            <StationAttackBonus {...station} />
+            <ExpandWithState
+              field="popups.stationExtras"
+              disabled={!station.total_stationed_pokemon}
+            />
+            <CollapseWithState
+              field="popups.stationExtras"
+              in={!!station.total_stationed_pokemon}
+            >
+              <StationMons {...station} />
+            </CollapseWithState>
+          </ExpandCollapse>
       )}
       <StationContent {...station} />
       <Footer lat={station.lat} lon={station.lon} />
