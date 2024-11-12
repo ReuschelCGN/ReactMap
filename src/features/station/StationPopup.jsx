@@ -60,7 +60,9 @@ export function StationPopup(station) {
       </Box>
       {!!station.battle_level && <StationRating {...station} />}
       <StationMedia {...station} />
-      {!!station.is_battle_available && station.battle_start < Date.now() / 1000 && (
+      {!!station.is_battle_available &&
+       station.battle_start < Date.now() / 1000 &&
+       station.battle_end > Date.now() / 1000 && (
         <ExpandCollapse>
           <StationAttackBonus {...station} />
           <ExpandWithState
