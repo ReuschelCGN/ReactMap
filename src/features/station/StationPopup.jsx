@@ -60,7 +60,8 @@ export function StationPopup(station) {
       </Box>
       {!!station.battle_level && station.battle_end > Date.now() / 1000 && <StationRating {...station} />}
       <StationMedia {...station} />
-      {station.battle_start < Date.now() / 1000 &&
+      {!!station.is_battle_available &&
+        station.battle_start < Date.now() / 1000 &&
         station.battle_end > Date.now() / 1000 && (
           <ExpandCollapse>
             <StationAttackBonus {...station} />
@@ -274,9 +275,11 @@ function StationMedia({
   battle_pokemon_move_2,
   battle_end,
   start_time,
+  end_time,
 }) {
   const { t } = useTranslateById()
   const stationImage = useMemory((s) => s.Icons.getStation(start_time < Date.now() / 1000))
+  const battle_end_time = ((battle_end == end_time) && (battle_end > Date.now() / 1000 + 60 * 60)) ? battle_end - 60 * 60 * 8 : battle_end
   const types = useMemory((s) => {
     if (!battle_pokemon_id) return []
     const poke = s.masterfile.pokemon[battle_pokemon_id]
@@ -286,7 +289,7 @@ function StationMedia({
     return poke?.types || []
   })
 
-  return battle_end > Date.now() / 1000 ? (
+  return battle_end_time > Date.now() / 1000 ? (
     <CardMedia>
       <Box className="popup-card-media">
         <Stack className="flex-center">
