@@ -669,6 +669,7 @@
   "done": "Erledigt",
   "fast": "Sofort",
   "charged": "Lade",
+  "cooldown": "Cooldown",
   "offline_mode": "offline Modus",
   "include_sponsored": "einschließlich gesponserte",
   "showcase_color": "Showcasefarbe",
@@ -793,5 +794,8 @@
   "dynamic_opacity": "dynamische Durchsichtigkeit",
   "tooltips": "Tooltips",
   "markers": "Marker",
-  "filters": "Filter"
+  "filters": "Filter",
+  "active": "aktiv",
+  "inactive": "inaktiv",
+  "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen."
 }
