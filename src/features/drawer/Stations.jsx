@@ -18,7 +18,7 @@ function StationLevels() {
   const available = useMemory((s) => s.available.stations)
   const enabled = useStorage(
     (s) =>
-      !!s.filters?.stations?.maxBattles,
+      !!s.filters?.stations?.maxBattles && !s.filters?.stations?.allStations,
   )
   const [filters, setFilters] = useDeepStore(
     'filters.stations.battleTier',
@@ -59,7 +59,8 @@ function StationsQuickSelect() {
   const enabled = useStorage(
     (s) =>
       !!s.filters?.stations?.maxBattles &&
-      s.filters?.stations?.battleTier === 'all',
+      s.filters?.stations?.battleTier === 'all' &&
+      !s.filters?.stations?.allStations,
   )
   return (
     <CollapsibleItem open={enabled}>
