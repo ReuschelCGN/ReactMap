@@ -79,7 +79,7 @@ class Station extends Model {
           .andWhere('battle_end', '>', ts)
 
         query.andWhere((station) => {
-          if (hasStationedGmax || !onlyGmaxStationed)
+          if (hasStationedGmax || !onlyGmaxStationed) {
             station.where((battle) => {
               if (onlyBattleTier === 'all') {
                 const battleBosses = new Set()
@@ -115,8 +115,10 @@ class Station extends Model {
                 battle.andWhere('battle_level', onlyBattleTier)
               }
             })
-          if (hasStationedGmax && onlyGmaxStationed)
+          }
+          if (hasStationedGmax && onlyGmaxStationed) {
             station.orWhere('total_stationed_gmax', '>', 0)
+          }
         })
       }
     }
