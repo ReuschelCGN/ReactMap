@@ -52,7 +52,7 @@ class Station extends Model {
       )
     // .where('is_inactive', false)
 
-    if (perms.dynamax && (onlyMaxBattles || onlyGmaxStationed)) {
+    if (perms.dynamax && (onlyMaxBattles || (onlyGmaxStationed && !onlyMaxBattles))) {
       select.push(
         'is_battle_available',
         'battle_level',
@@ -79,7 +79,7 @@ class Station extends Model {
           .andWhere('battle_end', '>', ts)
 
         query.andWhere((station) => {
-          if (hasStationedGmax || !onlyGmaxStationed) {
+          if (onlyMaxBattles) {
             station.where((battle) => {
               if (onlyBattleTier === 'all') {
                 const battleBosses = new Set()
@@ -116,7 +116,7 @@ class Station extends Model {
               }
             })
           }
-          if (hasStationedGmax && onlyGmaxStationed) {
+          if (hasStationedGmax && onlyGmaxStationed && !onlyAllStations & !onlyMaxBattles) {
             station.orWhere('total_stationed_gmax', '>', 0)
           }
         })
