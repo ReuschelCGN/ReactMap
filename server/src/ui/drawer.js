@@ -109,7 +109,7 @@ function drawer(req, perms) {
                   name: 'level',
                   label: '',
                   min: 1,
-                  max: 55,
+                  max: 50,
                   perm: 'iv',
                   color: 'secondary',
                 },
