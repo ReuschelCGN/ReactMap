@@ -52,7 +52,10 @@ class Station extends Model {
       )
     // .where('is_inactive', false)
 
-    if (perms.dynamax && (onlyMaxBattles || (onlyGmaxStationed && !onlyMaxBattles))) {
+    if (
+      perms.dynamax &&
+      (onlyMaxBattles || (onlyGmaxStationed && !onlyMaxBattles))
+    ) {
       select.push(
         'is_battle_available',
         'battle_level',
@@ -116,7 +119,12 @@ class Station extends Model {
               }
             })
           }
-          if (hasStationedGmax && onlyGmaxStationed && !onlyAllStations & !onlyMaxBattles) {
+          if (
+            hasStationedGmax &&
+            onlyGmaxStationed &&
+            !onlyAllStations &&
+            !onlyMaxBattles
+          ) {
             station.orWhere('total_stationed_gmax', '>', 0)
           }
         })
