@@ -117,7 +117,9 @@ function StationRating({
   const battle_start_time =
     battle_start == start_time ? battle_start + 60 * 60 : battle_start
   const battle_end_time =
-    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
+    battle_end == end_time &&
+    battle_end > Date.now() / 1000 + 60 * 60 &&
+    !is_battle_available
       ? battle_end - 60 * 60 * 8
       : battle_end
   const epoch = isStarting ? battle_start_time : battle_end_time
@@ -274,6 +276,7 @@ function StationMedia({
   battle_pokemon_bread_mode,
   battle_pokemon_move_1,
   battle_pokemon_move_2,
+  is_battle_available,
   battle_end,
   start_time,
   end_time,
@@ -283,7 +286,9 @@ function StationMedia({
     s.Icons.getStation(start_time < Date.now() / 1000),
   )
   const battle_end_time =
-    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
+    battle_end == end_time &&
+    battle_end > Date.now() / 1000 + 60 * 60 &&
+    !is_battle_available
       ? battle_end - 60 * 60 * 8
       : battle_end
   const types = useMemory((s) => {
