@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - develop
-      - developmod4
+      - developmod4-lvl55wild
 
 jobs:
   config:
