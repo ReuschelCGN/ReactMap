@@ -274,6 +274,7 @@ function StationMedia({
   battle_pokemon_bread_mode,
   battle_pokemon_move_1,
   battle_pokemon_move_2,
+  is_battle_available,
   battle_end,
   start_time,
   end_time,
