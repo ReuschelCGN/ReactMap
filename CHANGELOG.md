@@ -1,3 +1,17 @@
+# [1.36.0-develop.5](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.4...v1.36.0-develop.5) (2024-12-11)
+
+
+### Bug Fixes
+
+* correctly handle ditto forms ([1944f0c](https://github.com/WatWowMap/ReactMap/commit/1944f0ca0ed9dd82b6fde86d14ecbacbb33ad2b4))
+
+# [1.36.0-develop.4](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.3...v1.36.0-develop.4) (2024-12-10)
+
+
+### Bug Fixes
+
+* search raid before hatching ([060d4ac](https://github.com/WatWowMap/ReactMap/commit/060d4ac2e3a66bf63a433f32c851248ce3d98334))
+
 # [1.36.0-develop.3](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.2...v1.36.0-develop.3) (2024-12-02)
 
 
