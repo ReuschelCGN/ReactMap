@@ -1,3 +1,44 @@
+# [1.36.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.10...v1.36.0-develop.11) (2025-02-12)
+
+
+### Bug Fixes
+
+* bump uicons 2.0.3 ([978f0c2](https://github.com/WatWowMap/ReactMap/commit/978f0c223db89c5231e3db91944f8be5f4043f2e))
+
+# [1.36.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.9...v1.36.0-develop.10) (2024-12-27)
+
+
+### Bug Fixes
+
+* server filters might not be sent ([8a4db0f](https://github.com/WatWowMap/ReactMap/commit/8a4db0f71236f17fbd0509722fd474ff9f649365)), closes [#1083](https://github.com/WatWowMap/ReactMap/issues/1083)
+
+# [1.36.0-develop.9](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.8...v1.36.0-develop.9) (2024-12-26)
+
+
+### Bug Fixes
+
+* audit deps ([3ed1ff2](https://github.com/WatWowMap/ReactMap/commit/3ed1ff234eacbcadbc9e08aa08160ca6ee3b34db))
+
+# [1.36.0-develop.8](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.7...v1.36.0-develop.8) (2024-12-22)
+
+
+### Bug Fixes
+
+* always add 0 form ([31900e2](https://github.com/WatWowMap/ReactMap/commit/31900e21796dbe8b9063a51c05c7d772678a86f5))
+* form can be unset for quests ([b83c493](https://github.com/WatWowMap/ReactMap/commit/b83c493bfdd182503501207a97f76a64911dd0a3))
+
+# [1.36.0-develop.7](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.6...v1.36.0-develop.7) (2024-12-20)
+
+
+### Bug Fixes
+
+* skip generating unlikely quest rewards ([9c82b90](https://github.com/WatWowMap/ReactMap/commit/9c82b909eaeb25abdbe2078cf80b1d184efac373))
+
+
+### Features
+
+* allow enable/disable all Pokemon by user choice ([9fb95f1](https://github.com/WatWowMap/ReactMap/commit/9fb95f1cb34ebc3563ee6562bce28c2e33ff182c))
+
 # [1.36.0-develop.6](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.5...v1.36.0-develop.6) (2024-12-15)
 
 
