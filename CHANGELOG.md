@@ -1,3 +1,30 @@
+# [1.36.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.12...v1.36.0-develop.13) (2025-03-13)
+
+
+### Bug Fixes
+
+* nullability ([0c2b06e](https://github.com/WatWowMap/ReactMap/commit/0c2b06e79f4e53950b6b5f6739fc3df982c0209c))
+* only display probability if available ([15b9c15](https://github.com/WatWowMap/ReactMap/commit/15b9c15c2c5409b4ad8c321f200ade41c1e85504))
+
+
+### Features
+
+* quest_shiny_probability ([a5487da](https://github.com/WatWowMap/ReactMap/commit/a5487dad229c9edd7a2c23a863c9bc4c4b0d18e1))
+
+# [1.36.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.11...v1.36.0-develop.12) (2025-02-13)
+
+
+### Features
+
+* station interactionRanges ([35bea36](https://github.com/WatWowMap/ReactMap/commit/35bea3648a4c01180b9cc5f21791c5570e05893c)), closes [#1086](https://github.com/WatWowMap/ReactMap/issues/1086)
+
+# [1.36.0-develop.11](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.10...v1.36.0-develop.11) (2025-02-12)
+
+
+### Bug Fixes
+
+* bump uicons 2.0.3 ([978f0c2](https://github.com/WatWowMap/ReactMap/commit/978f0c223db89c5231e3db91944f8be5f4043f2e))
+
 # [1.36.0-develop.10](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.9...v1.36.0-develop.10) (2024-12-27)
 
 
