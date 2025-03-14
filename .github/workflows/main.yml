@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - develop
-      - developmod-qshiny
+      - developmod
 
 jobs:
   config:
