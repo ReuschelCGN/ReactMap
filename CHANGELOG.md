@@ -1,3 +1,30 @@
+# [1.36.0-develop.15](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.14...v1.36.0-develop.15) (2025-03-23)
+
+
+### Features
+
+* add role array support ([67a71fb](https://github.com/WatWowMap/ReactMap/commit/67a71fb7d85c147f45c2942d98dc920c7e162137))
+
+# [1.36.0-develop.14](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.13...v1.36.0-develop.14) (2025-03-14)
+
+
+### Bug Fixes
+
+* update en translation ([df052b6](https://github.com/WatWowMap/ReactMap/commit/df052b6068882a561d653fd5c573baa601857d45))
+
+# [1.36.0-develop.13](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.12...v1.36.0-develop.13) (2025-03-13)
+
+
+### Bug Fixes
+
+* nullability ([0c2b06e](https://github.com/WatWowMap/ReactMap/commit/0c2b06e79f4e53950b6b5f6739fc3df982c0209c))
+* only display probability if available ([15b9c15](https://github.com/WatWowMap/ReactMap/commit/15b9c15c2c5409b4ad8c321f200ade41c1e85504))
+
+
+### Features
+
+* quest_shiny_probability ([a5487da](https://github.com/WatWowMap/ReactMap/commit/a5487dad229c9edd7a2c23a863c9bc4c4b0d18e1))
+
 # [1.36.0-develop.12](https://github.com/WatWowMap/ReactMap/compare/v1.36.0-develop.11...v1.36.0-develop.12) (2025-02-13)
 
 
