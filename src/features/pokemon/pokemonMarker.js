@@ -95,7 +95,7 @@ export const fancyPokemonMarker = ({
           pkmn.seen_type === 'tappable_encounter'
             ? /* html */ `
             <img
-              src="${Icons.getMisc('grass')}"
+              src="${Icons.getMisc('pokemon')}"
               alt="tappable_encounter"
               style="
                 width: ${iconSize / 1.5}px;
