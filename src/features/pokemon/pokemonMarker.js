@@ -98,7 +98,7 @@ export const fancyPokemonMarker = ({
               src="${Icons.getMisc('pokemon')}"
               alt="tappable_encounter"
               style="
-                width: ${iconSize / 1.5}px;
+                width: ${iconSize / 2}px;
                 height: auto;
                 bottom: ${(-iconSize / 5) * pokemonMod.offsetY}px;
                 left: 10%;
