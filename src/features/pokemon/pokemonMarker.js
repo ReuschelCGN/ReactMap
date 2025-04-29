@@ -92,6 +92,21 @@ export const fancyPokemonMarker = ({
             : ''
         }
         ${
+          pkmn.seen_type === 'tappable_encounter'
+            ? /* html */ `
+            <img
+              src="${Icons.getMisc('grass')}"
+              alt="tappable_encounter"
+              style="
+                width: ${iconSize / 1.5}px;
+                height: auto;
+                bottom: ${(-iconSize / 5) * pokemonMod.offsetY}px;
+                left: 10%;
+              "
+            />`
+            : ''
+        }
+        ${
           badge
             ? /* html */ `
             <img
