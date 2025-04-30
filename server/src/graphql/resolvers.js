@@ -494,6 +494,12 @@ const resolvers = {
       }
       return []
     },
+    stationsSingle: (_, args, { perms, Db }) => {
+      if (perms?.stations || perms?.dynamax) {
+        return Db.getOne('Station', args.id)
+      }
+      return {}
+    },
     stationPokemon: (_, { id }, { perms, Db }) => {
       if (perms?.stations) {
         return Db.query('Station', 'getDynamaxMons', id)

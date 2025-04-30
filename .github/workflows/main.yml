@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - develop
-      - developmod4-station-id
+      - developmod4-station-id2
 
 jobs:
   config:
