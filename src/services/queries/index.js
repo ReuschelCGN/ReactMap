@@ -143,11 +143,7 @@ export class Query {
   /** @param {import('@rm/types').AllFilters['stations']} filters */
   static stations(filters) {
     const { perms } = useMemory.getState().auth
-    if (filters === 'id') {
-      return GET_ONE_STATION
-    }
     let query = 'GET_ALL_STATIONS'
-    }
     if ((filters.maxBattles || filters.gmaxStationed) && perms.dynamax) {
       query += '_BATTLE'
     }
