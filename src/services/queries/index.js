@@ -15,7 +15,6 @@ import { GET_ALL_WEATHER } from './weather'
 import { GET_ALL_SCAN_CELLS } from './scanCell'
 import { GET_ALL_SUBMISSION_CELLS } from './submissionCells'
 import { GET_ONE_NEST, GET_ALL_NESTS, NEST_SUBMISSION } from './nest'
-import { GET_ONE_STATION } from './station'
 import { GET_ALL_SCAN_AREAS, GET_SCAN_AREAS_MENU } from './scanAreas'
 import { S2_CELLS } from './s2cell'
 import { GET_ROUTE, GET_ROUTES } from './route'
@@ -146,8 +145,8 @@ export class Query {
     const { perms } = useMemory.getState().auth
     if (filters === 'id') {
       return GET_ONE_STATION
-    } else {
-      let query = 'GET_ALL_STATIONS'
+    }
+    let query = 'GET_ALL_STATIONS'
     }
     if ((filters.maxBattles || filters.gmaxStationed) && perms.dynamax) {
       query += '_BATTLE'
