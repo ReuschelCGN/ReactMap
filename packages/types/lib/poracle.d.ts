@@ -218,6 +218,7 @@ export interface Poracle {
   gym: PoracleGym[]
   egg: PoracleEgg[]
   raid: PoracleRaid[]
+  maxbattle: PoracleMaxbattle[]
   pokemon: PoraclePokemon[]
   invasion: PoracleInvasion[]
   lure: PoracleLure[]
@@ -249,6 +250,7 @@ export type PoracleCategory =
   | 'egg'
   | 'invasion'
   | 'lure'
+  | 'maxbattle'
   | 'nest'
   | 'pokemon'
   | 'quest'
@@ -340,6 +342,7 @@ interface APIReturnType {
   quickGym: PoracleGym[]
   egg: PoracleEgg[]
   raid: PoracleRaid[]
+  maxbattle: PoracleMaxbattle[]
 }
 
 export type APIMethod<T extends PoracleAPIInput = PoracleAPIInput> = (
