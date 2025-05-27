@@ -88,6 +88,22 @@ export interface PoracleEgg {
   description: string
 }
 
+export interface PoracleMaxbattle {
+  uid: number
+  id: string
+  profile_no: number
+  ping: string
+  clean: boolean
+  pokemon_id: number
+  gmax: boolean
+  template: string
+  distance: number
+  level: number
+  form: number
+  move: number
+  station_id: string
+  description: string
+}
 export interface PoracleInvasion {
   uid: number
   id: string
