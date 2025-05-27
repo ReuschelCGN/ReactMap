@@ -147,6 +147,9 @@ export class Query {
     if ((filters.maxBattles || filters.gmaxStationed) && perms.dynamax) {
       query += '_BATTLE'
     }
+    if (filters === 'id') {
+      return stationIndex.GET_ONE_STATION
+    }
     return stationIndex[query]
   }
 
