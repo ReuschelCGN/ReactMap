@@ -232,6 +232,28 @@ const Raid = gql`
   }
 `
 
+const Maxbattle = gql`
+  fragment PoracleMaxbattle on Poracle {
+    maxbattle {
+      gmax
+      distance
+      clean
+      form
+      station_id
+      level
+      move
+      id
+      ping
+      pokemon_id
+      profile_no
+      template
+      uid
+      description
+      allMoves
+    }
+  }
+`
+
 const Weather = gql`
   fragment PoracleWeather on Poracle {
     weather {
