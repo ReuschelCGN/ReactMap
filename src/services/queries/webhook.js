@@ -281,6 +281,7 @@ export const ALL_PROFILES = gql`
   ${PROFILE}
   ${Quest}
   ${Raid}
+  ${Maxbattle}
   ${Weather}
   query Webhook($category: String!, $status: String!) {
     webhook(category: $category, status: $status) {
@@ -294,6 +295,7 @@ export const ALL_PROFILES = gql`
       ...PoracleProfile
       ...PoracleQuest
       ...PoracleRaid
+      ...PoracleMaxbattle
       ...PoracleWeather
     }
   }
@@ -319,6 +321,7 @@ export const QUICK_ADD = gql`
   ${PROFILE}
   ${Quest}
   ${Raid}
+  ${Maxbattle}
   ${Weather}
   mutation Webhook($data: JSON, $category: String!, $status: String!) {
     webhook(data: $data, category: $category, status: $status) {
@@ -332,6 +335,7 @@ export const QUICK_ADD = gql`
       ...PoracleProfile
       ...PoracleQuest
       ...PoracleRaid
+      ...PoracleMaxbattle
       ...PoracleWeather
       status
       message
