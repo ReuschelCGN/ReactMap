@@ -9,6 +9,7 @@ const queryObj = /** @type {const} */ ({
   quests: { model: 'Pokestop', category: 'pokestops' },
   raids: { model: 'Gym', category: 'gyms' },
   nests: { model: 'Nest', category: 'nests' },
+  stations: { model: 'Station', category: 'stations' },
 })
 
 /** @param {string} category */
@@ -40,12 +41,14 @@ const getAll = async (compare) => {
         state.db.getAvailable('Pokestop'),
         state.db.getAvailable('Gym'),
         state.db.getAvailable('Nest'),
+        state.db.getAvailable('Station'),
       ])
     : [
         state.event.available.pokemon,
         state.event.available.pokestops,
         state.event.available.gyms,
         state.event.available.nests,
+        state.event.available.stations,
       ]
   return Object.fromEntries(
     Object.keys(queryObj).map((key, i) => [key, available[i]]),
