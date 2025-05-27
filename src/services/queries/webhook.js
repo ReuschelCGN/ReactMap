@@ -398,6 +398,17 @@ export const EGG = gql`
   }
 `
 
+export const MAXBATTLE = gql`
+  ${base}
+  ${Maxbattle}
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
+      ...Base
+      ...PoracleMaxbattle
+    }
+  }
+`
+
 export const GYM = gql`
   ${base}
   ${Gym}
