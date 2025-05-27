@@ -501,6 +501,7 @@ class PoracleAPI {
       case 'pokemon':
       case 'quest':
       case 'raid':
+      case 'maxbattle':
       case 'gym':
         return this.#tracking(userId, category, method, data)
       case 'quickGym':
@@ -542,6 +543,8 @@ class PoracleAPI {
         return { team: 4, slot_changes: true, battle_changes: this.gymBattles }
       case 'egg':
       case 'raid':
+        return { level: 90 }
+      case 'maxbattle':
         return { level: 90 }
       default:
         return {}
@@ -898,6 +901,81 @@ class PoracleAPI {
                 name: 'gymName',
                 label: 'gym',
                 searchCategory: 'gyms',
+                xs: 12,
+                sm: 12,
+              },
+            ],
+            distanceOrArea: {
+              booleans: [
+                {
+                  name: 'byDistance',
+                  max: this.maxDistance,
+                  xs: 6,
+                  sm: 8,
+                  override: true,
+                },
+              ],
+              texts: [
+                {
+                  name: 'distance',
+                  type: 'number',
+                  adornment: 'm',
+                  xs: 6,
+                  sm: 4,
+                },
+              ],
+            },
+          },
+          global: {
+            booleans: [],
+          },
+        },
+      },
+      maxbattle: {
+        identifiers: ['pokemon_id', 'form', 'level'],
+        defaults: {
+          clean: false,
+          distance: 0,
+          template: this.defaultTemplateName.toString(),
+          pokemon_id: 9000,
+          evolution: 9000,
+          form: 0,
+          move: 9000,
+          gmax: false,
+          level: 9000,
+          station_id: null,
+          byDistance: false,
+          allMoves: true,
+          allForms: false,
+          everything_individually:
+            this.everythingFlagPermissions ===
+              'allow-and-always-individually' ||
+            this.everythingFlagPermissions === 'deny',
+        },
+        ui: {
+          general: {
+            selects: [
+              {
+                name: 'profile_no',
+                disabled: true,
+                options: [],
+                xs: 6,
+                sm: 3,
+              },
+              { name: 'template', options: [], xs: 6, sm: 3 },
+              { name: 'move', options: [], xs: 6, sm: 3 },
+            ],
+            booleans: [
+              { name: 'clean', xs: 6, sm: 3 },
+              { name: 'gmax', xs: 6, sm: 3 },
+              { name: 'allForms', disabled: ['r'], xs: 6, sm: 3 },
+              { name: 'allMoves', disabled: ['r'], xs: 6, sm: 3 },
+            ],
+            autoComplete: [
+              {
+                name: 'stationName',
+                label: 'station',
+                searchCategory: 'stations',
                 xs: 12,
                 sm: 12,
               },
