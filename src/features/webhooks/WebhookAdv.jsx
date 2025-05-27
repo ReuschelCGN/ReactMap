@@ -58,12 +58,14 @@ const skipFields = new Set([
   'enabled',
   'level',
   'exclusive',
+  'gmax',
   'lure_id',
   'reward',
   'reward_type',
   'grunt_type',
   'grunt_id',
   'gym_id',
+  'station_id',
   'slot_changes',
   'team',
   'battle_changes',
@@ -77,6 +79,7 @@ const wildCards = {
   raid: ['r90'],
   egg: ['e90'],
   gym: ['t4'],
+  maxbattle: ['b90'],
   invasion: ['i0'],
 }
 
@@ -475,6 +478,9 @@ export function WebhookAdvanced() {
         return `${prefix}${id.charAt(0) === 'e' ? t('egg') : t('raid')} ${t(
           'level',
         )}${idObj.id}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+      case 'b':
+        return `${prefix}${t('maxbattle')}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'i': {
         const invasion = Object.keys(types).find(
