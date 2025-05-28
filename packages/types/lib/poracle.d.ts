@@ -104,6 +104,7 @@ export interface PoracleMaxbattle {
   station_id: string
   description: string
 }
+
 export interface PoracleInvasion {
   uid: number
   id: string
