@@ -79,7 +79,7 @@ const wildCards = {
   raid: ['r90'],
   egg: ['e90'],
   gym: ['t4'],
-  maxbattle: ['b90'],
+  maxbattle: ['k90'],
   invasion: ['i0'],
 }
 
@@ -481,7 +481,7 @@ export function WebhookAdvanced() {
           'level',
         )}${idObj.id}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
-      case 'b':
+      case 'k':
         return `${prefix}${t('maxbattle')}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'i': {
