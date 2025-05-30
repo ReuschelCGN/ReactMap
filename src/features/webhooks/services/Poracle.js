@@ -11,6 +11,7 @@ export class Poracle {
       case 'raid':
         return 'gyms'
       case 'maxbattle':
+        return 'maxbattles'
       case 'invasion':
       case 'lure':
       case 'quest':
