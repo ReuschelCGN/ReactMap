@@ -404,6 +404,8 @@ export function WebhookAdvanced() {
       return `t${poracleValues.min_time}`
     if (field === 'exclusive' && poracleValues.exclusive)
       return ` ${t('exclusive')} `
+    if (field === 'gmax' && poracleValues.gmax)
+      return ` ${t('gmax')} `
     if (field === 'clean' && poracleValues.clean) return ` ${t('clean')} `
     if (field === 'min_spawn_avg' && poracleValues.min_spawn_avg > 0)
       return ` ${t('minspawn')}${poracleValues.min_spawn_avg} `
