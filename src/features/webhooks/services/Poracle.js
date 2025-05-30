@@ -76,7 +76,7 @@ export class Poracle {
           : `${item.pokemon_id}-${item.form}`
       case 'maxbattle':
         return item.pokemon_id === 9000
-          ? `b${item.level}`
+          ? `k${item.level}`
           : `${item.pokemon_id}-${item.form}`
       case 'quest':
         return (() => {
@@ -114,8 +114,8 @@ export class Poracle {
         return { id: id.replace('l', ''), type: 'lure' }
       case 'r':
         return { id: id.replace('r', ''), type: 'raid' }
-      case 'b':
-        return { id: id.replace('b', ''), type: 'maxbattle' }
+      case 'k':
+        return { id: id.replace('k', ''), type: 'maxbattle' }
       case 'q':
         return { id: id.replace('q', ''), type: 'item' }
       case 'm':
