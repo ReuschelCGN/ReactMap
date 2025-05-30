@@ -37,7 +37,7 @@ export class Poracle {
       case 'raid':
         return ['raids', 'pokemon']
       case 'maxbattle':
-        return ['maxbattles', 'pokemon']
+        return ['pokemon']
       case 'quest':
         return [
           'items',
