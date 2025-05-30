@@ -10,8 +10,6 @@ export class Poracle {
       case 'egg':
       case 'raid':
         return 'gyms'
-      case 'maxbattle':
-        return 'maxbattles'
       case 'invasion':
       case 'lure':
       case 'quest':
