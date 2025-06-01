@@ -469,5 +469,6 @@
   "webhook_advanced_save_width": 2,
   "login_button": 5,
   "join_button": 5,
-  "all": "Alle"
+  "all": "Alle",
+  "view_defenders": "verdedigers tonen"
 }
