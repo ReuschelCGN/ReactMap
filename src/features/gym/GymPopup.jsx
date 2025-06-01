@@ -81,21 +81,6 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
           <Title backup={t('unknown_gym')}>{gym.name}</Title>
         </Grid>
         <MenuActions hasRaid={hasRaid} {...gym} />
-        {gym.defenders?.length > 0 && (
-          <Grid xs={12} textAlign="center" my={1}>
-            <Button
-              color="secondary"
-              variant="outlined"
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowDefenders(true)
-              }}
-            >
-              <Typography variant="caption">{t('view_defenders')}</Typography>
-            </Button>
-          </Grid>
-        )}
         {perms.gyms && (
           <Grid xs={12}>
             <Collapse
@@ -918,6 +903,21 @@ const ExtraGymInfo = ({
       )}
       {!!total_cp && updated > gymValidDataLimit && (
         <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
+      )}
+      {gym.defenders?.length > 0 && (
+        <Grid xs={12} textAlign="center" my={1}>
+          <Button
+            color="secondary"
+            variant="outlined"
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowDefenders(true)
+            }}
+          >
+            <Typography variant="caption">{t('view_defenders')}</Typography>
+          </Button>
+        </Grid>
       )}
       <Divider
         flexItem
