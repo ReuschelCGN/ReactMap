@@ -799,5 +799,6 @@
   "filters": "Filter",
   "active": "aktiv",
   "inactive": "inaktiv",
-  "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen."
+  "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen.",
+  "view_defenders": "Verteidiger anzeigen"
 }
