@@ -82,15 +82,16 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         <MenuActions hasRaid={hasRaid} {...gym} />
         {gym.defenders?.length > 0 && (
           <Grid xs={12} textAlign="center" my={1}>
-            <button
+            <Button
               color="secondary"
-              variant="contained"
+              variant="outlined"
+              size="small"
               onClick={(e) => {
                 e.stopPropagation()
                 setShowDefenders(true)
               }}
             >
-              {t('view_defenders')}
+              <Typography variant="caption">{t('view_defenders')}</Typography>
             </button>
           </Grid>
         )}
