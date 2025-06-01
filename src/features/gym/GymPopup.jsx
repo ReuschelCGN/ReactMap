@@ -260,7 +260,7 @@ function DefendersModal({ gym, onClose }) {
                 >
                   {t(`poke_${def.pokemon_id}`)}
                 </span>
-                <span style={{ fontSize: 13, color: '#666' }}>
+                <span style={{ fontSize: 10, color: '#ccc' }}>
                   {t('cp')}: <b>{currentCP}</b> / {fullCP}
                 </span>
               </div>
