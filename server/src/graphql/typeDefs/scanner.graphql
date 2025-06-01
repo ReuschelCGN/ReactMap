@@ -25,6 +25,7 @@ type Gym {
   guarding_pokemon_id: Int
   guarding_pokemon_display: JSON
   available_slots: Int
+  defenders: JSON
   team_id: Int
   raid_level: Int
   ex_raid_eligible: Boolean
