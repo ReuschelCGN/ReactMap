@@ -83,15 +83,8 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         {gym.defenders?.length > 0 && (
           <Grid xs={12} textAlign="center" my={1}>
             <button
-              type="button"
-              style={{
-                padding: 2,
-                borderRadius: 4,
-                border: '1px solid #ac0000',
-                fontWeight: 600,
-                width: '100%',
-                fontSize: 12,
-              }}
+              color="secondary"
+              variant="contained"
               onClick={(e) => {
                 e.stopPropagation()
                 setShowDefenders(true)
