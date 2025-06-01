@@ -93,7 +93,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
               }}
             >
               <Typography variant="caption">{t('view_defenders')}</Typography>
-            </button>
+            </Button>
           </Grid>
         )}
         {perms.gyms && (
