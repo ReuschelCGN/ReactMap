@@ -11,6 +11,7 @@ import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import FavoriteIcon from '@mui/icons-material/Favorite'
+import Button from '@mui/material/Button'
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@features/webhooks'
