@@ -85,13 +85,12 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
             <button
               type="button"
               style={{
-                padding: 6,
-                borderRadius: 8,
-                border: '1px solid #ccc',
-                background: '#fff',
+                padding: 2,
+                borderRadius: 4,
+                border: '1px solid #ac0000',
                 fontWeight: 600,
                 width: '100%',
-                fontSize: 14,
+                fontSize: 12,
               }}
               onClick={(e) => {
                 e.stopPropagation()
