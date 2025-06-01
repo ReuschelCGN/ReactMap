@@ -41,6 +41,18 @@ export interface PokemonDisplay {
   location_card: number
 }
 
+export interface Defender extends PokemonDisplay {
+  pokemon_id: number
+  deployed_ms: number
+  deployed_time: number
+  battles_won: number
+  battles_lost: number
+  times_fed: number
+  motivation_now: number
+  cp_when_deployed: number
+  cp_now: number
+}
+
 export interface Gym {
   id: string
   lat: number
