@@ -774,5 +774,6 @@
   "weather_audio": "Son de météo",
   "active": "Actif",
   "inactive": "Inactif",
-  "bread_time_window": "Tu peux participer à des Combats Dynamax entre 6h et 21h."
+  "bread_time_window": "Tu peux participer à des Combats Dynamax entre 6h et 21h.",
+  "view_defenders": "montrer les défenseurs"
 }
