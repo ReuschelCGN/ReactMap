@@ -223,11 +223,11 @@ class PoracleAPI {
 
     if (
       major < 4 ||
-      (major === 4 && minor < 6) ||
-      (major === 4 && minor === 6 && patch < 0)
+      (major === 4 && minor < 8) ||
+      (major === 4 && minor === 8 && patch < 3)
     ) {
       throw new Error(
-        `Poracle must be at least version 4.6.0, current version is ${this.version}`,
+        `Poracle must be at least version 4.8.3, current version is ${this.version}`,
       )
     }
     const { providerURL, addressFormat, ...rest } = remoteConfig
@@ -796,6 +796,7 @@ class PoracleAPI {
           exclusive: false,
           level: 9000,
           team: 4,
+          rsvp_changes: 0,
           gym_id: null,
           byDistance: false,
           allMoves: true,
@@ -818,6 +819,7 @@ class PoracleAPI {
               { name: 'template', options: [], xs: 6, sm: 3 },
               { name: 'team', options: [0, 1, 2, 3, 4], xs: 6, sm: 3 },
               { name: 'move', options: [], xs: 6, sm: 3 },
+              { name: 'rsvp_changes', options: [0, 1, 2], xs: 6, sm: 3 }, 
             ],
             booleans: [
               { name: 'clean', xs: 6, sm: 3 },
@@ -869,6 +871,7 @@ class PoracleAPI {
           exclusive: false,
           level: 9000,
           team: 4,
+          rsvp_changes: 0,
           gym_id: null,
           byDistance: false,
           everything_individually:
@@ -888,6 +891,7 @@ class PoracleAPI {
               },
               { name: 'template', options: [], xs: 6, sm: 4 },
               { name: 'team', options: [0, 1, 2, 3, 4], xs: 6, sm: 4 },
+              { name: 'rsvp_changes', options: [0, 1, 2], xs: 6, sm: 4 },
             ],
             booleans: [
               { name: 'clean', xs: 6, sm: 6 },
