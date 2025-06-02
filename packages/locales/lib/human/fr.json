@@ -775,5 +775,7 @@
   "active": "Actif",
   "inactive": "Inactif",
   "bread_time_window": "Tu peux participer à des Combats Dynamax entre 6h et 21h.",
-  "view_defenders": "montrer les défenseurs"
+  "view_defenders": "montrer les défenseurs",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only"
 }
