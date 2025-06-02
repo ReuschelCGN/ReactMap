@@ -129,7 +129,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
         {perms.gyms && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraGymInfo gym={gym} {...gym} />
+            <ExtraGymInfo {...gym} />
           </Collapse>
         )}
       </Grid>
@@ -867,6 +867,7 @@ const ExtraGymInfo = ({
   total_cp,
   guarding_pokemon_id,
   guarding_pokemon_display,
+  defenders,
 }) => {
   const { t, i18n } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
@@ -904,7 +905,7 @@ const ExtraGymInfo = ({
       {!!total_cp && updated > gymValidDataLimit && (
         <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
       )}
-      {gym.defenders?.length > 0 && (
+      {defenders?.length > 0 && (
         <Grid xs={12} textAlign="center" my={1}>
           <Button
             color="secondary"
