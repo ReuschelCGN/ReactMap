@@ -420,6 +420,8 @@ export function WebhookAdvanced() {
       return ` ${t('battle_changes_poracle')} `
     if (field === 'team' && poracleValues.team !== 4)
       return t(`team_${poracleValues.team}`)
+    if (field === 'rsvp_changes' && poracleValues.rsvp_changes !== 0)
+      return t(`rsvp_${poracleValues.rsvp_changes}`)
     if (
       field === 'everything_individually' &&
       poracleValues.everything_individually
