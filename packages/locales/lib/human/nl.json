@@ -470,5 +470,7 @@
   "login_button": 5,
   "join_button": 5,
   "all": "Alle",
-  "view_defenders": "verdedigers tonen"
+  "view_defenders": "verdedigers tonen",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only"
 }
