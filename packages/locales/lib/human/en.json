@@ -824,5 +824,6 @@
   "view_defenders": "show defenders",
   "rsvp_0": "no_rsvp",
   "rsvp_1": "rsvp",
-  "rsvp_2": "rsvp_only"
+  "rsvp_2": "rsvp_only",
+  "rsvp_changes": "RSVP changes"
 }
