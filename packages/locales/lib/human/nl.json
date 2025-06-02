@@ -471,6 +471,7 @@
   "join_button": 5,
   "all": "Alle",
   "view_defenders": "verdedigers tonen",
+  "rsvp_0": "no_rsvp",
   "rsvp_1": "rsvp",
   "rsvp_2": "rsvp_only"
 }
