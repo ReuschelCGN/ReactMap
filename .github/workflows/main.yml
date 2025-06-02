@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - develop
-      - developmod4-gym-defender
+      - developmod4-gd-poracle-rsvp
 
 jobs:
   config:
