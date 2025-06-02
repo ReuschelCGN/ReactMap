@@ -333,7 +333,7 @@ export function WebhookAdvanced() {
         option.options.forEach((rsvp_changes) =>
           menuItems.push(
             <MenuItem key={rsvp_changes} value={rsvp_changes} dense>
-              {t(`rsvp_${team}`, t('any'))}
+              {t(`rsvp_${rsvp_changes}`, t('any'))}
             </MenuItem>,
           ),
         )
