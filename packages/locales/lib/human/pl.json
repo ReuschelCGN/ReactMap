@@ -769,5 +769,7 @@
   "zero_iv": "0% IV",
   "zoom_in": "Przybliż",
   "zoom_out": "Oddal",
-  "view_defenders": "pokazać obrońców"
+  "view_defenders": "pokazać obrońców",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only"
 }
