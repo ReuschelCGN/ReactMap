@@ -800,5 +800,7 @@
   "active": "aktiv",
   "inactive": "inaktiv",
   "bread_time_window": "Du kannst von 6Uhr bis 21Uhr an Dyna-Kämpfen teilnehmen.",
-  "view_defenders": "Verteidiger anzeigen"
+  "view_defenders": "Verteidiger anzeigen",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only"
 }
