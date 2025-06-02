@@ -129,7 +129,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
         {perms.gyms && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraGymInfo {...gym} />
+            <ExtraGymInfo gym={gym} {...gym} />
           </Collapse>
         )}
       </Grid>
