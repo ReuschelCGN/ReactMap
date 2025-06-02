@@ -134,17 +134,25 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         )}
         {gym.defenders?.length > 0 && (
           <Grid xs={12} textAlign="center" my={1}>
-            <Button
-              color="secondary"
-              variant="outlined"
-              size="small"
+            <button
+              type="button"
+              style={{
+                padding: 6,
+                borderRadius: 8,
+                border: '1px solid #888',
+                background: '#000',
+                color: '#fff',
+                fontWeight: 600,
+                width: '100%',
+                fontSize: 12,
+              }}
               onClick={(e) => {
                 e.stopPropagation()
                 setShowDefenders(true)
               }}
             >
-              <Typography variant="caption">{t('view_defenders')}</Typography>
-            </Button>
+              {t('view_defenders')}
+            </button>
           </Grid>
         )}
       </Grid>
