@@ -66,6 +66,7 @@ const skipFields = new Set([
   'gym_id',
   'slot_changes',
   'team',
+  'rsvp_changes',
   'battle_changes',
   'shiny',
   'everything_individually',
@@ -324,6 +325,15 @@ export function WebhookAdvanced() {
           menuItems.push(
             <MenuItem key={team} value={team} dense>
               {t(`team_${team}`, t('any'))}
+            </MenuItem>,
+          ),
+        )
+        break
+      case 'rsvp_changes':
+        option.options.forEach((rsvp_changes) =>
+          menuItems.push(
+            <MenuItem key={rsvp_changes} value={rsvp_changes} dense>
+              {t(`rsvp_${team}`, t('any'))}
             </MenuItem>,
           ),
         )
