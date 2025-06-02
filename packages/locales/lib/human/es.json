@@ -619,5 +619,7 @@
   "reported_error": "Este error ha sido reportado al servidor con el identificador",
   "dark_mode": "Modo Oscuro",
   "bread_time_window": "Puedes acceder a los Combates Max de 6h a 21h.",
-  "view_defenders": "Mostrar defensores"
+  "view_defenders": "Mostrar defensores",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only"
 }
