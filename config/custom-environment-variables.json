@@ -737,6 +737,10 @@
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_RAID_LEVEL_BADGES",
         "__format": "boolean"
       },
+      "rsvpsBadge": {
+        "__name": "CLIENT_SIDE_OPTIONS_GYMS_RAID_LEVEL_BADGES",
+        "__format": "boolean"
+      },
       "gymBadgeDiamonds": {
         "__name": "CLIENT_SIDE_OPTIONS_GYMS_GYM_BADGE_DIAMONDS",
         "__format": "boolean"
