@@ -773,5 +773,6 @@
   "rsvp_0": "no_rsvp",
   "rsvp_1": "rsvp",
   "rsvp_2": "rsvp_only",
-  "rsvp_changes": "RSVP zmiany"
+  "rsvp_changes": "RSVP zmiany",
+  "show_rsvps_badge": "Pokaż odznaki Rsvp"
 }
