@@ -353,6 +353,7 @@
       "showExBadge": false,
       "showArBadge": false,
       "raidLevelBadges": false,
+      "rsvpsBadge": false,
       "gymBadgeDiamonds": true,
       "enableGymPopupCoords": false,
       "raidOpacity": true,
