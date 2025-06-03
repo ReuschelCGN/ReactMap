@@ -128,31 +128,8 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
         {perms.gyms && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraGymInfo {...gym} />
+            <ExtraGymInfo setShowDefenders={setShowDefenders} {...gym} />
           </Collapse>
-        )}
-        {gym.defenders?.length > 0 && (
-          <Grid xs={12} textAlign="center" my={1}>
-            <button
-              type="button"
-              style={{
-                padding: 6,
-                borderRadius: 8,
-                border: '1px solid #888',
-                background: '#000',
-                color: '#fff',
-                fontWeight: 600,
-                width: '100%',
-                fontSize: 12,
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowDefenders(true)
-              }}
-            >
-              {t('view_defenders')}
-            </button>
-          </Grid>
         )}
       </Grid>
     </ErrorBoundary>
@@ -879,6 +856,7 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
 /**
  *
  * @param {import('@rm/types').Gym} props
+ *   setShowDefenders: any
  * @returns
  */
 const ExtraGymInfo = ({
@@ -889,6 +867,8 @@ const ExtraGymInfo = ({
   total_cp,
   guarding_pokemon_id,
   guarding_pokemon_display,
+  defenders,
+  setShowDefenders,
 }) => {
   const { t, i18n } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
@@ -925,6 +905,29 @@ const ExtraGymInfo = ({
       )}
       {!!total_cp && updated > gymValidDataLimit && (
         <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
+      )}
+      {defenders?.length > 0 && (
+        <Grid xs={12} textAlign="center" my={1}>
+          <button
+            type="button"
+            style={{
+              padding: 6,
+              borderRadius: 8,
+              border: '1px solid #888',
+              background: '#000',
+              color: '#fff',
+              fontWeight: 600,
+              width: '100%',
+              fontSize: 12,
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowDefenders(true)
+            }}
+          >
+            {t('view_defenders')}
+          </button>
+        </Grid>
       )}
       <Divider
         flexItem
