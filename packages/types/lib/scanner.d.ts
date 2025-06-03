@@ -53,12 +53,6 @@ export interface Defender extends PokemonDisplay {
   cp_now: number
 }
 
-export interface Rsvp {
-  timeslot: number
-  going_count: number
-  maybe_count: number
-}
-
 export interface Gym {
   id: string
   lat: number
@@ -100,6 +94,12 @@ export interface Gym {
   power_up_end_timestamp: number
   deleted: boolean
   enabled: boolean
+}
+
+export interface Rsvp extends Gym {
+  timeslot: number
+  going_count: number
+  maybe_count: number
 }
 
 export type FullGym = FullModel<Gym, GymModel.Gym>
