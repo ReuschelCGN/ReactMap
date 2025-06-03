@@ -68,6 +68,7 @@ export interface Gym {
   guarding_pokemon_id: number
   guarding_pokemon_display: PokemonDisplay
   defenders: Defender[]
+  rsvps: Rsvp[]
   available_slots: number
   team_id: number
   raid_level: number
@@ -93,6 +94,12 @@ export interface Gym {
   power_up_end_timestamp: number
   deleted: boolean
   enabled: boolean
+}
+
+export interface Rsvp extends Gym {
+  timeslot: number
+  going_count: number
+  maybe_count: number
 }
 
 export type FullGym = FullModel<Gym, GymModel.Gym>
