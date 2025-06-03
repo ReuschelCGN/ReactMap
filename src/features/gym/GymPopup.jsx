@@ -760,7 +760,7 @@ const RsvpsInfo = ({
   rsvps,
 }) => {
   const { t } = useTranslation()
-  const rsvps = rsvps || []
+  const rsvp = rsvps || []
 
   return (
     <Grid container alignItems="center" justifyContent="center">
