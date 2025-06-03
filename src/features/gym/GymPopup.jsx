@@ -757,6 +757,7 @@ const RsvpsInfo = ({
   timeslot,
   going_count,
   maybe_count,
+  rsvps,
 }) => {
   const { t } = useTranslation()
   const rsvps = rsvps || []
