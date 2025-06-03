@@ -117,7 +117,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                   <Timer start {...gym} />
                 )}
                 {gym.rsvps?.length > 0 && (
-                  <RsvpsInfo {...gym} />
+                  <RsvpsModal gym={gym} />
                 )}
                 {Boolean(
                   gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
@@ -347,6 +347,80 @@ function DefendersModal({ gym, onClose }) {
           : t('unknown')}
       </Grid>
     </Grid>
+  )
+}
+
+/**
+ * Compact modal for rsvps
+ * @param {{ gym: import('@rm/types').Gym }} param0
+ */
+function RsvpsModal({ gym }) {
+  const { t } = useTranslation()
+  const rsvps = gym.rsvps || []
+
+  return (
+      <Grid container direction="column" spacing={1}>
+        {rsvps.map((rsvp) => {
+
+          return (
+            <div
+              key={rsvp.timeslot}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: 60,
+                width: '100%',
+                padding: '4px 0',
+              }}
+            >
+              <div
+                style={{
+                  marginLeft: 8,
+                  marginRight: 8,
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexShrink: 0,
+                }}
+              >
+                <span style={{ fontSize: 14, color: '#fff' }}>
+                  Timeslot: <b>{rsvp.timeslot}</b>
+                </span>
+              </div>
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  minWidth: 0,
+                  textAlign: 'left',
+                  overflow: 'hidden',
+                  marginLeft: 4,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    marginBottom: 2,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%',
+                  }}
+                  title={gym.name}
+                >
+                  Going: <b>{rsvp.going_count}</b>
+                </span>
+                <span style={{ fontSize: 12 }}>
+                  Maybe: <b>{rsvp.maybe_count}</b>
+                </span>
+              </div>
+            </div>
+          )
+        })}
+      </Grid>
   )
 }
 
@@ -749,91 +823,6 @@ const RaidInfo = ({
     </Grid>
   )
 }
-
-/**
- * @param {import('@rm/types').Gym} props
- */
-const RsvpsInfo = ({
-  timeslot,
-  going_count,
-  maybe_count,
-  rsvps,
-}) => {
-  const { t } = useTranslation()
-  const rsvp = rsvps || []
-
-  return (
-    <Grid container alignItems="center" justifyContent="center">
-      <div
-        key={rsvp.timeslot}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          minHeight: 60,
-          width: '100%',
-          padding: '4px 0',
-        }}
-      >
-        <div
-          style={{
-            marginLeft: 8,
-            marginRight: 8,
-            display: 'flex',
-            alignItems: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              marginBottom: 2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              maxWidth: '100%',
-            }}
-            title={t(`${rsvp.timeslot}`)}
-          >
-            {t(`${rsvp.timeslot}`)}
-          </span>
-        </div>
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            minWidth: 0,
-            textAlign: 'left',
-            overflow: 'hidden',
-            marginLeft: 4,
-          }}
-        >
-           <span
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              marginBottom: 2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              maxWidth: '100%',
-            }}
-            title={t(`${rsvp.going_count}`)}
-          >
-            {t('going')}: {t(`${rsvp.going_count}`)}
-          </span>
-          <span style={{ fontSize: 10 }}>
-            {t('maybe')}: {t(`${rsvp.maybe_count}`)}
-          </span>
-        </div>
-      </div>
-    </Grid>
-  )
-}
-
 
 /**
  *
