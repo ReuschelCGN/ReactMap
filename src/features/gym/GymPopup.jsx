@@ -116,6 +116,9 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                 ) : (
                   <Timer start {...gym} />
                 )}
+                {gym.rsvps?.length > 0 && (
+                  <RsvpsInfo {...gym} />
+                )}
                 {Boolean(
                   gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
                 ) && <Timer start {...gym} hasHatched={hasHatched} />}
@@ -128,31 +131,8 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
         {perms.gyms && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraGymInfo {...gym} />
+            <ExtraGymInfo setShowDefenders={setShowDefenders} {...gym} />
           </Collapse>
-        )}
-        {gym.defenders?.length > 0 && (
-          <Grid xs={12} textAlign="center" my={1}>
-            <button
-              type="button"
-              style={{
-                padding: 6,
-                borderRadius: 8,
-                border: '1px solid #888',
-                background: '#000',
-                color: '#fff',
-                fontWeight: 600,
-                width: '100%',
-                fontSize: 12,
-              }}
-              onClick={(e) => {
-                e.stopPropagation()
-                setShowDefenders(true)
-              }}
-            >
-              {t('view_defenders')}
-            </button>
-          </Grid>
         )}
       </Grid>
     </ErrorBoundary>
@@ -771,6 +751,90 @@ const RaidInfo = ({
 }
 
 /**
+ * @param {import('@rm/types').Gym} props
+ */
+const RsvpsInfo = ({
+  timeslot,
+  going_count,
+  maybe_count,
+}) => {
+  const { t } = useTranslation()
+  const rsvps = rsvps || []
+
+  return (
+    <Grid container alignItems="center" justifyContent="center">
+      <div
+        key={rsvp.timeslot}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          minHeight: 60,
+          width: '100%',
+          padding: '4px 0',
+        }}
+      >
+        <div
+          style={{
+            marginLeft: 8,
+            marginRight: 8,
+            display: 'flex',
+            alignItems: 'center',
+            flexShrink: 0,
+          }}
+        >
+          <span
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              marginBottom: 2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: '100%',
+            }}
+            title={t(`${rsvp.timeslot}`)}
+          >
+            {t(`${rsvp.timeslot}`)}
+          </span>
+        </div>
+        <div
+          style={{
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-start',
+            justifyContent: 'center',
+            minWidth: 0,
+            textAlign: 'left',
+            overflow: 'hidden',
+            marginLeft: 4,
+          }}
+        >
+           <span
+            style={{
+              fontSize: 15,
+              fontWeight: 600,
+              marginBottom: 2,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              maxWidth: '100%',
+            }}
+            title={t(`${rsvp.going_count}`)}
+          >
+            {t('going')}: {t(`${rsvp.going_count}`)}
+          </span>
+          <span style={{ fontSize: 10 }}>
+            {t('maybe')}: {t(`${rsvp.maybe_count}`)}
+          </span>
+        </div>
+      </div>
+    </Grid>
+  )
+}
+
+
+/**
  *
  * @param {{
  *  start?: boolean
@@ -879,6 +943,7 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
 /**
  *
  * @param {import('@rm/types').Gym} props
+ *   setShowDefenders: any
  * @returns
  */
 const ExtraGymInfo = ({
@@ -889,6 +954,8 @@ const ExtraGymInfo = ({
   total_cp,
   guarding_pokemon_id,
   guarding_pokemon_display,
+  defenders,
+  setShowDefenders,
 }) => {
   const { t, i18n } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
@@ -925,6 +992,29 @@ const ExtraGymInfo = ({
       )}
       {!!total_cp && updated > gymValidDataLimit && (
         <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
+      )}
+      {defenders?.length > 0 && (
+        <Grid xs={12} textAlign="center" my={1}>
+          <button
+            type="button"
+            style={{
+              padding: 6,
+              borderRadius: 8,
+              border: '1px solid #888',
+              background: '#000',
+              color: '#fff',
+              fontWeight: 600,
+              width: '100%',
+              fontSize: 12,
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowDefenders(true)
+            }}
+          >
+            {t('view_defenders')}
+          </button>
+        </Grid>
       )}
       <Divider
         flexItem
