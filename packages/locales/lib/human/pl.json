@@ -774,5 +774,7 @@
   "rsvp_1": "rsvp",
   "rsvp_2": "rsvp_only",
   "rsvp_changes": "RSVP zmiany",
-  "show_rsvps_badge": "Pokaż odznaki Rsvp"
+  "show_rsvps_badge": "Pokaż odznaki Rsvp",
+  "going": "obiecal",
+  "maybe": "być może"
 }
