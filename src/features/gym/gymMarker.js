@@ -154,10 +154,10 @@ export function gymMarker({
                   src="${Icons.getMisc('rsvps')}"
                   alt="rsvps"
                   style="
-                    width: ${gymIconSize / 2}px;
+                    width: ${gymIconSize / 1.4}px;
                     height: auto;
-                    bottom: ${43 + gymMod.offsetY}px;
-                    left: ${gymMod.offsetX * -2}%;
+                    bottom: ${60 + gymMod.offsetY}px;
+                    left: ${gymMod.offsetX * 50}%;
                     transform: translateX(-50%);
                   "
                 />`
