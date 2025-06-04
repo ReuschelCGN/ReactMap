@@ -623,5 +623,8 @@
   "rsvp_0": "no_rsvp",
   "rsvp_1": "rsvp",
   "rsvp_2": "rsvp_only",
-  "rsvp_changes": "RSVP cambios"
+  "rsvp_changes": "RSVP cambios",
+  "show_rsvps_badge": "Mostrar Insignia de Rsvp",
+  "going": "prometido",
+  "maybe": "tal vez"
 }

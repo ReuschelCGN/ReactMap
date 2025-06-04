@@ -804,5 +804,8 @@
   "rsvp_0": "no_rsvp",
   "rsvp_1": "rsvp",
   "rsvp_2": "rsvp_only",
-  "rsvp_changes": "RSVP Änderungen"
+  "rsvp_changes": "RSVP Änderungen",
+  "show_rsvps_badge": "Rsvp Symbol anzeigen",
+  "going": "zugesagt",
+  "maybe": "vielleicht"
 }

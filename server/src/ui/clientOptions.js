@@ -35,6 +35,7 @@ function clientOptions(perms) {
       showExBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
       showArBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
       raidLevelBadges: { type: 'bool', perm: ['raids'], category: 'markers' },
+      showRsvpsBadge: { type: 'bool', perm: ['raids'], category: 'markers' },
       gymBadgeDiamonds: {
         type: 'bool',
         perm: ['gymBadges'],

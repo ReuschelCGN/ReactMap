@@ -10,6 +10,7 @@ import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { useTranslation } from 'react-i18next'
 
@@ -117,7 +118,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                   <Timer start {...gym} />
                 )}
                 {gym.rsvps?.length > 0 && (
-                  <RsvpsInfo {...gym} />
+                  <RsvpsModal gym={gym} />
                 )}
                 {Boolean(
                   gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
@@ -200,19 +201,24 @@ function DefendersModal({ gym, onClose }) {
             >
               <div
                 style={{
-                  marginLeft: 8,
-                  marginRight: 8,
+                  width: 44,
+                  height: 44,
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 12,
+                  marginRight: 6,
                   flexShrink: 0,
                 }}
               >
                 <Img
                   src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
                   alt={t(`poke_${def.pokemon_id}`)}
-                  maxHeight={44}
-                  maxWidth={44}
-                  style={{ objectFit: 'contain' }}
+                  style={{
+                    maxHeight: 44,
+                    maxWidth: 44,
+                    objectFit: 'contain',
+                  }}
                 />
               </div>
               <div
@@ -249,16 +255,14 @@ function DefendersModal({ gym, onClose }) {
               <div
                 style={{
                   width: 44,
-                  minWidth: 44,
-                  maxWidth: 44,
                   height: 44,
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'flex-end',
-                  position: 'relative',
-                  marginLeft: 4,
-                  marginRight: 8,
+                  justifyContent: 'right',
+                  marginLeft: 6,
+                  marginRight: 12,
                   flexShrink: 0,
+                  position: 'relative',
                 }}
               >
                 {/* Heart outline */}
@@ -266,8 +270,6 @@ function DefendersModal({ gym, onClose }) {
                   style={{
                     color: 'transparent',
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     width: 28,
                     height: 28,
                     stroke: 'white',
@@ -282,8 +284,6 @@ function DefendersModal({ gym, onClose }) {
                     color: 'white',
                     opacity: 0.18,
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     width: 28,
                     height: 28,
                   }}
@@ -293,8 +293,6 @@ function DefendersModal({ gym, onClose }) {
                   style={{
                     color: '#ff69b4',
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     width: 28,
                     height: 28,
                     clipPath: `inset(${100 - percent * 100}% 0 0 0)`,
@@ -308,27 +306,30 @@ function DefendersModal({ gym, onClose }) {
                   viewBox="0 0 28 28"
                   style={{
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     pointerEvents: 'none',
                   }}
                 >
-                  {/* Crack at 1/3 height (top) */}
-                  <path
-                    d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                    stroke="white"
-                    strokeWidth={1.5}
-                    fill="none"
-                    strokeLinejoin="round"
-                  />
-                  {/* Crack at 2/3 height (bottom, improved to fit heart) */}
-                  <path
-                    d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                    stroke="white"
-                    strokeWidth={1.5}
-                    fill="none"
-                    strokeLinejoin="round"
-                  />
+                  {/* Show cracks based on health: */}
+                  {percent <= 2 / 3 && (
+                    // Always show top crack if percent <= 2/3
+                    <path
+                      d="M2,9 Q7,11 14,9 Q21,11 26,9"
+                      stroke="white"
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
+                  {percent <= 1 / 3 && (
+                    // Show bottom crack only if percent <= 1/3
+                    <path
+                      d="M7,19 Q11,17 14,19 Q17,17 21,19"
+                      stroke="white"
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
                 </svg>
               </div>
             </div>
@@ -347,6 +348,68 @@ function DefendersModal({ gym, onClose }) {
           : t('unknown')}
       </Grid>
     </Grid>
+  )
+}
+
+/**
+ * Compact modal for rsvps
+ * @param {{ gym: import('@rm/types').Gym }} param0
+ */
+function RsvpsModal({ gym }) {
+  const { t } = useTranslation()
+  const rsvps = gym.rsvps || []
+
+  const formatTime = (timestamp) => {
+    const locale = localStorage.getItem('i18nextLng') || 'en'
+    return new Date(timestamp).toLocaleTimeString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  return (
+      <Grid xs={12}>
+        <Grid
+          container
+          direction="column"
+          alignItems="center"
+          style={{ margin: '2px 0' }}
+        >
+          <small
+            style={{
+              fontWeight: 'bold',
+              fontSize: 12,
+              marginBottom: 4,
+            }}
+          >
+            RSVPs: ({t(`going`)} / {t(`maybe`)})
+          </small>
+          <Grid container justifyContent="center" spacing={1}>
+            {rsvps.map((rsvp) => (
+              <Grid
+                key={rsvp.timeslot}
+                xs="auto"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  borderRadius: '6px',
+                  paddingTop: '4px',
+                  fontSize: 14,
+                  minWidth: 50,
+                  textAlign: 'center',
+                }}
+              >
+                <div>
+                  {formatTime(rsvp.timeslot)}&nbsp;
+                  <AccessTimeIcon fontSize="smaller" />&nbsp;
+                  {rsvp.going_count} / {rsvp.maybe_count}
+                </div>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+      </Grid>
   )
 }
 
@@ -749,91 +812,6 @@ const RaidInfo = ({
     </Grid>
   )
 }
-
-/**
- * @param {import('@rm/types').Gym} props
- */
-const RsvpsInfo = ({
-  timeslot,
-  going_count,
-  maybe_count,
-  rsvps,
-}) => {
-  const { t } = useTranslation()
-  const rsvp = rsvps || []
-
-  return (
-    <Grid container alignItems="center" justifyContent="center">
-      <div
-        key={rsvp.timeslot}
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          minHeight: 60,
-          width: '100%',
-          padding: '4px 0',
-        }}
-      >
-        <div
-          style={{
-            marginLeft: 8,
-            marginRight: 8,
-            display: 'flex',
-            alignItems: 'center',
-            flexShrink: 0,
-          }}
-        >
-          <span
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              marginBottom: 2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              maxWidth: '100%',
-            }}
-            title={t(`${rsvp.timeslot}`)}
-          >
-            {t(`${rsvp.timeslot}`)}
-          </span>
-        </div>
-        <div
-          style={{
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'flex-start',
-            justifyContent: 'center',
-            minWidth: 0,
-            textAlign: 'left',
-            overflow: 'hidden',
-            marginLeft: 4,
-          }}
-        >
-           <span
-            style={{
-              fontSize: 15,
-              fontWeight: 600,
-              marginBottom: 2,
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap',
-              maxWidth: '100%',
-            }}
-            title={t(`${rsvp.going_count}`)}
-          >
-            {t('going')}: {t(`${rsvp.going_count}`)}
-          </span>
-          <span style={{ fontSize: 10 }}>
-            {t('maybe')}: {t(`${rsvp.maybe_count}`)}
-          </span>
-        </div>
-      </div>
-    </Grid>
-  )
-}
-
 
 /**
  *
