@@ -10,7 +10,7 @@ import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { useTranslation } from 'react-i18next'
 
@@ -117,9 +117,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                 ) : (
                   <Timer start {...gym} />
                 )}
-                {gym.rsvps?.length > 0 && (
-                  <RsvpsModal gym={gym} />
-                )}
+                {gym.rsvps?.length > 0 && <RsvpsModal gym={gym} />}
                 {Boolean(
                   gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
                 ) && <Timer start {...gym} hasHatched={hasHatched} />}
@@ -371,49 +369,50 @@ function RsvpsModal({ gym }) {
   }
 
   return (
-      <Grid xs={12}>
-        <Grid
-          container
-          direction="column"
-          alignItems="center"
-          style={{ margin: '2px 0' }}
+    <Grid xs={12}>
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        style={{ margin: '2px 0' }}
+      >
+        <small
+          style={{
+            fontWeight: 'bold',
+            fontSize: 12,
+            marginBottom: 4,
+          }}
         >
-          <small
-            style={{
-              fontWeight: 'bold',
-              fontSize: 12,
-              marginBottom: 4,
-            }}
-          >
-            RSVPs: ({t(`going`)} / {t(`maybe`)})
-          </small>
-          <Grid container justifyContent="center" spacing={1}>
-            {rsvps.map((rsvp) => (
-              <Grid
-                key={rsvp.timeslot}
-                xs="auto"
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  borderRadius: '6px',
-                  paddingTop: '4px',
-                  fontSize: 14,
-                  minWidth: 50,
-                  textAlign: 'center',
-                }}
-              >
-                <div>
-                  {t(`starts`)}:&nbsp;
-                  {formatTime(rsvp.timeslot)}&nbsp;
-                  <AccessTimeIcon fontSize="smaller" />&nbsp;
-                  {rsvp.going_count} / {rsvp.maybe_count}
-                </div>
-              </Grid>
-            ))}
-          </Grid>
+          RSVPs: ({t(`going`)} / {t(`maybe`)})
+        </small>
+        <Grid container justifyContent="center" spacing={1}>
+          {rsvps.map((rsvp) => (
+            <Grid
+              key={rsvp.timeslot}
+              xs="auto"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                borderRadius: '6px',
+                paddingTop: '4px',
+                fontSize: 14,
+                minWidth: 50,
+                textAlign: 'center',
+              }}
+            >
+              <div>
+                {t(`starts`)}:&nbsp;
+                {formatTime(rsvp.timeslot)}&nbsp;
+                <AccessTimeIcon fontSize="smaller" />
+                &nbsp;
+                {rsvp.going_count} / {rsvp.maybe_count}
+              </div>
+            </Grid>
+          ))}
         </Grid>
       </Grid>
+    </Grid>
   )
 }
 
