@@ -200,19 +200,24 @@ function DefendersModal({ gym, onClose }) {
             >
               <div
                 style={{
-                  marginLeft: 8,
-                  marginRight: 8,
+                  width: 44,
+                  height: 44,
                   display: 'flex',
                   alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 12,
+                  marginRight: 6,
                   flexShrink: 0,
                 }}
               >
                 <Img
                   src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
                   alt={t(`poke_${def.pokemon_id}`)}
-                  maxHeight={44}
-                  maxWidth={44}
-                  style={{ objectFit: 'contain' }}
+                  style={{
+                    maxHeight: 44,
+                    maxWidth: 44,
+                    objectFit: 'contain',
+                  }}
                 />
               </div>
               <div
@@ -249,16 +254,14 @@ function DefendersModal({ gym, onClose }) {
               <div
                 style={{
                   width: 44,
-                  minWidth: 44,
-                  maxWidth: 44,
                   height: 44,
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'flex-end',
-                  position: 'relative',
-                  marginLeft: 4,
-                  marginRight: 8,
+                  justifyContent: 'right',
+                  marginLeft: 6,
+                  marginRight: 12,
                   flexShrink: 0,
+                  position: 'relative',
                 }}
               >
                 {/* Heart outline */}
@@ -266,8 +269,6 @@ function DefendersModal({ gym, onClose }) {
                   style={{
                     color: 'transparent',
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     width: 28,
                     height: 28,
                     stroke: 'white',
@@ -282,8 +283,6 @@ function DefendersModal({ gym, onClose }) {
                     color: 'white',
                     opacity: 0.18,
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     width: 28,
                     height: 28,
                   }}
@@ -293,8 +292,6 @@ function DefendersModal({ gym, onClose }) {
                   style={{
                     color: '#ff69b4',
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     width: 28,
                     height: 28,
                     clipPath: `inset(${100 - percent * 100}% 0 0 0)`,
@@ -308,27 +305,30 @@ function DefendersModal({ gym, onClose }) {
                   viewBox="0 0 28 28"
                   style={{
                     position: 'absolute',
-                    top: 0,
-                    right: 0,
                     pointerEvents: 'none',
                   }}
                 >
-                  {/* Crack at 1/3 height (top) */}
-                  <path
-                    d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                    stroke="white"
-                    strokeWidth={1.5}
-                    fill="none"
-                    strokeLinejoin="round"
-                  />
-                  {/* Crack at 2/3 height (bottom, improved to fit heart) */}
-                  <path
-                    d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                    stroke="white"
-                    strokeWidth={1.5}
-                    fill="none"
-                    strokeLinejoin="round"
-                  />
+                  {/* Show cracks based on health: */}
+                  {percent <= 2 / 3 && (
+                    // Always show top crack if percent <= 2/3
+                    <path
+                      d="M2,9 Q7,11 14,9 Q21,11 26,9"
+                      stroke="white"
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
+                  {percent <= 1 / 3 && (
+                    // Show bottom crack only if percent <= 1/3
+                    <path
+                      d="M7,19 Q11,17 14,19 Q17,17 21,19"
+                      stroke="white"
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
                 </svg>
               </div>
             </div>
