@@ -401,6 +401,7 @@ function RsvpsModal({ gym }) {
                 }}
               >
                 <div>
+                  {t(`starts`)}:&nbsp;
                   {formatTime(rsvp.timeslot)}&nbsp;
                   <AccessTimeIcon fontSize="smaller" />&nbsp;
                   {rsvp.going_count} / {rsvp.maybe_count}
