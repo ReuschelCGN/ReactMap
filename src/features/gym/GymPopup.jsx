@@ -186,7 +186,10 @@ function DefendersModal({ gym, onClose }) {
         {defenders.map((def) => {
           const fullCP = def.cp_when_deployed
           const currentCP = def.cp_now
-          const percent = Math.max(0, Math.min(1, currentCP / fullCP))
+          const percent = Math.max(
+            0,
+            Math.min(1, (currentCP / fullCP) * 1.25 - 0.25),
+          )
 
           return (
             <div
