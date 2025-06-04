@@ -819,7 +819,7 @@ class PoracleAPI {
               { name: 'template', options: [], xs: 6, sm: 4 },
               { name: 'team', options: [0, 1, 2, 3, 4], xs: 6, sm: 4 },
               { name: 'move', options: [], xs: 6, sm: 5 },
-              { name: 'rsvp_changes', options: [0, 1, 2], xs: 6, sm: 5 }, 
+              { name: 'rsvp_changes', options: [0, 1, 2], xs: 6, sm: 5 },
             ],
             booleans: [
               { name: 'clean', xs: 6, sm: 3 },
