@@ -475,5 +475,7 @@
   "rsvp_1": "rsvp",
   "rsvp_2": "rsvp_only",
   "rsvp_changes": "RSVP veranderingen",
-  "show_rsvps_badge": "Toon Rsvp Badge"
+  "show_rsvps_badge": "Toon Rsvp Badge",
+  "going": "beloofd",
+  "maybe": "misschien"
 }
