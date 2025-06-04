@@ -157,7 +157,7 @@ export function gymMarker({
                     width: ${gymIconSize / 1.4}px;
                     height: auto;
                     bottom: ${60 + gymMod.offsetY}px;
-                    left: ${gymMod.offsetX * 50}%;
+                    left: ${gymMod.offsetX * 54}%;
                     transform: translateX(-50%);
                   "
                 />`
