@@ -9,6 +9,9 @@ import MenuItem from '@mui/material/MenuItem'
 import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
+import FavoriteIcon from '@mui/icons-material/Favorite'
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@features/webhooks'
@@ -44,8 +47,26 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
   const { perms } = useMemory((s) => s.auth)
   const popups = useStorage((s) => s.popups)
   const ts = Math.floor(Date.now() / 1000)
+  const [showDefenders, setShowDefenders] = React.useState(false)
 
   useAnalytics('Popup', `Team ID: ${gym.team_id} Has Raid: ${hasRaid}`, 'Gym')
+
+  // If defenders modal is toggled, show only that
+  if (showDefenders) {
+    return (
+      <ErrorBoundary noRefresh style={{}} variant="h5">
+        <Grid
+          container
+          direction="row"
+          justifyContent="center"
+          alignItems="center"
+          width={200}
+        >
+          <DefendersModal gym={gym} onClose={() => setShowDefenders(false)} />
+        </Grid>
+      </ErrorBoundary>
+    )
+  }
 
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
@@ -96,6 +117,9 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                 ) : (
                   <Timer start {...gym} />
                 )}
+                {gym.rsvps?.length > 0 && (
+                  <RsvpsModal gym={gym} />
+                )}
                 {Boolean(
                   gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
                 ) && <Timer start {...gym} hasHatched={hasHatched} />}
@@ -108,11 +132,285 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
         <GymFooter hasRaid={hasRaid} lat={gym.lat} lon={gym.lon} />
         {perms.gyms && (
           <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-            <ExtraGymInfo {...gym} />
+            <ExtraGymInfo setShowDefenders={setShowDefenders} {...gym} />
           </Collapse>
         )}
       </Grid>
     </ErrorBoundary>
+  )
+}
+
+/**
+ * Compact modal for gym defenders
+ * @param {{ gym: import('@rm/types').Gym, onClose: () => void }} param0
+ */
+function DefendersModal({ gym, onClose }) {
+  const { t } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  const defenders = gym.defenders || []
+
+  return (
+    <Grid
+      container
+      direction="column"
+      alignItems="stretch"
+      style={{ minWidth: 250, maxWidth: 350, padding: 8 }}
+    >
+      <Grid container alignItems="center" mb={1}>
+        <Grid xs={2}>
+          <IconButton
+            onClick={(e) => {
+              e.stopPropagation()
+              onClose()
+            }}
+            size="small"
+          >
+            <ArrowBackIosNewIcon fontSize="small" />
+          </IconButton>
+        </Grid>
+        <Grid
+          xs={8}
+          style={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            wordBreak: 'break-word',
+            maxWidth: 200,
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <Title backup={t('unknown_gym')}>{gym.name}</Title>
+        </Grid>
+      </Grid>
+      <Grid container direction="column" spacing={1}>
+        {defenders.map((def) => {
+          const fullCP = def.cp_when_deployed
+          const currentCP = def.cp_now
+          const percent = Math.max(0, Math.min(1, currentCP / fullCP))
+
+          return (
+            <div
+              key={def.pokemon_id}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                minHeight: 60,
+                width: '100%',
+                padding: '4px 0',
+              }}
+            >
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginLeft: 12,
+                  marginRight: 6,
+                  flexShrink: 0,
+                }}
+              >
+                <Img
+                  src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
+                  alt={t(`poke_${def.pokemon_id}`)}
+                  style={{
+                    maxHeight: 44,
+                    maxWidth: 44,
+                    objectFit: 'contain',
+                  }}
+                />
+              </div>
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  justifyContent: 'center',
+                  minWidth: 0,
+                  textAlign: 'left',
+                  overflow: 'hidden',
+                  marginLeft: 4,
+                }}
+              >
+                <span
+                  style={{
+                    fontSize: 15,
+                    fontWeight: 600,
+                    marginBottom: 2,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    maxWidth: '100%',
+                  }}
+                  title={t(`poke_${def.pokemon_id}`)}
+                >
+                  {t(`poke_${def.pokemon_id}`)}
+                </span>
+                <span style={{ fontSize: 10 }}>
+                  {t('cp')}: <b>{currentCP}</b> / {fullCP}
+                </span>
+              </div>
+              <div
+                style={{
+                  width: 44,
+                  height: 44,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'right',
+                  marginLeft: 6,
+                  marginRight: 12,
+                  flexShrink: 0,
+                  position: 'relative',
+                }}
+              >
+                {/* Heart outline */}
+                <FavoriteIcon
+                  style={{
+                    color: 'transparent',
+                    position: 'absolute',
+                    width: 28,
+                    height: 28,
+                    stroke: 'white',
+                    strokeWidth: 1,
+                    filter: 'drop-shadow(0 0 1px #0008)',
+                  }}
+                  className="heart-outline"
+                />
+                {/* Heart background */}
+                <FavoriteIcon
+                  style={{
+                    color: 'white',
+                    opacity: 0.18,
+                    position: 'absolute',
+                    width: 28,
+                    height: 28,
+                  }}
+                />
+                {/* Heart fill */}
+                <FavoriteIcon
+                  style={{
+                    color: '#ff69b4',
+                    position: 'absolute',
+                    width: 28,
+                    height: 28,
+                    clipPath: `inset(${100 - percent * 100}% 0 0 0)`,
+                    transition: 'clip-path 0.3s',
+                  }}
+                />
+                {/* Heart cracks for rounds */}
+                <svg
+                  width={28}
+                  height={28}
+                  viewBox="0 0 28 28"
+                  style={{
+                    position: 'absolute',
+                    pointerEvents: 'none',
+                  }}
+                >
+                  {/* Show cracks based on health: */}
+                  {percent <= 2 / 3 && (
+                    // Always show top crack if percent <= 2/3
+                    <path
+                      d="M2,9 Q7,11 14,9 Q21,11 26,9"
+                      stroke="white"
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
+                  {percent <= 1 / 3 && (
+                    // Show bottom crack only if percent <= 1/3
+                    <path
+                      d="M7,19 Q11,17 14,19 Q17,17 21,19"
+                      stroke="white"
+                      strokeWidth={1.5}
+                      fill="none"
+                      strokeLinejoin="round"
+                    />
+                  )}
+                </svg>
+              </div>
+            </div>
+          )
+        })}
+      </Grid>
+      <Grid
+        xs={12}
+        textAlign="center"
+        mt={2}
+        style={{ fontSize: 12, color: '#888' }}
+      >
+        {t('last_updated')}:{' '}
+        {gym.updated
+          ? new Date(gym.updated * 1000).toLocaleString()
+          : t('unknown')}
+      </Grid>
+    </Grid>
+  )
+}
+
+/**
+ * Compact modal for rsvps
+ * @param {{ gym: import('@rm/types').Gym }} param0
+ */
+function RsvpsModal({ gym }) {
+  const { t } = useTranslation()
+  const rsvps = gym.rsvps || []
+
+  const formatTime = (timestamp) => {
+    const locale = localStorage.getItem('i18nextLng') || 'en'
+    return new Date(timestamp).toLocaleTimeString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  return (
+      <Grid xs={12}>
+        <Grid
+          container
+          direction="column"
+          alignItems="center"
+          style={{ margin: '2px 0' }}
+        >
+          <small
+            style={{
+              fontWeight: 'bold',
+              fontSize: 12,
+              marginBottom: 4,
+            }}
+          >
+            RSVPs: ({t(`going`)} / {t(`maybe`)})
+          </small>
+          <Grid container justifyContent="center" spacing={1}>
+            {rsvps.map((rsvp) => (
+              <Grid
+                key={rsvp.timeslot}
+                xs="auto"
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  borderRadius: '6px',
+                  paddingTop: '4px',
+                  fontSize: 14,
+                  minWidth: 50,
+                  textAlign: 'center',
+                }}
+              >
+                <div>
+                  {t(`starts`)}:&nbsp;
+                  {formatTime(rsvp.timeslot)}&nbsp;
+                  <AccessTimeIcon fontSize="smaller" />&nbsp;
+                  {rsvp.going_count} / {rsvp.maybe_count}
+                </div>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
+      </Grid>
   )
 }
 
@@ -625,6 +923,7 @@ const GymFooter = ({ lat, lon, hasRaid }) => {
 /**
  *
  * @param {import('@rm/types').Gym} props
+ *   setShowDefenders: any
  * @returns
  */
 const ExtraGymInfo = ({
@@ -635,6 +934,8 @@ const ExtraGymInfo = ({
   total_cp,
   guarding_pokemon_id,
   guarding_pokemon_display,
+  defenders,
+  setShowDefenders,
 }) => {
   const { t, i18n } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
@@ -671,6 +972,29 @@ const ExtraGymInfo = ({
       )}
       {!!total_cp && updated > gymValidDataLimit && (
         <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
+      )}
+      {defenders?.length > 0 && (
+        <Grid xs={12} textAlign="center" my={1}>
+          <button
+            type="button"
+            style={{
+              padding: 6,
+              borderRadius: 8,
+              border: '1px solid #888',
+              background: '#000',
+              color: '#fff',
+              fontWeight: 600,
+              width: '100%',
+              fontSize: 12,
+            }}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowDefenders(true)
+            }}
+          >
+            {t('view_defenders')}
+          </button>
+        </Grid>
       )}
       <Divider
         flexItem

@@ -16,10 +16,7 @@ import { SelectorListMemo } from './components/SelectorList'
 function StationLevels() {
   const { t } = useTranslation()
   const available = useMemory((s) => s.available.stations)
-  const enabled = useStorage(
-    (s) =>
-      !!s.filters?.stations?.maxBattles && !s.filters?.stations?.allStations,
-  )
+  const enabled = useStorage((s) => !!s.filters?.stations?.maxBattles)
   const [filters, setFilters] = useDeepStore(
     'filters.stations.battleTier',
     'all',
@@ -59,8 +56,7 @@ function StationsQuickSelect() {
   const enabled = useStorage(
     (s) =>
       !!s.filters?.stations?.maxBattles &&
-      s.filters?.stations?.battleTier === 'all' &&
-      !s.filters?.stations?.allStations,
+      s.filters?.stations?.battleTier === 'all',
   )
   return (
     <CollapsibleItem open={enabled}>

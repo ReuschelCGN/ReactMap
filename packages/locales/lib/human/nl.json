@@ -468,5 +468,13 @@
   "webhook_advanced_save_width": 2,
   "login_button": 5,
   "join_button": 5,
-  "all": "Alle"
+  "all": "Alle",
+  "view_defenders": "verdedigers tonen",
+  "rsvp_0": "no_rsvp",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only",
+  "rsvp_changes": "RSVP veranderingen",
+  "show_rsvps_badge": "Toon Rsvp Badge",
+  "going": "beloofd",
+  "maybe": "misschien"
 }

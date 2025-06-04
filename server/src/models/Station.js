@@ -52,7 +52,10 @@ class Station extends Model {
       )
     // .where('is_inactive', false)
 
-    if (perms.dynamax && (onlyMaxBattles || onlyGmaxStationed)) {
+    if (
+      perms.dynamax &&
+      (onlyMaxBattles || (onlyGmaxStationed && !onlyMaxBattles))
+    ) {
       select.push(
         'is_battle_available',
         'battle_level',
@@ -73,10 +76,13 @@ class Station extends Model {
       )
 
       if (!onlyAllStations) {
-        query.whereNotNull('battle_pokemon_id').andWhere('battle_end', '>', ts)
+        query
+          .whereNotNull('battle_pokemon_id')
+          .andWhere('is_battle_available', true)
+          .andWhere('battle_end', '>', ts)
 
         query.andWhere((station) => {
-          if (hasStationedGmax || !onlyGmaxStationed)
+          if (onlyMaxBattles) {
             station.where((battle) => {
               if (onlyBattleTier === 'all') {
                 const battleBosses = new Set()
@@ -112,8 +118,15 @@ class Station extends Model {
                 battle.andWhere('battle_level', onlyBattleTier)
               }
             })
-          if (hasStationedGmax && onlyGmaxStationed)
+          }
+          if (
+            hasStationedGmax &&
+            onlyGmaxStationed &&
+            !onlyAllStations &&
+            !onlyMaxBattles
+          ) {
             station.orWhere('total_stationed_gmax', '>', 0)
+          }
         })
       }
     }
@@ -154,12 +167,12 @@ class Station extends Model {
           onlyAllStations ||
           (perms.dynamax &&
             ((onlyMaxBattles &&
-              (onlyBattleTier === 'all'
-                ? args.filters[`j${station.battle_level}`] ||
-                  args.filters[
-                    `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
-                  ]
-                : onlyBattleTier === station.battle_level)) ||
+              (args.filters[`j${station.battle_level}`] ||
+                args.filters[
+                  `${station.battle_pokemon_id}-${station.battle_pokemon_form}`
+                ] ||
+                onlyBattleTier === 'all' ||
+                onlyBattleTier === station.battle_level)) ||
               (onlyGmaxStationed && station.total_stationed_gmax))),
       )
   }

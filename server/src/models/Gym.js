@@ -27,6 +27,8 @@ const gymFields = [
   'in_battle',
   'guarding_pokemon_id',
   'guarding_pokemon_display',
+  'defenders',
+  'rsvps',
   'total_cp',
   'power_up_points',
   'power_up_level',
@@ -308,6 +310,12 @@ class Gym extends Model {
             newGym.guarding_pokemon_display = JSON.parse(
               gym.guarding_pokemon_display,
             )
+          }
+          if (typeof gym.defenders === 'string' && gym.defenders) {
+            newGym.defenders = JSON.parse(gym.defenders)
+          }
+          if (typeof gym.rsvps === 'string' && gym.rsvps) {
+            newGym.rsvps = JSON.parse(gym.rsvps)
           }
         }
         if (

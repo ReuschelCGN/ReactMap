@@ -40,6 +40,18 @@ export interface PokemonDisplay {
   location_card: number
 }
 
+export interface Defender extends PokemonDisplay {
+  pokemon_id: number
+  deployed_ms: number
+  deployed_time: number
+  battles_won: number
+  battles_lost: number
+  times_fed: number
+  motivation_now: number
+  cp_when_deployed: number
+  cp_now: number
+}
+
 export interface Gym {
   id: string
   lat: number
@@ -54,6 +66,8 @@ export interface Gym {
   updated: number
   guarding_pokemon_id: number
   guarding_pokemon_display: PokemonDisplay
+  defenders: Defender[]
+  rsvps: Rsvp[]
   available_slots: number
   team_id: number
   raid_level: number
@@ -79,6 +93,12 @@ export interface Gym {
   power_up_end_timestamp: number
   deleted: boolean
   enabled: boolean
+}
+
+export interface Rsvp extends Gym {
+  timeslot: number
+  going_count: number
+  maybe_count: number
 }
 
 export type FullGym = FullModel<Gym, GymModel.Gym>

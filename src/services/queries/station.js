@@ -89,3 +89,12 @@ export const GET_STATION_POKEMON = gql`
     }
   }
 `
+
+export const GET_ONE_STATION = gql`
+  query GetOneStation($id: ID!, $perm: String!) {
+    stationsSingle(id: $id, perm: $perm) {
+      lat
+      lon
+    }
+  }
+`

@@ -767,5 +767,13 @@
   "xs": "xs",
   "zero_iv": "0% IV",
   "zoom_in": "Przybliż",
-  "zoom_out": "Oddal"
+  "zoom_out": "Oddal",
+  "view_defenders": "pokazać obrońców",
+  "rsvp_0": "no_rsvp",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only",
+  "rsvp_changes": "RSVP zmiany",
+  "show_rsvps_badge": "Pokaż odznaki Rsvp",
+  "going": "obiecal",
+  "maybe": "być może"
 }

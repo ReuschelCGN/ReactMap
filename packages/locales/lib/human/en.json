@@ -819,5 +819,13 @@
   "filters": "Filters",
   "active": "Active",
   "inactive": "Inactive",
-  "bread_time_window": "You can take on Max Battles between 6AM and 9PM."
+  "bread_time_window": "You can take on Max Battles between 6AM and 9PM.",
+  "view_defenders": "show defenders",
+  "rsvp_0": "no_rsvp",
+  "rsvp_1": "rsvp",
+  "rsvp_2": "rsvp_only",
+  "rsvp_changes": "RSVP changes",
+  "show_rsvps_badge": "Show Rsvp Badge",
+  "going": "Going",
+  "maybe": "Maybe"
 }
