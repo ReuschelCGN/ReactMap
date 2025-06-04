@@ -10,6 +10,7 @@ import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import AccessTimeIcon from '@mui/icons-material/AccessTime';
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import { useTranslation } from 'react-i18next'
 
@@ -358,68 +359,56 @@ function RsvpsModal({ gym }) {
   const { t } = useTranslation()
   const rsvps = gym.rsvps || []
 
-  return (
-      <Grid container direction="column" spacing={1}>
-        {rsvps.map((rsvp) => {
+  const formatTime = (timestamp) => {
+    const locale = localStorage.getItem('i18nextLng') || 'en'
+    return new Date(timestamp).toLocaleTimeString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
 
-          return (
-            <div
-              key={rsvp.timeslot}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                minHeight: 60,
-                width: '100%',
-                padding: '4px 0',
-              }}
-            >
-              <div
+  return (
+      <Grid xs={12}>
+        <Grid
+          container
+          direction="column"
+          alignItems="center"
+          style={{ margin: '2px 0' }}
+        >
+          <small
+            style={{
+              fontWeight: 'bold',
+              fontSize: 12,
+              marginBottom: 4,
+            }}
+          >
+            RSVPs: ({t(`going`)} / {t(`maybe`)})
+          </small>
+          <Grid container justifyContent="center" spacing={1}>
+            {rsvps.map((rsvp) => (
+              <Grid
+                key={rsvp.timeslot}
+                xs="auto"
                 style={{
-                  marginLeft: 8,
-                  marginRight: 8,
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexShrink: 0,
-                }}
-              >
-                <span style={{ fontSize: 14, color: '#fff' }}>
-                  Timeslot: <b>{rsvp.timeslot}</b>
-                </span>
-              </div>
-              <div
-                style={{
-                  flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  minWidth: 0,
-                  textAlign: 'left',
-                  overflow: 'hidden',
-                  marginLeft: 4,
+                  alignItems: 'center',
+                  borderRadius: '6px',
+                  paddingTop: '4px',
+                  fontSize: 14,
+                  minWidth: 50,
+                  textAlign: 'center',
                 }}
               >
-                <span
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 600,
-                    marginBottom: 2,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: '100%',
-                  }}
-                  title={gym.name}
-                >
-                  Going: <b>{rsvp.going_count}</b>
-                </span>
-                <span style={{ fontSize: 12 }}>
-                  Maybe: <b>{rsvp.maybe_count}</b>
-                </span>
-              </div>
-            </div>
-          )
-        })}
+                <div>
+                  {formatTime(rsvp.timeslot)}&nbsp;
+                  <AccessTimeIcon fontSize="smaller" />&nbsp;
+                  {rsvp.going_count} / {rsvp.maybe_count}
+                </div>
+              </Grid>
+            ))}
+          </Grid>
+        </Grid>
       </Grid>
   )
 }
