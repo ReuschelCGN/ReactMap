@@ -115,8 +115,8 @@ export class Poracle {
         return { id: id.replace('l', ''), type: 'lure' }
       case 'r':
         return { id: id.replace('r', ''), type: 'raid' }
-      case 'k':
-        return { id: id.replace('k', ''), type: 'maxbattle' }
+      case 'j':
+        return { id: id.replace('j', ''), type: 'maxbattle' }
       case 'q':
         return { id: id.replace('q', ''), type: 'item' }
       case 'm':
