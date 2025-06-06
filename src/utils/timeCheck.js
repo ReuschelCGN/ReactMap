@@ -13,9 +13,9 @@ export function timeCheck(lat, lon) {
   switch (true) {
     case date > times.dawn && date < times.sunriseEnd:
       return 'dawn'
-    case date > times.dusk && date < times.night:
+    case date > times.sunsetStart && date < times.dusk:
       return 'dusk'
-    case date > times.night || date < times.nightEnd:
+    case date > times.dusk || date < times.dawn:
       return 'night'
     default:
       return 'day'
