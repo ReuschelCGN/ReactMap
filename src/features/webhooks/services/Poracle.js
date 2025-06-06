@@ -9,7 +9,6 @@ export class Poracle {
       case 'gym':
       case 'egg':
       case 'raid':
-      case 'maxbattle':
         return 'gyms'
       case 'invasion':
       case 'lure':
@@ -17,6 +16,8 @@ export class Poracle {
         return 'pokestops'
       case 'nest':
         return 'nests'
+      case 'maxbattle':
+        return 'stations'
       default:
         return poracleCategory
     }
@@ -37,7 +38,7 @@ export class Poracle {
       case 'raid':
         return ['raids', 'pokemon']
       case 'maxbattle':
-        return ['pokemon']
+        return ['maxbattles', 'pokemon']
       case 'quest':
         return [
           'items',
