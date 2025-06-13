@@ -82,6 +82,7 @@ class Pokestop extends Model {
       hasMultiInvasions,
       multiInvasionMs,
       hasRewardAmount,
+      hasLayerColumn,
       hasPowerUp,
       hasConfirmed,
     },
@@ -103,7 +104,8 @@ class Pokestop extends Model {
     } = args
     const midnight = getUserMidnight(args)
     const ts = Math.floor(Date.now() / 1000)
-    const { queryLimits, stopValidDataLimit } = config.getSafe('api')
+    const { queryLimits, stopValidDataLimit, hideOldPokestops } =
+      config.getSafe('api')
 
     const {
       lures: lurePerms,
@@ -115,8 +117,9 @@ class Pokestop extends Model {
     } = perms
 
     const query = this.query()
-    query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
-
+    if (hideOldPokestops) {
+      query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
+    }
     Pokestop.joinIncident(query, hasMultiInvasions, multiInvasionMs)
     query
       .whereBetween('lat', [args.minLat, args.maxLat])
@@ -446,7 +449,6 @@ class Pokestop extends Model {
                 '>=',
                 ts * (multiInvasionMs ? 1000 : 1),
               )
-
               if (hasConfirmed && onlyConfirmed) {
                 invasion.andWhere('confirmed', onlyConfirmed)
               }
@@ -477,7 +479,6 @@ class Pokestop extends Model {
             stops.orWhere((invasion) => {
               invasion.whereIn('grunt_type', invasions)
               invasion.andWhere('expiration', '>=', ts)
-
               if (hasConfirmed) {
                 invasion.andWhere('confirmed', onlyConfirmed)
               }
@@ -905,7 +906,6 @@ class Pokestop extends Model {
           )
       }
     }
-
     // stardust
 
     // xp
@@ -950,7 +950,6 @@ class Pokestop extends Model {
           )
       }
     }
-
     // xp
 
     // mega
@@ -1059,7 +1058,6 @@ class Pokestop extends Model {
         )
         .where('alternative_quest_reward_type', 7)
     }
-
     // pokemon
 
     // invasions
@@ -1317,7 +1315,7 @@ class Pokestop extends Model {
     return quest
   }
 
-  static async search(perms, args, distance, bbox) {
+  static async search(perms, args, {}, distance, bbox) {
     const { onlyAreas = [], search = '' } = args
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
@@ -1474,7 +1472,7 @@ class Pokestop extends Model {
     return mapped.map((result) => this.parseRdmRewards(result)).filter(Boolean)
   }
 
-  static async searchLures(perms, args, distance, bbox) {
+  static async searchLures(perms, args, {}, distance, bbox) {
     const { search, onlyAreas = [], locale } = args
     const ts = Math.floor(Date.now() / 1000)
 
@@ -1591,7 +1589,7 @@ class Pokestop extends Model {
       : results
   }
 
-  static getOne(id) {
+  static getOne(id, {}) {
     return this.query().select(['lat', 'lon']).where('id', id).first()
   }
 
@@ -1604,8 +1602,8 @@ class Pokestop extends Model {
       maxLon,
     } = args
     const query = this.query()
-      .whereBetween('lat', [minLat - 0.025, maxLat + 0.025])
-      .andWhereBetween('lon', [minLon - 0.025, maxLon + 0.025])
+      .whereBetween(`lat`, [minLat - 0.025, maxLat + 0.025])
+      .andWhereBetween(`lon`, [minLon - 0.025, maxLon + 0.025])
     query.select(['id', 'lat', 'lon', 'enabled', 'deleted', 'partner_id'])
     if (!onlyIncludeSponsored) {
       query.andWhere((poi) => {
@@ -1615,7 +1613,6 @@ class Pokestop extends Model {
     if (hasShowcaseData) {
       query.select('showcase_expiry')
     }
-
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
@@ -1630,7 +1627,7 @@ class Pokestop extends Model {
    * @returns {Promise<{ hasConfirmedInvasions: boolean }>}
    */
   static async getFilterContext({ hasConfirmed }) {
-    if (false || !hasConfirmed) return { hasConfirmedInvasions: false }
+    if (!hasConfirmed) return { hasConfirmedInvasions: false }
     const result = await this.query()
       .from('incident')
       .count('id', { as: 'total' })
