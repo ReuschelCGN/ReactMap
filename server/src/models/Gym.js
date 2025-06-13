@@ -59,7 +59,8 @@ class Gym extends Model {
    * @param {import('objection').QueryBuilder<Gym, Gym[]>} query
    */
   static onlyValid(query) {
-    query.andWhere('enabled', true).andWhere('deleted', false)
+    query.andWhere('enabled', true)
+    query.andWhere('deleted', false)
   }
 
   static async getAll(perms, args, { availableSlotsCol }, userId) {
@@ -392,7 +393,7 @@ class Gym extends Model {
     }
   }
 
-  static async search(perms, args, distance, bbox) {
+  static async search(perms, args, {}, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '' } = args
 
@@ -433,6 +434,7 @@ class Gym extends Model {
         'raid_pokemon_gender',
         'raid_pokemon_costume',
         'raid_pokemon_evolution',
+        'raid_end_timestamp',
         distance,
       ])
       .whereBetween('lat', [bbox.minLat, bbox.maxLat])
@@ -440,7 +442,7 @@ class Gym extends Model {
       .whereIn('raid_pokemon_id', pokemonIds)
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
-      .andWhere('raid_battle_timestamp', '<=', ts)
+      .andWhere('raid_pokemon_id', '>', 0)
       .andWhere('raid_end_timestamp', '>=', ts)
     if (hasAlignment) {
       query.select('raid_pokemon_alignment')
@@ -453,7 +455,7 @@ class Gym extends Model {
     return query
   }
 
-  static async getBadges(userGyms) {
+  static async getBadges(userGyms, {}) {
     const query = this.query().select(['*', 'gym.id', 'lat', 'lon', 'deleted'])
 
     const results = await query.whereIn(
@@ -479,11 +481,11 @@ class Gym extends Model {
       .reverse()
   }
 
-  static getOne(id) {
+  static getOne(id, {}) {
     return this.query().select(['lat', 'lon']).where('id', id).first()
   }
 
-  static async getSubmissions(perms, args) {
+  static async getSubmissions(perms, args, {}) {
     const {
       filters: { onlyAreas = [], onlyIncludeSponsored = true },
       minLat,
@@ -493,15 +495,16 @@ class Gym extends Model {
     } = args
     const wiggle = 0.025
     const query = this.query()
-      .whereBetween('lat', [minLat - wiggle, maxLat + wiggle])
-      .andWhereBetween('lon', [minLon - wiggle, maxLon + wiggle])
-    query.select(['id', 'lat', 'lon', 'partner_id'])
+      .whereBetween(`lat`, [minLat - wiggle, maxLat + wiggle])
+      .andWhereBetween(`lon`, [minLon - wiggle, maxLon + wiggle])
 
+    query.select(['id', 'lat', 'lon', 'partner_id'])
     if (!onlyIncludeSponsored) {
       query.andWhere((poi) => {
         poi.whereNull('partner_id').orWhere('partner_id', 0)
       })
     }
+
     if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
