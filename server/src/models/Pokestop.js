@@ -1602,8 +1602,8 @@ class Pokestop extends Model {
       maxLon,
     } = args
     const query = this.query()
-      .whereBetween(`lat`, [minLat - 0.025, maxLat + 0.025])
-      .andWhereBetween(`lon`, [minLon - 0.025, maxLon + 0.025])
+      .whereBetween('lat', [minLat - 0.025, maxLat + 0.025])
+      .andWhereBetween('lon', [minLon - 0.025, maxLon + 0.025])
     query.select(['id', 'lat', 'lon', 'enabled', 'deleted', 'partner_id'])
     if (!onlyIncludeSponsored) {
       query.andWhere((poi) => {
