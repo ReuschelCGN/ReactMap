@@ -495,9 +495,8 @@ class Gym extends Model {
     } = args
     const wiggle = 0.025
     const query = this.query()
-      .whereBetween(`lat`, [minLat - wiggle, maxLat + wiggle])
-      .andWhereBetween(`lon`, [minLon - wiggle, maxLon + wiggle])
-
+      .whereBetween('lat', [minLat - wiggle, maxLat + wiggle])
+      .andWhereBetween('lon', [minLon - wiggle, maxLon + wiggle])
     query.select(['id', 'lat', 'lon', 'partner_id'])
     if (!onlyIncludeSponsored) {
       query.andWhere((poi) => {
