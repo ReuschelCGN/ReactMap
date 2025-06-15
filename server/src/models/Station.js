@@ -243,7 +243,7 @@ class Station extends Model {
    * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<import("@rm/types").FullStation[]>}
    */
-  static async search(perms, args, distance, bbox) {
+  static async search(perms, args, {}, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '', locale } = args
     const { searchResultsLimit, stationUpdateLimit } = config.getSafe('api')
