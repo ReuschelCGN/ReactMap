@@ -234,6 +234,28 @@ const Raid = gql`
   }
 `
 
+const Maxbattle = gql`
+  fragment PoracleMaxbattle on Poracle {
+    maxbattle {
+      gmax
+      distance
+      clean
+      form
+      station_id
+      level
+      move
+      id
+      ping
+      pokemon_id
+      profile_no
+      template
+      uid
+      description
+      allMoves
+    }
+  }
+`
+
 const Weather = gql`
   fragment PoracleWeather on Poracle {
     weather {
@@ -261,6 +283,7 @@ export const ALL_PROFILES = gql`
   ${PROFILE}
   ${Quest}
   ${Raid}
+  ${Maxbattle}
   ${Weather}
   query Webhook($category: String!, $status: String!) {
     webhook(category: $category, status: $status) {
@@ -274,6 +297,7 @@ export const ALL_PROFILES = gql`
       ...PoracleProfile
       ...PoracleQuest
       ...PoracleRaid
+      ...PoracleMaxbattle
       ...PoracleWeather
     }
   }
@@ -299,6 +323,7 @@ export const QUICK_ADD = gql`
   ${PROFILE}
   ${Quest}
   ${Raid}
+  ${Maxbattle}
   ${Weather}
   mutation Webhook($data: JSON, $category: String!, $status: String!) {
     webhook(data: $data, category: $category, status: $status) {
@@ -312,6 +337,7 @@ export const QUICK_ADD = gql`
       ...PoracleProfile
       ...PoracleQuest
       ...PoracleRaid
+      ...PoracleMaxbattle
       ...PoracleWeather
       status
       message
@@ -370,6 +396,17 @@ export const EGG = gql`
     webhook(data: $data, category: $category, status: $status) {
       ...Base
       ...PoracleEgg
+    }
+  }
+`
+
+export const MAXBATTLE = gql`
+  ${base}
+  ${Maxbattle}
+  mutation Webhook($data: JSON, $category: String!, $status: String!) {
+    webhook(data: $data, category: $category, status: $status) {
+      ...Base
+      ...PoracleMaxbattle
     }
   }
 `

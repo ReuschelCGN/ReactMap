@@ -16,6 +16,8 @@ export class Poracle {
         return 'pokestops'
       case 'nest':
         return 'nests'
+      case 'maxbattle':
+        return 'stations'
       default:
         return poracleCategory
     }
@@ -35,6 +37,8 @@ export class Poracle {
         return ['pokemon']
       case 'raid':
         return ['raids', 'pokemon']
+      case 'maxbattle':
+        return ['maxbattles', 'pokemon']
       case 'quest':
         return [
           'items',
@@ -70,6 +74,10 @@ export class Poracle {
       case 'raid':
         return item.pokemon_id === 9000
           ? `r${item.level}`
+          : `${item.pokemon_id}-${item.form}`
+      case 'maxbattle':
+        return item.pokemon_id === 9000
+          ? `k${item.level}`
           : `${item.pokemon_id}-${item.form}`
       case 'quest':
         return (() => {
@@ -107,6 +115,8 @@ export class Poracle {
         return { id: id.replace('l', ''), type: 'lure' }
       case 'r':
         return { id: id.replace('r', ''), type: 'raid' }
+      case 'j':
+        return { id: id.replace('j', ''), type: 'maxbattle' }
       case 'q':
         return { id: id.replace('q', ''), type: 'item' }
       case 'm':
@@ -137,6 +147,8 @@ export class Poracle {
         return [`lure_${idObj.id}`]
       case 'raid':
         return idObj.id === '90' ? ['poke_global'] : [`raid_${idObj.id}_plural`]
+      case 'maxbattle':
+        return idObj.id === '90' ? ['poke_global'] : [`maxbattle_${idObj.id}_plural`]
       case 'pokemon':
         return idObj.id === '0'
           ? ['poke_global']
@@ -221,6 +233,22 @@ export class Poracle {
           byDistance: undefined,
         }))
       case 'raid':
+        return entries
+          .map((boss) => {
+            if (boss.allForms) {
+              boss.form = defaults.form
+              if (dupes[boss.pokemon_id]) {
+                return null
+              }
+              dupes[boss.pokemon_id] = true
+            }
+            if (boss.byDistance === false) {
+              boss.distance = 0
+            }
+            return { ...defaults, ...boss }
+          })
+          .filter((boss) => boss)
+      case 'maxbattle':
         return entries
           .map((boss) => {
             if (boss.allForms) {
@@ -362,6 +390,7 @@ export class Poracle {
       // case 'gym': return `${t(`team_${item.team}`)} ${item.gym_id ? item.name : ''}`
       // case 'raid':
       // case 'egg': return `Level ${item.level} ${item.exclusive ? 'Exclusive Only' : ''} ${item.clean ? 'clean' : ''} Template: ${item.template} ${item.team === 4 ? '' : item.team} ${item.gym_id ? 'Gym:' : ''}${item.distance ? ` | d${item.distance}` : ''}`
+      // case 'maxbattle': return `Level ${item.level} ${item.gmax ? 'Gmax Only' : ''} ${item.clean ? 'clean' : ''} Template: ${item.template} ${item.station_id ? 'Station:' : ''}${item.distance ? ` | d${item.distance}` : ''}`
       case 'nest':
         return `${t(`poke_${item.pokemon_id}`)} | Min Spawn: ${
           item.min_spawn_avg

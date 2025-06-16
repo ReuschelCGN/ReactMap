@@ -555,6 +555,12 @@ const resolvers = {
             allMoves: x.move === 9000,
           }))
         }
+        if (category === 'maxbattle' && result.maxbattle) {
+          result.maxbattle = result.maxbattle.map((x) => ({
+            ...x,
+            allMoves: x.move === 9000,
+          }))
+        }
         return result
       }
       return {}
@@ -710,6 +716,12 @@ const resolvers = {
         }
         if (category === 'raid' && result.raid) {
           result.raid = result.raid.map((x) => ({
+            ...x,
+            allMoves: x.move === 9000,
+          }))
+        }
+        if (category === 'maxbattle' && result.maxbattle) {
+          result.maxbattle = result.maxbattle.map((x) => ({
             ...x,
             allMoves: x.move === 9000,
           }))

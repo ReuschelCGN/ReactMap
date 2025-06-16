@@ -20,6 +20,7 @@ import { create } from 'zustand'
  *  pokemon: import("@rm/types").PoraclePokemon[]
  *  raid: import("@rm/types").PoracleRaid[]
  *  egg: import("@rm/types").PoracleEgg[]
+ *  maxbattle: import("@rm/types").PoracleMaxbattle[]
  *  invasion: import("@rm/types").PoracleInvasion[]
  *  lure: import("@rm/types").PoracleLure[]
  *  nest: import("@rm/types").PoracleNest[]
@@ -59,6 +60,7 @@ export const useWebhookStore = create(() => ({
   pokemon: [],
   raid: [],
   egg: [],
+  maxbattle: [],
   invasion: [],
   lure: [],
   nest: [],
