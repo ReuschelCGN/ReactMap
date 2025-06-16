@@ -148,7 +148,9 @@ export class Poracle {
       case 'raid':
         return idObj.id === '90' ? ['poke_global'] : [`raid_${idObj.id}_plural`]
       case 'maxbattle':
-        return idObj.id === '90' ? ['poke_global'] : [`maxbattle_${idObj.id}_plural`]
+        return idObj.id === '90'
+          ? ['poke_global']
+          : [`maxbattle_${idObj.id}_plural`]
       case 'pokemon':
         return idObj.id === '0'
           ? ['poke_global']
