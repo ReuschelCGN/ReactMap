@@ -710,7 +710,11 @@ export function WebhookAdvanced() {
                 freeSolo
                 onChange={(event, newValue) => {
                   if (newValue) {
-                    setPoracleValues({ ...poracleValues, gym_id: newValue.id })
+                    if (option.searchCategory === 'stations') {
+                      setPoracleValues({ ...poracleValues, station_id: newValue.id })
+                    } else {
+                      setPoracleValues({ ...poracleValues, gym_id: newValue.id })
+                    }
                   }
                 }}
                 renderInput={(params) => (
