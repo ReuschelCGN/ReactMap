@@ -247,7 +247,7 @@ class Pokemon extends Model {
         (pkmn.pvp ||
           pkmn.pvp_rankings_great_league ||
           pkmn.pvp_rankings_ultra_league ||
-          (false && reactMapHandlesPvp && pkmn.cp))
+          (reactMapHandlesPvp && pkmn.cp))
       ) {
         noPvp = false
         listOfIds.push(pkmn.id)
