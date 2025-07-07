@@ -38,26 +38,6 @@ import { formatInterval } from '@utils/formatInterval'
 import { useWebhook } from './useWebhook'
 
 /**
- * Format deployed time as either "Xd Xh Xm" or "X:X:X" format
- * @param {number} intervalMs - Time interval in milliseconds
- * @returns {string} Formatted time string
- */
-function formatDeployedTime(intervalMs) {
-  const totalSeconds = Math.floor(intervalMs / 1000)
-  const days = Math.floor(totalSeconds / 86400)
-  const hours = Math.floor((totalSeconds % 86400) / 3600)
-  const minutes = Math.floor((totalSeconds % 3600) / 60)
-
-  if (days > 0) {
-    // Format as "Xd Xh Xm"
-    return `${days}d ${hours}h ${minutes}m`
-  }
-  // Format as "X:X:X" (HH:MM:SS)
-  const seconds = totalSeconds % 60
-  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
-}
-
-/**
  *
  * @param {{
  *  hasRaid: boolean
@@ -232,16 +212,16 @@ function DefendersModal({ gym, onClose }) {
               style={{
                 display: 'flex',
                 alignItems: 'center',
-                minHeight: 80,
+                minHeight: 60,
                 width: '100%',
-                padding: '8px 0',
+                padding: '4px 0',
                 borderBottom: `1px solid ${theme.palette.divider}`,
               }}
             >
               <div
                 style={{
-                  width: 50,
-                  height: 50,
+                  width: 44,
+                  height: 44,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -254,8 +234,8 @@ function DefendersModal({ gym, onClose }) {
                   src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
                   alt={t(`poke_${def.pokemon_id}`)}
                   style={{
-                    maxHeight: 50,
-                    maxWidth: 50,
+                    maxHeight: 44,
+                    maxWidth: 44,
                     objectFit: 'contain',
                   }}
                 />
@@ -271,29 +251,38 @@ function DefendersModal({ gym, onClose }) {
                   textAlign: 'left',
                   overflow: 'hidden',
                   marginLeft: 4,
-                  gap: '4px',
+                  gap: '2px',
                 }}
               >
-                {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
+                {/* First line: Pokemon name */}
                 <div
                   style={{
-                    fontSize: 16,
-                    fontWeight: 700,
+                    fontSize: 15,
+                    fontWeight: 600,
+                    marginBottom: 2,
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     whiteSpace: 'nowrap',
                     maxWidth: '100%',
                   }}
-                  title={`${t(`poke_${def.pokemon_id}`)} {t('cp')}: <b>${currentCP}</b> / ${fullCP}`}
+                  title={t(`poke_${def.pokemon_id}`)}
                 >
                   {t(`poke_${def.pokemon_id}`)}
                 </div>
                 <div
                   style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                  }}
+                >
+                  {t('cp')}: {currentCP} / {fullCP}{' '}
+                </div>
+                <div
+                  style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    fontSize: 13,
+                    gap: '2px',
+                    fontSize: 10,
                     color: theme.palette.text.secondary,
                   }}
                 >
@@ -301,7 +290,7 @@ function DefendersModal({ gym, onClose }) {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '2px',
+                      gap: '1px',
                     }}
                   >
                     <EmojiEventsIcon style={{ fontSize: 16 }} />
@@ -311,7 +300,7 @@ function DefendersModal({ gym, onClose }) {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '2px',
+                      gap: '1px',
                     }}
                   >
                     <SentimentVeryDissatisfiedIcon style={{ fontSize: 16 }} />
@@ -321,22 +310,12 @@ function DefendersModal({ gym, onClose }) {
                     style={{
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '2px',
+                      gap: '1px',
                     }}
                   >
                     <RestaurantIcon style={{ fontSize: 16 }} />
                     <span>{def.times_fed || 0}</span>
                   </div>
-                </div>
-
-                <div
-                  style={{
-                    fontSize: 13,
-                    color: theme.palette.text.secondary,
-                  }}
-                >
-                  {t('cp')}: <b>{currentCP}</b> / {fullCP}{' '}
-                  {formatDeployedTime(def.deployed_ms + now - updatedMs)}
                 </div>
               </div>
               <div
