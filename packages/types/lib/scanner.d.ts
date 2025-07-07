@@ -28,17 +28,6 @@ export interface Device {
 
 export type FullDevice = FullModel<Device, DeviceModel.Device>
 
-export interface PokemonDisplay {
-  form: number
-  costume: number
-  gender: number
-  shiny: boolean
-  temp_evolution: number
-  alignment: number
-  badge: number
-  location_card: number
-}
-
 export interface Defender extends PokemonDisplay {
   pokemon_id: number
   deployed_ms: number
