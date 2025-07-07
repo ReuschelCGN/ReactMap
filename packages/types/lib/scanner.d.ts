@@ -53,7 +53,6 @@ export interface Gym {
   raid_pokemon_id: number
   updated: number
   guarding_pokemon_id: number
-  guarding_pokemon_display: PokemonDisplay
   defenders: Defender[]
   rsvps: Rsvp[]
   available_slots: number
