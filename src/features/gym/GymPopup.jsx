@@ -21,7 +21,7 @@ import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { ErrorBoundary } from '@components/ErrorBoundary'
-import { Img, TextWithIcon } from '@components/Img'
+import { Img } from '@components/Img'
 import { Title } from '@components/popups/Title'
 import { PowerUp } from '@components/popups/PowerUp'
 import { GenderIcon } from '@components/popups/GenderIcon'
@@ -1000,9 +1000,6 @@ const ExtraGymInfo = ({
   lat,
   lon,
   updated,
-  total_cp,
-  guarding_pokemon_id,
-  guarding_pokemon_display,
   defenders,
   setShowDefenders,
 }) => {
@@ -1013,23 +1010,8 @@ const ExtraGymInfo = ({
     (s) => s.userSettings.gyms.enableGymPopupCoords,
   )
 
-  const numFormatter = new Intl.NumberFormat(i18n.language)
-  const gpd = guarding_pokemon_display || {}
-
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {!!guarding_pokemon_id && updated > gymValidDataLimit && (
-        <ExtraInfo title="defender">
-          <TextWithIcon
-            src={Icons.getPokemonByDisplay(guarding_pokemon_id, gpd)}
-          >
-            {t(`poke_${guarding_pokemon_id}`)}
-          </TextWithIcon>
-        </ExtraInfo>
-      )}
-      {!!total_cp && updated > gymValidDataLimit && (
-        <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
-      )}
       {defenders?.length > 0 && (
         <Grid xs={12} textAlign="center" my={1}>
           <button
