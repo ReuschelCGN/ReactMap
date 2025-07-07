@@ -268,7 +268,7 @@ const Header = ({
 }
 
 const Stats = ({ pokemon, t }) => {
-  const { cp, iv, atk_iv, def_iv, sta_iv, level, inactive_stats } = pokemon
+  const { cp, iv, atk_iv, def_iv, sta_iv, level } = pokemon
 
   return (
     <Grid
@@ -289,7 +289,7 @@ const Stats = ({ pokemon, t }) => {
       {atk_iv !== null && (
         <Grid>
           <Typography variant="subtitle1" align="center">
-            {atk_iv} | {def_iv} | {sta_iv} {inactive_stats ? '*' : ''}
+            {atk_iv} | {def_iv} | {sta_iv}
           </Typography>
         </Grid>
       )}

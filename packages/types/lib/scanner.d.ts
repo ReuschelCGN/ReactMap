@@ -28,18 +28,6 @@ export interface Device {
 
 export type FullDevice = FullModel<Device, DeviceModel.Device>
 
-export interface PokemonDisplay {
-  form: number
-  costume: number
-  gender: number
-  shiny: boolean
-  temp_evolution: number
-  temp_evolution_finish_ms?: number
-  alignment: number
-  badge: number
-  location_card: number
-}
-
 export interface Defender extends PokemonDisplay {
   pokemon_id: number
   deployed_ms: number
@@ -64,8 +52,6 @@ export interface Gym {
   raid_battle_timestamp: number
   raid_pokemon_id: number
   updated: number
-  guarding_pokemon_id: number
-  guarding_pokemon_display: PokemonDisplay
   defenders: Defender[]
   rsvps: Rsvp[]
   available_slots: number
