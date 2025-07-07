@@ -12,9 +12,7 @@ import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import FavoriteIcon from '@mui/icons-material/Favorite'
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
-import RestaurantIcon from '@mui/icons-material/Restaurant'
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism'
 import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 
@@ -36,6 +34,26 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
 
 import { useWebhook } from './useWebhook'
+
+/**
+ * Format deployed time as either "Xd Xh Xm" or "X:X:X" format
+ * @param {number} intervalMs - Time interval in milliseconds
+ * @returns {string} Formatted time string
+ */
+function formatDeployedTime(intervalMs) {
+  const totalSeconds = Math.floor(intervalMs / 1000)
+  const days = Math.floor(totalSeconds / 86400)
+  const hours = Math.floor((totalSeconds % 86400) / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+
+  if (days > 0) {
+    // Format as "Xd Xh Xm"
+    return `${days}d ${hours}h ${minutes}m`
+  }
+  // Format as "X:X:X" (HH:MM:SS)
+  const seconds = totalSeconds % 60
+  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+}
 
 /**
  *
@@ -293,28 +311,11 @@ function DefendersModal({ gym, onClose }) {
                       gap: '1px',
                     }}
                   >
-                    <EmojiEventsIcon style={{ fontSize: 16 }} />
-                    <span>{def.battles_won || 0}</span>
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1px',
-                    }}
-                  >
-                    <SentimentVeryDissatisfiedIcon style={{ fontSize: 16 }} />
-                    <span>{def.battles_lost || 0}</span>
-                  </div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '1px',
-                    }}
-                  >
-                    <RestaurantIcon style={{ fontSize: 16 }} />
+                    <VolunteerActivismIcon style={{ fontSize: 16 }} />
                     <span>{def.times_fed || 0}</span>
+                    <span>&nbsp;</span>
+                    <AccessTimeIcon style={{ fontSize: 16 }} />
+                    <span>{formatDeployedTime(def.deployed_ms + now - updatedMs)}</span>
                   </div>
                 </div>
               </div>
@@ -455,16 +456,19 @@ function RsvpsModal({ gym }) {
               xs="auto"
               style={{
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 borderRadius: '6px',
-                paddingTop: '4px',
                 fontSize: 14,
                 minWidth: 50,
-                textAlign: 'center',
               }}
             >
-              <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '2px',
+                }}
+              >
                 {t(`starts`)}:&nbsp;
                 {formatTime(rsvp.timeslot)}&nbsp;
                 <AccessTimeIcon fontSize="smaller" />
