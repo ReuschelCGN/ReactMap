@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - develop
-      - developmod
+      - developmod-gdfixes
 
 jobs:
   config:
