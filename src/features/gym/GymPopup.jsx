@@ -315,7 +315,9 @@ function DefendersModal({ gym, onClose }) {
                     <span>{def.times_fed || 0}</span>
                     <span>&nbsp;</span>
                     <AccessTimeIcon style={{ fontSize: 16 }} />
-                    <span>{formatDeployedTime(def.deployed_ms + now - updatedMs)}</span>
+                    <span>
+                      {formatDeployedTime(def.deployed_ms + now - updatedMs)}
+                    </span>
                   </div>
                 </div>
               </div>
