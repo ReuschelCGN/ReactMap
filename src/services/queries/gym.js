@@ -21,7 +21,6 @@ const gym = gql`
     ar_scan_eligible
     team_id
     in_battle
-    guarding_pokemon_id
     defenders
     rsvps
     total_cp
