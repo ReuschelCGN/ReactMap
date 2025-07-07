@@ -52,7 +52,6 @@ export interface Gym {
   raid_battle_timestamp: number
   raid_pokemon_id: number
   updated: number
-  guarding_pokemon_id: number
   defenders: Defender[]
   rsvps: Rsvp[]
   available_slots: number
