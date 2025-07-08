@@ -152,6 +152,10 @@ function drawer(req, perms) {
             },
           }
         : BLOCKED,
+    tappable:
+      perms.pokemon && state.db.models.Tappable
+        ? { enabled: true }
+        : BLOCKED,
     routes: perms.routes && state.db.models.Route ? { enabled: true } : BLOCKED,
     wayfarer:
       perms.portals || perms.submissionCells
