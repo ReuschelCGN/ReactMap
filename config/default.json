@@ -30,6 +30,7 @@
       "gyms": 10,
       "nests": 300,
       "pokemon": 20,
+      "tappable": 20,
       "pokestops": 300,
       "portals": 300,
       "routes": 10000,
@@ -159,6 +160,7 @@
         "pokestops",
         "stations",
         "pokemon",
+        "tappable",
         "routes",
         "wayfarer",
         "s2cells",
@@ -551,6 +553,9 @@
         "xxs": false,
         "xxl": false
       }
+    },
+    "tappable": {
+      "enabled": true
     },
     "portals": {
       "enabled": false
