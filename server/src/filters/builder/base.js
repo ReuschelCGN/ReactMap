@@ -153,6 +153,16 @@ function buildDefaultFilters(perms) {
             filter: pokemon.full,
           }
         : undefined,
+    tappable:
+      perms.pokemon && state.db.models.Tappable
+        ? {
+            enabled: defaultFilters.tappable.enabled,
+            standard: new BaseFilter(),
+            filter: {
+              global: new BaseFilter(),
+            },
+          }
+        : undefined,
     routes:
       perms.routes && state.db.models.Route
         ? {
