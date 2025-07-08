@@ -87,6 +87,10 @@
         "__name": "API_POLLING_POKEMON",
         "__format": "number"
       },
+      "tappable": {
+        "__name": "API_POLLING_TAPPABLE",
+        "__format": "number"
+      },
       "pokestops": {
         "__name": "API_POLLING_POKESTOPS",
         "__format": "number"
@@ -1261,6 +1265,12 @@
           "__name": "DEFAULT_FILTERS_POKEMON_GLOBAL_VALUES_XXL",
           "__format": "boolean"
         }
+      }
+    },
+    "tappable": {
+      "enabled": {
+        "__name": "DEFAULT_FILTERS_TAPPABLE_ENABLED",
+        "__format": "boolean"
       }
     },
     "portals": {
