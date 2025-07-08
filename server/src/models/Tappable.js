@@ -30,18 +30,13 @@ class Tappable extends Model {
   }
 
   /**
-   * Returns a single tappable record
-   * @param {number} Id
-   * @param {number} lat
-   * @param {number} lon
-   * @returns {Promise<import('@rm/types').Tappable>}
+   * Returns the single tappable record after querying it by ID
+   * @param {number} id
    */
-  static async getOne(Id, lat, lon) {
-    return this.query()
-      .where('id', Id)
-      .where('lat', lat)
-      .where('lon', lon)
-      .first()
+  static async getOne(id) {
+    /** @type {import('@rm/types').Tappable} */
+    const result = await this.query().findById(id)
+    return result
   }
 }
 
