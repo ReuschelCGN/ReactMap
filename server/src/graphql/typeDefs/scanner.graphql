@@ -183,6 +183,21 @@ type Pokemon {
   updated: Int
 }
 
+type Tappable {
+  id: ID
+  lat: Float
+  lon: Float
+  fort_id: String
+  spawn_id: Int
+  type: String 
+  pokemon_id: Int
+  item_id: Int
+  count: Int
+  expire_timestamp_verified: Boolean
+  expire_timestamp: Int
+  updated: Int
+}
+
 type Portal {
   id: ID
   external_id: String
