@@ -11,7 +11,7 @@ class Tappable extends Model {
   }
 
   /**
-   * Returns all tappable records within bounds
+   * Returns all tappable item records within bounds
    * @param {import('@rm/types').Permissions} perms
    * @param {object} args
    * @returns {Promise<import('@rm/types').Tappable[]>}
@@ -30,7 +30,7 @@ class Tappable extends Model {
   }
 
   /**
-   * Returns the single tappable record after querying it by ID
+   * Returns the single tappable item after querying it by ID
    * @param {number} id
    */
   static async getOne(id) {
