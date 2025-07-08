@@ -26,7 +26,6 @@ import { Config } from '@rm/types'
 import { OperationTypeNode } from 'graphql'
 
 export interface DbContext {
-  isMad: boolean
   pvpV2: boolean
   mem: string
   secret: string
@@ -35,7 +34,6 @@ export interface DbContext {
   hasRewardAmount: boolean
   hasPowerUp: boolean
   hasAltQuests: boolean
-  hasLayerColumn: boolean
   hasMultiInvasions: boolean
   multiInvasionMs: boolean
   hasConfirmed: boolean

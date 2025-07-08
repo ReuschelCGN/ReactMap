@@ -12,6 +12,8 @@ import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
 import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import FavoriteIcon from '@mui/icons-material/Favorite'
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism'
+import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 
 import { useSyncData } from '@features/webhooks'
@@ -19,7 +21,7 @@ import { useMemory } from '@store/useMemory'
 import { useLayoutStore } from '@store/useLayoutStore'
 import { setDeepStore, useStorage } from '@store/useStorage'
 import { ErrorBoundary } from '@components/ErrorBoundary'
-import { Img, TextWithIcon } from '@components/Img'
+import { Img } from '@components/Img'
 import { Title } from '@components/popups/Title'
 import { PowerUp } from '@components/popups/PowerUp'
 import { GenderIcon } from '@components/popups/GenderIcon'
@@ -32,6 +34,26 @@ import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
 
 import { useWebhook } from './useWebhook'
+
+/**
+ * Format deployed time as either "Xd Xh Xm" or "X:X:X" format
+ * @param {number} intervalMs - Time interval in milliseconds
+ * @returns {string} Formatted time string
+ */
+function formatDeployedTime(intervalMs) {
+  const totalSeconds = Math.floor(intervalMs / 1000)
+  const days = Math.floor(totalSeconds / 86400)
+  const hours = Math.floor((totalSeconds % 86400) / 3600)
+  const minutes = Math.floor((totalSeconds % 3600) / 60)
+
+  if (days > 0) {
+    // Format as "Xd Xh Xm"
+    return `${days}d ${hours}h ${minutes}m`
+  }
+  // Format as "X:X:X" (HH:MM:SS)
+  const seconds = totalSeconds % 60
+  return `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
+}
 
 /**
  *
@@ -144,8 +166,13 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
  */
 function DefendersModal({ gym, onClose }) {
   const { t } = useTranslation()
+  const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
   const defenders = gym.defenders || []
+  const updatedMs =
+    defenders.length &&
+    defenders[0].deployed_ms + defenders[0].deployed_time * 1000
+  const now = Date.now()
 
   return (
     <Grid
@@ -183,10 +210,18 @@ function DefendersModal({ gym, onClose }) {
       <Grid container direction="column" spacing={1}>
         {defenders.map((def) => {
           const fullCP = def.cp_when_deployed
-          const currentCP = def.cp_now
-          const percent = Math.max(
+          const decayTime =
+            72 *
+            60 *
+            60 *
+            1000 *
+            Math.min(Math.max(Math.log10(3000 / fullCP), 1 / 9), 1)
+          const predictedMotivation = Math.max(
             0,
-            Math.min(1, (currentCP / fullCP) * 1.25 - 0.25),
+            def.motivation_now - Math.max(0, now - updatedMs) / decayTime,
+          )
+          const currentCP = Math.round(
+            fullCP * (0.2 + 0.8 * predictedMotivation),
           )
 
           return (
@@ -198,6 +233,7 @@ function DefendersModal({ gym, onClose }) {
                 minHeight: 60,
                 width: '100%',
                 padding: '4px 0',
+                borderBottom: `1px solid ${theme.palette.divider}`,
               }}
             >
               <div
@@ -208,7 +244,7 @@ function DefendersModal({ gym, onClose }) {
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginLeft: 12,
-                  marginRight: 6,
+                  marginRight: 12,
                   flexShrink: 0,
                 }}
               >
@@ -233,9 +269,11 @@ function DefendersModal({ gym, onClose }) {
                   textAlign: 'left',
                   overflow: 'hidden',
                   marginLeft: 4,
+                  gap: '2px',
                 }}
               >
-                <span
+                {/* First line: Pokemon name */}
+                <div
                   style={{
                     fontSize: 15,
                     fontWeight: 600,
@@ -248,10 +286,40 @@ function DefendersModal({ gym, onClose }) {
                   title={t(`poke_${def.pokemon_id}`)}
                 >
                   {t(`poke_${def.pokemon_id}`)}
-                </span>
-                <span style={{ fontSize: 10 }}>
-                  {t('cp')}: <b>{currentCP}</b> / {fullCP}
-                </span>
+                </div>
+                <div
+                  style={{
+                    fontSize: 10,
+                    fontWeight: 600,
+                  }}
+                >
+                  {t('cp')}: {currentCP} / {fullCP}{' '}
+                </div>
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '2px',
+                    fontSize: 10,
+                    color: theme.palette.text.secondary,
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1px',
+                    }}
+                  >
+                    <VolunteerActivismIcon style={{ fontSize: 16 }} />
+                    <span>{def.times_fed || 0}</span>
+                    <span>&nbsp;</span>
+                    <AccessTimeIcon style={{ fontSize: 16 }} />
+                    <span>
+                      {formatDeployedTime(def.deployed_ms + now - updatedMs)}
+                    </span>
+                  </div>
+                </div>
               </div>
               <div
                 style={{
@@ -273,7 +341,7 @@ function DefendersModal({ gym, onClose }) {
                     position: 'absolute',
                     width: 28,
                     height: 28,
-                    stroke: 'white',
+                    stroke: theme.palette.text.primary,
                     strokeWidth: 1,
                     filter: 'drop-shadow(0 0 1px #0008)',
                   }}
@@ -282,7 +350,7 @@ function DefendersModal({ gym, onClose }) {
                 {/* Heart background */}
                 <FavoriteIcon
                   style={{
-                    color: 'white',
+                    color: theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
                     opacity: 0.18,
                     position: 'absolute',
                     width: 28,
@@ -296,7 +364,7 @@ function DefendersModal({ gym, onClose }) {
                     position: 'absolute',
                     width: 28,
                     height: 28,
-                    clipPath: `inset(${100 - percent * 100}% 0 0 0)`,
+                    clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
                     transition: 'clip-path 0.3s',
                   }}
                 />
@@ -311,21 +379,21 @@ function DefendersModal({ gym, onClose }) {
                   }}
                 >
                   {/* Show cracks based on health: */}
-                  {percent <= 2 / 3 && (
-                    // Always show top crack if percent <= 2/3
+                  {predictedMotivation <= 2 / 3 && (
+                    // Always show top crack if predictedMotivation <= 2/3
                     <path
                       d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                      stroke="white"
+                      stroke={theme.palette.text.primary}
                       strokeWidth={1.5}
                       fill="none"
                       strokeLinejoin="round"
                     />
                   )}
-                  {percent <= 1 / 3 && (
-                    // Show bottom crack only if percent <= 1/3
+                  {predictedMotivation <= 1 / 3 && (
+                    // Show bottom crack only if predictedMotivation <= 1/3
                     <path
                       d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                      stroke="white"
+                      stroke={theme.palette.text.primary}
                       strokeWidth={1.5}
                       fill="none"
                       strokeLinejoin="round"
@@ -344,9 +412,7 @@ function DefendersModal({ gym, onClose }) {
         style={{ fontSize: 12, color: '#888' }}
       >
         {t('last_updated')}:{' '}
-        {gym.updated
-          ? new Date(gym.updated * 1000).toLocaleString()
-          : t('unknown')}
+        {defenders.length ? new Date(updatedMs).toLocaleString() : t('unknown')}
       </Grid>
     </Grid>
   )
@@ -392,16 +458,19 @@ function RsvpsModal({ gym }) {
               xs="auto"
               style={{
                 display: 'flex',
-                flexDirection: 'column',
                 alignItems: 'center',
                 borderRadius: '6px',
-                paddingTop: '4px',
                 fontSize: 14,
                 minWidth: 50,
-                textAlign: 'center',
               }}
             >
-              <div>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '2px',
+                }}
+              >
                 {t(`starts`)}:&nbsp;
                 {formatTime(rsvp.timeslot)}&nbsp;
                 <AccessTimeIcon fontSize="smaller" />
@@ -933,9 +1002,6 @@ const ExtraGymInfo = ({
   lat,
   lon,
   updated,
-  total_cp,
-  guarding_pokemon_id,
-  guarding_pokemon_display,
   defenders,
   setShowDefenders,
 }) => {
@@ -946,35 +1012,8 @@ const ExtraGymInfo = ({
     (s) => s.userSettings.gyms.enableGymPopupCoords,
   )
 
-  const numFormatter = new Intl.NumberFormat(i18n.language)
-  /** @type {Partial<import('@rm/types').PokemonDisplay>} */
-  const gpd = guarding_pokemon_display || {}
-
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {!!guarding_pokemon_id && updated > gymValidDataLimit && (
-        <ExtraInfo title="defender">
-          <TextWithIcon
-            src={Icons.getPokemonByDisplay(guarding_pokemon_id, gpd)}
-          >
-            {gpd.badge === 1 && (
-              <>
-                <Img
-                  src={Icons.getMisc('bestbuddy')}
-                  alt={t('best_buddy')}
-                  maxHeight={15}
-                  maxWidth={15}
-                />
-                &nbsp;
-              </>
-            )}
-            {t(`poke_${guarding_pokemon_id}`)}
-          </TextWithIcon>
-        </ExtraInfo>
-      )}
-      {!!total_cp && updated > gymValidDataLimit && (
-        <ExtraInfo title="total_cp">{numFormatter.format(total_cp)}</ExtraInfo>
-      )}
       {defenders?.length > 0 && (
         <Grid xs={12} textAlign="center" my={1}>
           <button
