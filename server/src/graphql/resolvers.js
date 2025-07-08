@@ -267,6 +267,12 @@ const resolvers = {
       }
       return {}
     },
+    tappable: (_, args, { perms, Db }) => {
+      if (perms?.pokemon) {
+        return Db.query('Tappable', 'getAll', perms, args)
+      }
+      return []
+    },
     portals: (_, args, { perms, Db }) => {
       if (perms?.portals) {
         return Db.query('Portal', 'getAll', perms, args)
