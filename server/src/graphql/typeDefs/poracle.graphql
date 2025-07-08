@@ -86,6 +86,24 @@ type PoracleEgg {
   description: String
 }
 
+type PoracleMaxbattle {
+  uid: Int
+  id: ID
+  profile_no: Int
+  ping: String
+  clean: Boolean
+  pokemon_id: Int
+  gmax: Boolean
+  template: String
+  distance: Int
+  level: Int
+  form: Int
+  move: Int
+  station_id: String
+  description: String
+  allMoves: Boolean
+}
+
 type PoracleInvasion {
   uid: Int
   id: ID
@@ -203,6 +221,7 @@ type Poracle {
   gym: [PoracleGym]
   egg: [PoracleEgg]
   raid: [PoracleRaid]
+  maxbattle: [PoracleMaxbattle]
   pokemon: [PoraclePokemon]
   invasion: [PoracleInvasion]
   lure: [PoracleLure]

@@ -26,6 +26,9 @@ export const apolloCache = new InMemoryCache({
     PoracleEgg: {
       keyFields: ['uid'],
     },
+    PoracleMaxbattle: {
+      keyFields: ['uid'],
+    },
     PoracleInvasion: {
       keyFields: ['uid'],
     },

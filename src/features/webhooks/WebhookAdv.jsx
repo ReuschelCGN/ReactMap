@@ -58,12 +58,14 @@ const skipFields = new Set([
   'enabled',
   'level',
   'exclusive',
+  'gmax',
   'lure_id',
   'reward',
   'reward_type',
   'grunt_type',
   'grunt_id',
   'gym_id',
+  'station_id',
   'slot_changes',
   'team',
   'rsvp_changes',
@@ -78,6 +80,7 @@ const wildCards = {
   raid: ['r90'],
   egg: ['e90'],
   gym: ['t4'],
+  maxbattle: ['j90'],
   invasion: ['i0'],
 }
 
@@ -411,6 +414,7 @@ export function WebhookAdvanced() {
       return `t${poracleValues.min_time}`
     if (field === 'exclusive' && poracleValues.exclusive)
       return ` ${t('exclusive')} `
+    if (field === 'gmax' && poracleValues.gmax) return ` ${t('gmax')} `
     if (field === 'clean' && poracleValues.clean) return ` ${t('clean')} `
     if (field === 'min_spawn_avg' && poracleValues.min_spawn_avg > 0)
       return ` ${t('minspawn')}${poracleValues.min_spawn_avg} `
@@ -487,6 +491,9 @@ export function WebhookAdvanced() {
         return `${prefix}${id.charAt(0) === 'e' ? t('egg') : t('raid')} ${t(
           'level',
         )}${idObj.id}
+      ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
+      case 'j':
+        return `${prefix}${t('maxbattle')}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'i': {
         const invasion = Object.keys(types).find(
@@ -703,7 +710,11 @@ export function WebhookAdvanced() {
                 freeSolo
                 onChange={(event, newValue) => {
                   if (newValue) {
-                    setPoracleValues({ ...poracleValues, gym_id: newValue.id })
+                    if (option.searchCategory === 'stations') {
+                      setPoracleValues({ ...poracleValues, station_id: newValue.id })
+                    } else {
+                      setPoracleValues({ ...poracleValues, gym_id: newValue.id })
+                    }
                   }
                 }}
                 renderInput={(params) => (
