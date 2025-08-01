@@ -459,7 +459,7 @@ class Pokestop extends Model {
                 // Case (b): Include if invasion has potential rewards that are checked
                 if (rocketPokemon.length) {
                   // For confirmed invasions, check actual Pokemon slots
-                  if (hasConfirmed)
+                  if (hasConfirmed) {
                     subQuery.orWhere((confirmedQuery) => {
                       confirmedQuery
                         .whereNotIn(
@@ -474,6 +474,7 @@ class Pokestop extends Model {
                             .orWhereIn('slot_3_pokemon_id', rocketPokemon)
                         })
                     })
+                  }
 
                   // For unconfirmed invasions, check if their potential rewards match
                   // Get all grunt types that have potential rewards matching the filter
