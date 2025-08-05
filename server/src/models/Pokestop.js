@@ -459,10 +459,14 @@ class Pokestop extends Model {
                 // Case (b): Include if invasion has potential rewards that are checked
                 if (rocketPokemon.length) {
                   // For confirmed invasions, check actual Pokemon slots
-                  if (hasConfirmed)
+                  if (hasConfirmed) {
                     subQuery.orWhere((confirmedQuery) => {
                       confirmedQuery
-                        .where('confirmed', 1)
+                        .whereNotIn(
+                          'character',
+                          [41, 42, 43, 44],
+                        )
+                        .andWhere('confirmed', 1)
                         .andWhere((pokemonQuery) => {
                           pokemonQuery
                             .whereIn('slot_1_pokemon_id', rocketPokemon)
@@ -470,6 +474,7 @@ class Pokestop extends Model {
                             .orWhereIn('slot_3_pokemon_id', rocketPokemon)
                         })
                     })
+                  }
 
                   // For unconfirmed invasions, check if their potential rewards match
                   // Get all grunt types that have potential rewards matching the filter
@@ -477,6 +482,10 @@ class Pokestop extends Model {
                   Object.entries(state.event.invasions).forEach(
                     ([gruntType, info]) => {
                       if (!info) return
+                      // Exclude team leaders (41-43) and Giovanni (44)
+                      const gruntTypeNum = parseInt(gruntType, 10)
+                      if (gruntTypeNum >= 41 && gruntTypeNum <= 44) return
+
                       if (
                         [
                           ...(info.firstReward ? info.encounters.first : []),
@@ -1285,8 +1294,13 @@ class Pokestop extends Model {
           }
           if (config.getSafe('map.misc.fallbackRocketPokemonFiltering')) {
             // Always include potential rocket Pokemon from state.event.invasions as backup
-            Object.values(state.event.invasions).forEach((invasionInfo) => {
-              if (invasionInfo) {
+            Object.entries(state.event.invasions).forEach(
+              ([gruntType, invasionInfo]) => {
+                if (!invasionInfo) return
+                // Exclude team leaders (41-43) and Giovanni (44)
+                const gruntTypeNum = parseInt(gruntType, 10)
+                if (gruntTypeNum >= 41 && gruntTypeNum <= 44) return
+
                 // Add all potential first slot rewards
                 if (invasionInfo.firstReward && invasionInfo.encounters.first) {
                   invasionInfo.encounters.first.forEach((poke) => {
@@ -1310,8 +1324,8 @@ class Pokestop extends Model {
                     finalList.add(`a${poke.id}-${poke.form}`)
                   })
                 }
-              }
-            })
+              },
+            )
           }
           break
         case 'showcase':
