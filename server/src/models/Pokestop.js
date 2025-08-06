@@ -462,10 +462,7 @@ class Pokestop extends Model {
                   if (hasConfirmed) {
                     subQuery.orWhere((confirmedQuery) => {
                       confirmedQuery
-                        .whereNotIn(
-                          'character',
-                          [41, 42, 43, 44],
-                        )
+                        .whereNotIn('character', [41, 42, 43, 44])
                         .andWhere('confirmed', 1)
                         .andWhere((pokemonQuery) => {
                           pokemonQuery
@@ -502,7 +499,10 @@ class Pokestop extends Model {
 
                   if (gruntTypesWithMatchingRewards.length > 0) {
                     subQuery.orWhere((unconfirmedQuery) => {
-                      unconfirmedQuery.whereIn('character', gruntTypesWithMatchingRewards)
+                      unconfirmedQuery.whereIn(
+                        'character',
+                        gruntTypesWithMatchingRewards,
+                      )
                       if (hasConfirmed)
                         unconfirmedQuery.andWhere((confirmationQuery) => {
                           confirmationQuery
