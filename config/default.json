@@ -155,15 +155,15 @@
       "attributionPrefix": "<a href='https://github.com/WatWowMap/ReactMap' target='_blank' rel='noreferrer'>ReactMap</a>",
       "menuOrder": [
         "gyms",
-        "nests",
         "pokestops",
-        "stations",
         "pokemon",
+        "stations",
+        "nests",
         "routes",
-        "wayfarer",
-        "s2cells",
         "scanAreas",
         "weather",
+        "wayfarer",
+        "s2cells",
         "admin",
         "settings"
       ]
@@ -245,6 +245,7 @@
       "enableMapJsFilter": true,
       "fetchLatestInvasions": true,
       "invasionCacheHrs": 1,
+      "fallbackRocketPokemonFiltering": true,
       "masterfileCacheHrs": 6,
       "webhookCacheHrs": 1,
       "questMessage": "",
@@ -380,6 +381,8 @@
     "stations": {
       "clustering": true,
       "stationTimers": false,
+      "interactionRanges": false,
+      "customRange": 0,
       "stationsOpacity": true,
       "enableStationPopupCoords": false,
       "opacityTenMinutes": 0.75,
@@ -580,7 +583,9 @@
       "pokemon": false,
       "battleTier": "all",
       "battles": false,
-      "gmaxStationed": false
+      "gmaxStationed": false,
+      "interactionRanges": false,
+      "customRange": 0
     },
     "s2cells": {
       "enabled": false,

@@ -453,18 +453,64 @@ class Pokestop extends Model {
                 invasion.andWhere('confirmed', onlyConfirmed)
               }
               invasion.andWhere((subQuery) => {
-                if (hasConfirmed) {
-                  if (rocketPokemon.length) {
-                    subQuery
-                      .whereIn('slot_1_pokemon_id', rocketPokemon)
-                      .orWhereIn('slot_2_pokemon_id', rocketPokemon)
-                      .orWhereIn('slot_3_pokemon_id', rocketPokemon)
-                      .orWhereIn('character', invasions)
-                  } else {
-                    subQuery.whereIn('character', invasions)
+                // Case (a): Include if the invasion character/grunt type is checked
+                subQuery.whereIn('character', invasions)
+
+                // Case (b): Include if invasion has potential rewards that are checked
+                if (rocketPokemon.length) {
+                  // For confirmed invasions, check actual Pokemon slots
+                  if (hasConfirmed) {
+                    subQuery.orWhere((confirmedQuery) => {
+                      confirmedQuery
+                        .whereNotIn('character', [41, 42, 43, 44])
+                        .andWhere('confirmed', 1)
+                        .andWhere((pokemonQuery) => {
+                          pokemonQuery
+                            .whereIn('slot_1_pokemon_id', rocketPokemon)
+                            .orWhereIn('slot_2_pokemon_id', rocketPokemon)
+                            .orWhereIn('slot_3_pokemon_id', rocketPokemon)
+                        })
+                    })
                   }
-                } else {
-                  subQuery.whereIn('character', invasions)
+
+                  // For unconfirmed invasions, check if their potential rewards match
+                  // Get all grunt types that have potential rewards matching the filter
+                  const gruntTypesWithMatchingRewards = []
+                  Object.entries(state.event.invasions).forEach(
+                    ([gruntType, info]) => {
+                      if (!info) return
+                      // Exclude team leaders (41-43) and Giovanni (44)
+                      const gruntTypeNum = parseInt(gruntType, 10)
+                      if (gruntTypeNum >= 41 && gruntTypeNum <= 44) return
+
+                      if (
+                        [
+                          ...(info.firstReward ? info.encounters.first : []),
+                          ...(info.secondReward ? info.encounters.second : []),
+                          ...(info.thirdReward ? info.encounters.third : []),
+                        ].some((poke) =>
+                          rocketPokemon.includes(String(poke.id)),
+                        )
+                      ) {
+                        gruntTypesWithMatchingRewards.push(gruntType)
+                      }
+                    },
+                  )
+
+                  if (gruntTypesWithMatchingRewards.length > 0) {
+                    subQuery.orWhere((unconfirmedQuery) => {
+                      unconfirmedQuery.whereIn(
+                        'character',
+                        gruntTypesWithMatchingRewards,
+                      )
+                      if (hasConfirmed)
+                        unconfirmedQuery.andWhere((confirmationQuery) => {
+                          confirmationQuery
+                            .where('confirmed', 0)
+                            .orWhereNull('confirmed')
+                        })
+                    })
+                  }
                 }
               })
               if (onlyExcludeGrunts) {
@@ -1246,6 +1292,41 @@ class Pokestop extends Model {
               }
             })
           }
+          if (config.getSafe('map.misc.fallbackRocketPokemonFiltering')) {
+            // Always include potential rocket Pokemon from state.event.invasions as backup
+            Object.entries(state.event.invasions).forEach(
+              ([gruntType, invasionInfo]) => {
+                if (!invasionInfo) return
+                // Exclude team leaders (41-43) and Giovanni (44)
+                const gruntTypeNum = parseInt(gruntType, 10)
+                if (gruntTypeNum >= 41 && gruntTypeNum <= 44) return
+
+                // Add all potential first slot rewards
+                if (invasionInfo.firstReward && invasionInfo.encounters.first) {
+                  invasionInfo.encounters.first.forEach((poke) => {
+                    finalList.add(`a${poke.id}-${poke.form}`)
+                  })
+                }
+
+                // Add all potential second slot rewards
+                if (
+                  invasionInfo.secondReward &&
+                  invasionInfo.encounters.second
+                ) {
+                  invasionInfo.encounters.second.forEach((poke) => {
+                    finalList.add(`a${poke.id}-${poke.form}`)
+                  })
+                }
+
+                // Add all potential third slot rewards
+                if (invasionInfo.thirdReward && invasionInfo.encounters.third) {
+                  invasionInfo.encounters.third.forEach((poke) => {
+                    finalList.add(`a${poke.id}-${poke.form}`)
+                  })
+                }
+              },
+            )
+          }
           break
         case 'showcase':
           if (hasShowcaseData) {
@@ -1627,6 +1708,16 @@ class Pokestop extends Model {
    * @returns {Promise<{ hasConfirmedInvasions: boolean }>}
    */
   static async getFilterContext({ hasConfirmed }) {
+    // Check if rocket Pokemon filtering should be forced via config
+    const fallback = config.getSafe('map.misc.fallbackRocketPokemonFiltering')
+
+    if (fallback) {
+      // Always enable rocket Pokemon filtering regardless of database support
+      // This allows filtering by potential rocket Pokemon even without confirmed invasions
+      return { hasConfirmedInvasions: true }
+    }
+
+    // Use original behavior when config is disabled
     if (!hasConfirmed) return { hasConfirmedInvasions: false }
     const result = await this.query()
       .from('incident')

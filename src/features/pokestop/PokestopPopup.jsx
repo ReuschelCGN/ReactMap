@@ -33,6 +33,7 @@ import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
 
@@ -133,11 +134,14 @@ export function PokestopPopup({
                         <>
                           <br />
                           <Typography variant="caption">
-                            {t('shiny_probability', {
-                              p: readableProbability(
-                                quest.quest_shiny_probability,
-                              ),
-                            })}
+                            <Trans
+                              i18nKey="shiny_probability"
+                              components={[
+                                readableProbability(
+                                  quest.quest_shiny_probability,
+                                ),
+                              ]}
+                            />
                           </Typography>
                         </>
                       )}
@@ -328,6 +332,8 @@ const MenuActions = ({
   const { t } = useTranslation()
   const masterfile = useMemory((s) => s.masterfile)
   const filters = useStorage((s) => s.filters)
+  const { available } = useGetAvailable('pokestops')
+  const hasConfirmed = available.some((x) => x.startsWith('a'))
 
   const [anchorEl, setAnchorEl] = React.useState(false)
 
@@ -421,55 +427,87 @@ const MenuActions = ({
             action: () => excludeInvasion(i),
           })
         }
-        const reference = masterfile.invasions[invasion.grunt_type]
-        if (reference) {
-          const encounters = new Set()
-          if (
-            invasion.slot_1_pokemon_id &&
-            reference.firstReward &&
-            filters.pokestops.filter[
-              `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
-            ]?.enabled
-          ) {
-            encounters.add(
-              `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`,
-            )
-          }
-          if (
-            invasion.slot_2_pokemon_id &&
-            reference.secondReward &&
-            filters.pokestops.filter[
-              `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
-            ]?.enabled
-          ) {
-            encounters.add(
-              `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`,
-            )
-          }
-          if (
-            invasion.slot_3_pokemon_id &&
-            reference.thirdReward &&
-            filters.pokestops.filter[
-              `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
-            ]?.enabled
-          ) {
-            encounters.add(
-              `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`,
-            )
-          }
-          if (encounters.size)
-            options.push(
-              ...[...encounters].map((x) => ({
-                key: x,
-                name: t('exclude_quest_multi', {
-                  reward: t(`poke_${x.slice(1).split('-')[0]}`),
-                }),
-                action: () => {
-                  setAnchorEl(null)
-                  setState(x)
+
+        if (hasConfirmed) {
+          const reference = masterfile.invasions[invasion.grunt_type]
+          if (reference) {
+            const encounters = new Set()
+
+            // Check actual invasion slots first (confirmed invasions)
+            if (
+              invasion.slot_1_pokemon_id &&
+              reference.firstReward &&
+              filters.pokestops.filter[
+                `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
+              ]?.enabled
+            ) {
+              encounters.add(
+                `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`,
+              )
+            }
+            if (
+              invasion.slot_2_pokemon_id &&
+              reference.secondReward &&
+              filters.pokestops.filter[
+                `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
+              ]?.enabled
+            ) {
+              encounters.add(
+                `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`,
+              )
+            }
+            if (
+              invasion.slot_3_pokemon_id &&
+              reference.thirdReward &&
+              filters.pokestops.filter[
+                `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
+              ]?.enabled
+            ) {
+              encounters.add(
+                `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`,
+              )
+            }
+
+            // If no specific Pokemon IDs are set (forced mode), iterate over all possible rewards from masterfile
+            if (
+              !invasion.slot_1_pokemon_id &&
+              !invasion.slot_2_pokemon_id &&
+              !invasion.slot_3_pokemon_id
+            ) {
+              // Iterate over all encounters in the masterfile for this grunt type
+              Object.entries(reference.encounters || {}).forEach(
+                ([position, lineup]) => {
+                  const hasReward =
+                    (position === 'first' && reference.firstReward) ||
+                    (position === 'second' && reference.secondReward) ||
+                    (position === 'third' && reference.thirdReward)
+
+                  if (hasReward && Array.isArray(lineup)) {
+                    lineup.forEach((pokemon) => {
+                      const key = `a${pokemon.id}-${pokemon.form || 0}`
+                      if (filters.pokestops.filter[key]?.enabled) {
+                        encounters.add(key)
+                      }
+                    })
+                  }
                 },
-              })),
-            )
+              )
+            }
+
+            if (encounters.size)
+              options.push(
+                ...[...encounters].map((x) => ({
+                  key: x,
+                  name: t('exclude_quest_multi', {
+                    reward: t(`poke_${x.slice(1).split('-')[0]}`),
+                  }),
+                  action: () => {
+                    setAnchorEl(null)
+                    setState(x)
+                  },
+                })),
+              )
+          }
         }
       })
     }
@@ -537,9 +575,11 @@ const readableProbability = (x) => {
   if (x <= 0) return '🚫'
   const x_1 = Math.round(1 / x)
   const percent = Math.round(x * 100)
-  return Math.abs(1 / x_1 - x) < Math.abs(percent * 0.01 - x)
-    ? `1:${x_1}`
-    : `${percent}%`
+  return Math.abs(1 / x_1 - x) < Math.abs(percent * 0.01 - x) ? (
+    <>1/{x_1}</>
+  ) : (
+    `${percent}%`
+  )
 }
 
 /**
