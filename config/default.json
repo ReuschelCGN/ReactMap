@@ -155,15 +155,15 @@
       "attributionPrefix": "<a href='https://github.com/WatWowMap/ReactMap' target='_blank' rel='noreferrer'>ReactMap</a>",
       "menuOrder": [
         "gyms",
-        "nests",
         "pokestops",
-        "stations",
         "pokemon",
+        "stations",
+        "nests",
         "routes",
-        "wayfarer",
-        "s2cells",
         "scanAreas",
         "weather",
+        "wayfarer",
+        "s2cells",
         "admin",
         "settings"
       ]
