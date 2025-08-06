@@ -42,6 +42,7 @@ export function useTranslateById(options = {}) {
           id === 'e90' ||
           id === 'r90' ||
           id === 't4' ||
+          id === 'j90' ||
           id === 'i0'
         )
           return i18n.t('poke_global')
