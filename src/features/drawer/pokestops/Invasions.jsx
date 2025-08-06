@@ -18,21 +18,22 @@ const BaseInvasion = () => {
   const noQuestsEnabled = useStorage((s) => !s.filters?.pokestops?.quests)
   return (
     <CollapsibleItem open={enabled}>
-      {((confirmedEnabled && noQuestsEnabled) || (hasConfirmed && noQuestsEnabled)) && (
+      {((confirmedEnabled && noQuestsEnabled) ||
+        (hasConfirmed && noQuestsEnabled)) && (
         <BoolToggle
           inset
           field="filters.pokestops.confirmed"
           label="only_confirmed"
         />
       )}
-      {(noQuestsEnabled) && (
+      {noQuestsEnabled && (
         <BoolToggle
           inset
           field="filters.pokestops.excludeGrunts"
           label="only_exclude_grunts"
         />
       )}
-      {(noQuestsEnabled) && (
+      {noQuestsEnabled && (
         <BoolToggle
           inset
           field="filters.pokestops.excludeLeaders"
