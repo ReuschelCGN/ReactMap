@@ -205,10 +205,11 @@ export function usePokestopMarker({
               })
             }
 
-            if (gruntData?.thirdReward && invasion.encounters.third) {
-              invasion.encounters.third.forEach((encounter) => {
-                const pokemonKey = `a${encounter.pokemon_id}-${encounter.pokemon_form || 0}`
-                const pokemonKeySimple = `a${encounter.pokemon_id}`
+            // Check third encounter rewards if thirdReward is true
+            if (gruntData.thirdReward && gruntData.encounters.third) {
+              gruntData.encounters.third.forEach((encounter) => {
+                const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                const pokemonKeySimple = `a${encounter.id}`
 
                 // Only consider this Pokemon's size if it's enabled in filters
                 if (
@@ -225,78 +226,6 @@ export function usePokestopMarker({
                   maxRewardSize = Math.max(maxRewardSize, rewardSize)
                 }
               })
-            }
-          } else if (gruntData?.encounters) {
-            // If no confirmed lineup, use all potential rewards from masterfile
-            if (gruntData.encounters) {
-              // Check first encounter rewards if firstReward is true
-              if (gruntData.firstReward && gruntData.encounters.first) {
-                gruntData.encounters.first.forEach((encounter) => {
-                  const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
-                  const pokemonKeySimple = `a${encounter.id}`
-
-                  // Only consider this Pokemon's size if it's enabled in filters
-                  if (
-                    filters[pokemonKey]?.enabled ||
-                    filters[pokemonKeySimple]?.enabled
-                  ) {
-                    const rewardSize =
-                      Icons.getSize('invasion', filters[pokemonKey]?.size) ||
-                      Icons.getSize(
-                        'invasion',
-                        filters[pokemonKeySimple]?.size,
-                      ) ||
-                      Icons.getSize('invasion')
-                    maxRewardSize = Math.max(maxRewardSize, rewardSize)
-                  }
-                })
-              }
-
-              // Check second encounter rewards if secondReward is true
-              if (gruntData.secondReward && gruntData.encounters.second) {
-                gruntData.encounters.second.forEach((encounter) => {
-                  const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
-                  const pokemonKeySimple = `a${encounter.id}`
-
-                  // Only consider this Pokemon's size if it's enabled in filters
-                  if (
-                    filters[pokemonKey]?.enabled ||
-                    filters[pokemonKeySimple]?.enabled
-                  ) {
-                    const rewardSize =
-                      Icons.getSize('invasion', filters[pokemonKey]?.size) ||
-                      Icons.getSize(
-                        'invasion',
-                        filters[pokemonKeySimple]?.size,
-                      ) ||
-                      Icons.getSize('invasion')
-                    maxRewardSize = Math.max(maxRewardSize, rewardSize)
-                  }
-                })
-              }
-
-              // Check third encounter rewards if thirdReward is true
-              if (gruntData.thirdReward && gruntData.encounters.third) {
-                gruntData.encounters.third.forEach((encounter) => {
-                  const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
-                  const pokemonKeySimple = `a${encounter.id}`
-
-                  // Only consider this Pokemon's size if it's enabled in filters
-                  if (
-                    filters[pokemonKey]?.enabled ||
-                    filters[pokemonKeySimple]?.enabled
-                  ) {
-                    const rewardSize =
-                      Icons.getSize('invasion', filters[pokemonKey]?.size) ||
-                      Icons.getSize(
-                        'invasion',
-                        filters[pokemonKeySimple]?.size,
-                      ) ||
-                      Icons.getSize('invasion')
-                    maxRewardSize = Math.max(maxRewardSize, rewardSize)
-                  }
-                })
-              }
             }
           }
 
