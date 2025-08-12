@@ -85,6 +85,7 @@ export function usePokestopMarker({
           icon: Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
           opacity: getOpacity(invasion.incident_expire_timestamp),
         })
+
         // Get base invasion type icon size
         const invasionTypeSize = Icons.getSize(
           'invasion',
