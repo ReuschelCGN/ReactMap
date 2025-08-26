@@ -711,9 +711,15 @@ export function WebhookAdvanced() {
                 onChange={(event, newValue) => {
                   if (newValue) {
                     if (option.searchCategory === 'stations') {
-                      setPoracleValues({ ...poracleValues, station_id: newValue.id })
+                      setPoracleValues({
+                        ...poracleValues,
+                        station_id: newValue.id,
+                      })
                     } else {
-                      setPoracleValues({ ...poracleValues, gym_id: newValue.id })
+                      setPoracleValues({
+                        ...poracleValues,
+                        gym_id: newValue.id,
+                      })
                     }
                   }
                 }}
