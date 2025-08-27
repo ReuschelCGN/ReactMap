@@ -561,6 +561,7 @@
   "300m_range": "300m Radius",
   "lure_range": "Lockmodulradius",
   "custom_range": "individueller Radius",
+  "showcase_range": "Showcase Radius",
   "tap_to_toggle": "Tippen zum Umschalten",
   "power_up": "Aufladung",
   "never_alt": "Nie",
