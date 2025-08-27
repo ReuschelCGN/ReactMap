@@ -464,6 +464,10 @@
         "__name": "MAP_MISC_INVASION_CACHE_HRS",
         "__format": "number"
       },
+      "fallbackRocketPokemonFiltering": {
+        "__name": "MAP_MISC_FALLBACK_ROCKET_POKEMON_FILTERING",
+        "__format": "boolean"
+      },
       "masterfileCacheHrs": {
         "__name": "MAP_MISC_MASTERFILE_CACHE_HRS",
         "__format": "number"
@@ -832,6 +836,14 @@
       "stationTimers": {
         "__name": "CLIENT_SIDE_OPTIONS_STATIONS_STATION_TIMERS",
         "__format": "boolean"
+      },
+      "interactionRanges": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "customRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_STATIONS_CUSTOM_RANGE",
+        "__format": "number"
       },
       "stationsOpacity": {
         "__name": "CLIENT_SIDE_OPTIONS_STATIONS_STATIONS_OPACITY",
@@ -1336,6 +1348,14 @@
       "gmaxStationed": {
         "__name": "DEFAULT_FILTERS_STATIONS_GMAX_STATIONED",
         "__format": "boolean"
+      },
+      "interactionRanges": {
+        "__name": "DEFAULT_FILTERS_STATIONS_INTERACTION_RANGES",
+        "__format": "boolean"
+      },
+      "customRange": {
+        "__name": "DEFAULT_FILTERS_STATIONS_CUSTOM_RANGE",
+        "__format": "number"
       }
     },
     "s2cells": {

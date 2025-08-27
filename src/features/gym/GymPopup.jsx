@@ -246,6 +246,7 @@ function DefendersModal({ gym, onClose }) {
                   marginLeft: 12,
                   marginRight: 12,
                   flexShrink: 0,
+                  position: 'relative',
                 }}
               >
                 <Img
@@ -257,6 +258,20 @@ function DefendersModal({ gym, onClose }) {
                     objectFit: 'contain',
                   }}
                 />
+                {def.badge === 1 && (
+                  <Img
+                    src={Icons.getMisc('bestbuddy')}
+                    alt={t('best_buddy')}
+                    style={{
+                      position: 'absolute',
+                      top: 0,
+                      right: 0,
+                      maxHeight: 15,
+                      maxWidth: 15,
+                      zIndex: 2,
+                    }}
+                  />
+                )}
               </div>
               <div
                 style={{
