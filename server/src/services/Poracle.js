@@ -224,10 +224,10 @@ class PoracleAPI {
     if (
       major < 4 ||
       (major === 4 && minor < 8) ||
-      (major === 4 && minor === 8 && patch < 3)
+      (major === 4 && minor === 8 && patch < 4)
     ) {
       throw new Error(
-        `Poracle must be at least version 4.8.3, current version is ${this.version}`,
+        `Poracle must be at least version 4.8.4, current version is ${this.version}`,
       )
     }
     const { providerURL, addressFormat, ...rest } = remoteConfig
