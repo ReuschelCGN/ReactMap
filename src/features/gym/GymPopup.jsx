@@ -455,7 +455,9 @@ function DefendersModal({ gym, onClose }) {
                         <span>&nbsp;</span>
                         <AccessTimeIcon style={{ fontSize: 16 }} />
                         <span>
-                          {formatDeployedTime(def.deployed_ms + now - updatedMs)}
+                          {formatDeployedTime(
+                            def.deployed_ms + now - updatedMs,
+                          )}
                         </span>
                       </div>
                     </div>
@@ -489,7 +491,8 @@ function DefendersModal({ gym, onClose }) {
                     {/* Heart background */}
                     <FavoriteIcon
                       style={{
-                        color: theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
+                        color:
+                          theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
                         opacity: 0.18,
                         position: 'absolute',
                         width: 28,
@@ -551,7 +554,9 @@ function DefendersModal({ gym, onClose }) {
             style={{ fontSize: 12, color: '#888' }}
           >
             {t('last_updated')}:{' '}
-            {defenders.length ? new Date(updatedMs).toLocaleString() : t('unknown')}
+            {defenders.length
+              ? new Date(updatedMs).toLocaleString()
+              : t('unknown')}
           </Grid>
         </>
       )}
@@ -1157,7 +1162,7 @@ const ExtraGymInfo = ({
 
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {(defenders?.length > 0 || (team_id > 0 && guarding_pokemon_id)) && ( 
+      {(defenders?.length > 0 || (team_id > 0 && guarding_pokemon_id)) && (
         <Grid xs={12} textAlign="center" my={1}>
           <button
             type="button"
