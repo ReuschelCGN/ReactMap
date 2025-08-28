@@ -25,6 +25,8 @@ const gymFields = [
   'ar_scan_eligible',
   'team_id',
   'in_battle',
+  'guarding_pokemon_id',
+  'guarding_pokemon_display',
   'defenders',
   'rsvps',
   'total_cp',
@@ -301,6 +303,14 @@ class Gym extends Model {
           }
           if (gym.updated > ts - gymValidDataLimit * 86400) {
             gymFields.forEach((field) => (newGym[field] = gym[field]))
+          }
+          if (
+            typeof gym.guarding_pokemon_display === 'string' &&
+            gym.guarding_pokemon_display
+          ) {
+            newGym.guarding_pokemon_display = JSON.parse(
+              gym.guarding_pokemon_display,
+            )
           }
           if (typeof gym.defenders === 'string' && gym.defenders) {
             newGym.defenders = JSON.parse(gym.defenders)

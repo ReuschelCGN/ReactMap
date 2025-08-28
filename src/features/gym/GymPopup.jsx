@@ -165,14 +165,19 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
  * @param {{ gym: import('@rm/types').Gym, onClose: () => void }} param0
  */
 function DefendersModal({ gym, onClose }) {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const theme = useTheme()
   const Icons = useMemory((s) => s.Icons)
+  const numFormatter = new Intl.NumberFormat(i18n.language)
   const defenders = gym.defenders || []
   const updatedMs =
     defenders.length &&
     defenders[0].deployed_ms + defenders[0].deployed_time * 1000
   const now = Date.now()
+
+  // Fallback to basic gym data when detailed defender info isn't available
+  const useFallbackData =
+    !defenders.length && gym.team_id > 0 && gym.guarding_pokemon_id
 
   return (
     <Grid
@@ -207,228 +212,349 @@ function DefendersModal({ gym, onClose }) {
           <Title backup={t('unknown_gym')}>{gym.name}</Title>
         </Grid>
       </Grid>
-      <Grid container direction="column" spacing={1}>
-        {defenders.map((def) => {
-          const fullCP = def.cp_when_deployed
-          const decayTime =
-            72 *
-            60 *
-            60 *
-            1000 *
-            Math.min(Math.max(Math.log10(3000 / fullCP), 1 / 9), 1)
-          const predictedMotivation = Math.max(
-            0,
-            def.motivation_now - Math.max(0, now - updatedMs) / decayTime,
-          )
-          const currentCP = Math.round(
-            fullCP * (0.2 + 0.8 * predictedMotivation),
-          )
 
-          return (
+      {useFallbackData ? (
+        // Fallback display using basic gym data
+        <Grid container direction="column" spacing={1}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              minHeight: 60,
+              width: '100%',
+              padding: '4px 0',
+              borderBottom: `1px solid ${theme.palette.divider}`,
+            }}
+          >
             <div
-              key={def.pokemon_id}
               style={{
+                width: 44,
+                height: 44,
                 display: 'flex',
                 alignItems: 'center',
-                minHeight: 60,
-                width: '100%',
-                padding: '4px 0',
-                borderBottom: `1px solid ${theme.palette.divider}`,
+                justifyContent: 'center',
+                marginLeft: 12,
+                marginRight: 12,
+                flexShrink: 0,
+                position: 'relative',
+              }}
+            >
+              <Img
+                src={Icons.getPokemonByDisplay(
+                  gym.guarding_pokemon_id,
+                  gym.guarding_pokemon_display,
+                )}
+                alt={t(`poke_${gym.guarding_pokemon_id}`)}
+                style={{
+                  maxHeight: 44,
+                  maxWidth: 44,
+                  objectFit: 'contain',
+                }}
+              />
+              {gym.guarding_pokemon_display?.badge === 1 && (
+                <Img
+                  src={Icons.getMisc('bestbuddy')}
+                  alt={t('best_buddy')}
+                  style={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    maxHeight: 15,
+                    maxWidth: 15,
+                    zIndex: 2,
+                  }}
+                />
+              )}
+            </div>
+            <div
+              style={{
+                flex: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'flex-start',
+                justifyContent: 'center',
+                minWidth: 0,
+                textAlign: 'left',
+                overflow: 'hidden',
+                marginLeft: 4,
+                gap: '2px',
               }}
             >
               <div
                 style={{
-                  width: 44,
-                  height: 44,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginLeft: 12,
-                  marginRight: 12,
-                  flexShrink: 0,
-                  position: 'relative',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  marginBottom: 2,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: '100%',
                 }}
+                title={t(`poke_${gym.guarding_pokemon_id}`)}
               >
-                <Img
-                  src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
-                  alt={t(`poke_${def.pokemon_id}`)}
-                  style={{
-                    maxHeight: 44,
-                    maxWidth: 44,
-                    objectFit: 'contain',
-                  }}
-                />
-                {def.badge === 1 && (
+                {gym.guarding_pokemon_display?.badge === 1 && (
                   <Img
                     src={Icons.getMisc('bestbuddy')}
                     alt={t('best_buddy')}
                     style={{
-                      position: 'absolute',
-                      top: 0,
-                      right: 0,
                       maxHeight: 15,
                       maxWidth: 15,
-                      zIndex: 2,
+                      marginRight: 2,
+                      verticalAlign: 'middle',
                     }}
                   />
                 )}
+                {t(`poke_${gym.guarding_pokemon_id}`)}
               </div>
+
               <div
                 style={{
-                  flex: 1,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  justifyContent: 'center',
-                  minWidth: 0,
-                  textAlign: 'left',
-                  overflow: 'hidden',
-                  marginLeft: 4,
-                  gap: '2px',
+                  fontSize: 10,
+                  fontWeight: 600,
                 }}
               >
-                {/* First line: Pokemon name */}
+                {gym.total_cp &&
+                  `${t('total_cp')}: ${numFormatter.format(gym.total_cp)}`}
+              </div>
+            </div>
+          </div>
+
+          <Grid
+            xs={12}
+            textAlign="center"
+            mt={2}
+            style={{ fontSize: 12, color: '#888' }}
+          >
+            {t('last_updated')}: {new Date(gym.updated * 1000).toLocaleString()}
+          </Grid>
+        </Grid>
+      ) : (
+        // Original detailed defender display
+        <>
+          <Grid container direction="column" spacing={1}>
+            {defenders.map((def) => {
+              const fullCP = def.cp_when_deployed
+              const decayTime =
+                72 *
+                60 *
+                60 *
+                1000 *
+                Math.min(Math.max(Math.log10(3000 / fullCP), 1 / 9), 1)
+              const predictedMotivation = Math.max(
+                0,
+                def.motivation_now - Math.max(0, now - updatedMs) / decayTime,
+              )
+              const currentCP = Math.round(
+                fullCP * (0.2 + 0.8 * predictedMotivation),
+              )
+
+              return (
                 <div
-                  style={{
-                    fontSize: 15,
-                    fontWeight: 600,
-                    marginBottom: 2,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    maxWidth: '100%',
-                  }}
-                  title={t(`poke_${def.pokemon_id}`)}
-                >
-                  {t(`poke_${def.pokemon_id}`)}
-                </div>
-                <div
-                  style={{
-                    fontSize: 10,
-                    fontWeight: 600,
-                  }}
-                >
-                  {t('cp')}: {currentCP} / {fullCP}{' '}
-                </div>
-                <div
+                  key={def.pokemon_id}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '2px',
-                    fontSize: 10,
-                    color: theme.palette.text.secondary,
+                    minHeight: 60,
+                    width: '100%',
+                    padding: '4px 0',
+                    borderBottom: `1px solid ${theme.palette.divider}`,
                   }}
                 >
                   <div
                     style={{
+                      width: 44,
+                      height: 44,
                       display: 'flex',
                       alignItems: 'center',
-                      gap: '1px',
+                      justifyContent: 'center',
+                      marginLeft: 12,
+                      marginRight: 12,
+                      flexShrink: 0,
+                      position: 'relative',
                     }}
                   >
-                    <VolunteerActivismIcon style={{ fontSize: 16 }} />
-                    <span>{def.times_fed || 0}</span>
-                    <span>&nbsp;</span>
-                    <AccessTimeIcon style={{ fontSize: 16 }} />
-                    <span>
-                      {formatDeployedTime(def.deployed_ms + now - updatedMs)}
-                    </span>
+                    <Img
+                      src={Icons.getPokemonByDisplay(def.pokemon_id, def)}
+                      alt={t(`poke_${def.pokemon_id}`)}
+                      style={{
+                        maxHeight: 44,
+                        maxWidth: 44,
+                        objectFit: 'contain',
+                      }}
+                    />
+                    {def.badge === 1 && (
+                      <Img
+                        src={Icons.getMisc('bestbuddy')}
+                        alt={t('best_buddy')}
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          right: 0,
+                          maxHeight: 15,
+                          maxWidth: 15,
+                          zIndex: 2,
+                        }}
+                      />
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      flex: 1,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-start',
+                      justifyContent: 'center',
+                      minWidth: 0,
+                      textAlign: 'left',
+                      overflow: 'hidden',
+                      marginLeft: 4,
+                      gap: '2px',
+                    }}
+                  >
+                    {/* First line: Pokemon name */}
+                    <div
+                      style={{
+                        fontSize: 15,
+                        fontWeight: 600,
+                        marginBottom: 2,
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        whiteSpace: 'nowrap',
+                        maxWidth: '100%',
+                      }}
+                      title={t(`poke_${def.pokemon_id}`)}
+                    >
+                      {t(`poke_${def.pokemon_id}`)}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 600,
+                      }}
+                    >
+                      {t('cp')}: {currentCP} / {fullCP}{' '}
+                    </div>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '2px',
+                        fontSize: 10,
+                        color: theme.palette.text.secondary,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '1px',
+                        }}
+                      >
+                        <VolunteerActivismIcon style={{ fontSize: 16 }} />
+                        <span>{def.times_fed || 0}</span>
+                        <span>&nbsp;</span>
+                        <AccessTimeIcon style={{ fontSize: 16 }} />
+                        <span>
+                          {formatDeployedTime(def.deployed_ms + now - updatedMs)}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'right',
+                      marginLeft: 6,
+                      marginRight: 12,
+                      flexShrink: 0,
+                      position: 'relative',
+                    }}
+                  >
+                    {/* Heart outline */}
+                    <FavoriteIcon
+                      style={{
+                        color: 'transparent',
+                        position: 'absolute',
+                        width: 28,
+                        height: 28,
+                        stroke: theme.palette.text.primary,
+                        strokeWidth: 1,
+                        filter: 'drop-shadow(0 0 1px #0008)',
+                      }}
+                      className="heart-outline"
+                    />
+                    {/* Heart background */}
+                    <FavoriteIcon
+                      style={{
+                        color: theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
+                        opacity: 0.18,
+                        position: 'absolute',
+                        width: 28,
+                        height: 28,
+                      }}
+                    />
+                    {/* Heart fill */}
+                    <FavoriteIcon
+                      style={{
+                        color: '#ff69b4',
+                        position: 'absolute',
+                        width: 28,
+                        height: 28,
+                        clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
+                        transition: 'clip-path 0.3s',
+                      }}
+                    />
+                    {/* Heart cracks for rounds */}
+                    <svg
+                      width={28}
+                      height={28}
+                      viewBox="0 0 28 28"
+                      style={{
+                        position: 'absolute',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      {/* Show cracks based on health: */}
+                      {predictedMotivation <= 2 / 3 && (
+                        // Always show top crack if predictedMotivation <= 2/3
+                        <path
+                          d="M2,9 Q7,11 14,9 Q21,11 26,9"
+                          stroke={theme.palette.text.primary}
+                          strokeWidth={1.5}
+                          fill="none"
+                          strokeLinejoin="round"
+                        />
+                      )}
+                      {predictedMotivation <= 1 / 3 && (
+                        // Show bottom crack only if predictedMotivation <= 1/3
+                        <path
+                          d="M7,19 Q11,17 14,19 Q17,17 21,19"
+                          stroke={theme.palette.text.primary}
+                          strokeWidth={1.5}
+                          fill="none"
+                          strokeLinejoin="round"
+                        />
+                      )}
+                    </svg>
                   </div>
                 </div>
-              </div>
-              <div
-                style={{
-                  width: 44,
-                  height: 44,
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'right',
-                  marginLeft: 6,
-                  marginRight: 12,
-                  flexShrink: 0,
-                  position: 'relative',
-                }}
-              >
-                {/* Heart outline */}
-                <FavoriteIcon
-                  style={{
-                    color: 'transparent',
-                    position: 'absolute',
-                    width: 28,
-                    height: 28,
-                    stroke: theme.palette.text.primary,
-                    strokeWidth: 1,
-                    filter: 'drop-shadow(0 0 1px #0008)',
-                  }}
-                  className="heart-outline"
-                />
-                {/* Heart background */}
-                <FavoriteIcon
-                  style={{
-                    color: theme.palette.mode === 'dark' ? 'white' : '#f0f0f0',
-                    opacity: 0.18,
-                    position: 'absolute',
-                    width: 28,
-                    height: 28,
-                  }}
-                />
-                {/* Heart fill */}
-                <FavoriteIcon
-                  style={{
-                    color: '#ff69b4',
-                    position: 'absolute',
-                    width: 28,
-                    height: 28,
-                    clipPath: `inset(${100 - predictedMotivation * 100}% 0 0 0)`,
-                    transition: 'clip-path 0.3s',
-                  }}
-                />
-                {/* Heart cracks for rounds */}
-                <svg
-                  width={28}
-                  height={28}
-                  viewBox="0 0 28 28"
-                  style={{
-                    position: 'absolute',
-                    pointerEvents: 'none',
-                  }}
-                >
-                  {/* Show cracks based on health: */}
-                  {predictedMotivation <= 2 / 3 && (
-                    // Always show top crack if predictedMotivation <= 2/3
-                    <path
-                      d="M2,9 Q7,11 14,9 Q21,11 26,9"
-                      stroke={theme.palette.text.primary}
-                      strokeWidth={1.5}
-                      fill="none"
-                      strokeLinejoin="round"
-                    />
-                  )}
-                  {predictedMotivation <= 1 / 3 && (
-                    // Show bottom crack only if predictedMotivation <= 1/3
-                    <path
-                      d="M7,19 Q11,17 14,19 Q17,17 21,19"
-                      stroke={theme.palette.text.primary}
-                      strokeWidth={1.5}
-                      fill="none"
-                      strokeLinejoin="round"
-                    />
-                  )}
-                </svg>
-              </div>
-            </div>
-          )
-        })}
-      </Grid>
-      <Grid
-        xs={12}
-        textAlign="center"
-        mt={2}
-        style={{ fontSize: 12, color: '#888' }}
-      >
-        {t('last_updated')}:{' '}
-        {defenders.length ? new Date(updatedMs).toLocaleString() : t('unknown')}
-      </Grid>
+              )
+            })}
+          </Grid>
+          <Grid
+            xs={12}
+            textAlign="center"
+            mt={2}
+            style={{ fontSize: 12, color: '#888' }}
+          >
+            {t('last_updated')}:{' '}
+            {defenders.length ? new Date(updatedMs).toLocaleString() : t('unknown')}
+          </Grid>
+        </>
+      )}
     </Grid>
   )
 }
@@ -1018,6 +1144,8 @@ const ExtraGymInfo = ({
   lon,
   updated,
   defenders,
+  team_id,
+  guarding_pokemon_id,
   setShowDefenders,
 }) => {
   const { t, i18n } = useTranslation()
@@ -1029,7 +1157,7 @@ const ExtraGymInfo = ({
 
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {defenders?.length > 0 && (
+      {(defenders?.length > 0 || (team_id > 0 && guarding_pokemon_id)) && ( 
         <Grid xs={12} textAlign="center" my={1}>
           <button
             type="button"
