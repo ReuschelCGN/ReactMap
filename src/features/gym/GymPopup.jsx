@@ -1144,6 +1144,8 @@ const ExtraGymInfo = ({
   lon,
   updated,
   defenders,
+  team_id,
+  guarding_pokemon_id,
   setShowDefenders,
 }) => {
   const { t, i18n } = useTranslation()
@@ -1155,7 +1157,7 @@ const ExtraGymInfo = ({
 
   return (
     <Grid container alignItems="center" justifyContent="center">
-      {defenders?.length > 0 && (
+      {(defenders?.length > 0 || (team_id > 0 && guarding_pokemon_id)) && ( 
         <Grid xs={12} textAlign="center" my={1}>
           <button
             type="button"
