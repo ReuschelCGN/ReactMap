@@ -169,6 +169,9 @@ class DbManager extends Logger {
     const [polygon] = await schema('nests')
       .columnInfo()
       .then((columns) => ['polygon' in columns])
+    const [hasShortcode] = await schema('route')
+      .columnInfo()
+      .then((columns) => ['shortcode' in columns])
 
     return {
       pvpV2,
@@ -189,6 +192,7 @@ class DbManager extends Logger {
       hasShowcaseForm,
       hasShowcaseType,
       hasStationedGmax,
+      hasShortcode,
     }
   }
 
