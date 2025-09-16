@@ -78,7 +78,7 @@ class Route extends Model {
    * @param {number} id
    * @param {import('@rm/types').DbContext} ctx
    */
-  static async getOne(id) {
+  static async getOne(id, { hasShortcode }) {
     /** @type {import('@rm/types').FullRoute} */
     const result = await this.query().findById(id)
 
