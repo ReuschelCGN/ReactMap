@@ -38,6 +38,7 @@ import {
 } from '@components/inputs/ExpandCollapse'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationAttackBonus } from '@utils/getAttackBonus'
+import { getStationDamageBoost } from '@utils/getAttackBonus'
 import { CopyCoords } from '@components/popups/Coords'
 import { PokeMove } from '@components/popups/PokeMove'
 
@@ -59,7 +60,8 @@ export function StationPopup(station) {
       <StationMedia {...station} />
       {!!station.is_battle_available &&
         station.battle_start < Date.now() / 1000 &&
-        station.battle_end > Date.now() / 1000 && (
+        station.battle_end > Date.now() / 1000 &&
+        !!station.total_stationed_pokemon && (
           <ExpandCollapse>
             <StationAttackBonus {...station} />
             <ExpandWithState
@@ -365,11 +367,13 @@ function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
         max={4}
       />
       <Typography variant="caption">
-        {t('battle_bonus')} &nbsp;(
+        {t('battle_bonus')}: +{getStationDamageBoost(total_stationed_pokemon)}%
+        <br />
+        {t('placed_pokemon')}:{' '}
         {total_stationed_gmax === undefined || total_stationed_gmax === null
           ? ''
-          : `${total_stationed_gmax} / `}
-        {total_stationed_pokemon} / 40)
+          : `${total_stationed_gmax}/`}
+        {total_stationed_pokemon}/40
       </Typography>
     </Stack>
   )
