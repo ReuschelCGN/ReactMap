@@ -17,6 +17,8 @@ import Rating from '@mui/material/Rating'
 import Typography from '@mui/material/Typography'
 import Stack from '@mui/material/Stack'
 import Box from '@mui/material/Box'
+import LockOpenIcon from '@mui/icons-material/LockOpen'
+import LockIcon from '@mui/icons-material/Lock'
 
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useGetDeepStore, useStorage } from '@store/useStorage'
@@ -35,6 +37,7 @@ import {
   ExpandWithState,
 } from '@components/inputs/ExpandCollapse'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
+import { getStationAttackBonus } from '@utils/getAttackBonus'
 import { getStationDamageBoost } from '@utils/getAttackBonus'
 import { CopyCoords } from '@components/popups/Coords'
 import { PokeMove } from '@components/popups/PokeMove'
@@ -356,6 +359,13 @@ function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
   const { t } = useTranslation()
   return (
     <Stack alignItems="center">
+      <Rating
+        value={getStationAttackBonus(total_stationed_pokemon)}
+        readOnly
+        icon={<LockOpenIcon fontSize="inherit" />}
+        emptyIcon={<LockIcon fontSize="inherit" />}
+        max={4}
+      />
       <Typography variant="caption">
         {t('battle_bonus')}: +{getStationDamageBoost(total_stationed_pokemon)}%
         <br />
@@ -389,11 +399,15 @@ function StationContent({ start_time, end_time, id }) {
 /** @param {import('@rm/types').Station} props */
 function StationMons({ id }) {
   const { t: tId } = useTranslateById()
+  const { t } = useTranslation()
   const mons = useGetStationMons(id)
   const icons = useMemory((s) => s.Icons)
 
   return (
     <CardContent sx={{ my: 1, p: 0, height: 130 }}>
+      <Typography variant="h6" align="center">
+        {t('placed_pokemon')}
+      </Typography>
       <VirtualGrid data={mons} xs={6}>
         {(index, mon) => {
           const caption = tId(`${mon.pokemon_id}-${mon.form}`)
