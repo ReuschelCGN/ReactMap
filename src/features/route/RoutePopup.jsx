@@ -364,7 +364,6 @@ export function RoutePopup({ end, inline = false, ...props }) {
       >
         {notification.message}
       </Notification>
-
     </>
   )
 
