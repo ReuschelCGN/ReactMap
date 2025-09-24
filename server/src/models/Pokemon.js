@@ -18,15 +18,15 @@ const { BASE_KEYS } = require('../filters/pokemon/constants')
 const { PkmnBackend } = require('../filters/pokemon/Backend')
 const { state } = require('../services/state')
 
-class Pokemon extends Model {
-  static get tableName() {
-    return 'pokemon'
-  }
-
 const DITTO_ID = 132
 
 const getPokemonFilterKey = (pokemonId, form) =>
   pokemonId === DITTO_ID ? `${DITTO_ID}-0` : `${pokemonId}-${form}`
+
+class Pokemon extends Model {
+  static get tableName() {
+    return 'pokemon'
+  }
 
   /**
    * @param {import("@rm/types").Permissions} perms
