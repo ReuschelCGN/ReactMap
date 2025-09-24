@@ -235,7 +235,6 @@ export interface Pokemon {
   costume: number
   gender: Gender
   display_pokemon_id: number
-  ditto_form: number
   weight: number
   height: number
   size: number
