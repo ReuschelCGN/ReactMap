@@ -121,7 +121,7 @@ export const useMemory = create(() => ({
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
-    featureFlags: {
+  featureFlags: {
     supportsShinyStats: false,
   },
   available: {
