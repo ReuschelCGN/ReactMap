@@ -2,6 +2,28 @@
 /* eslint-disable no-console */
 import { UICONS } from 'uicons.js'
 
+/**
+ * Extract the first file extension from a set of filenames.
+ * @param {Set<string>} set
+ */
+const extractExtension = (set) => {
+  if (!set) return undefined
+  const iterator = set.values()
+  let next = iterator.next()
+  while (!next.done) {
+    const entry = next.value
+    if (typeof entry === 'string' && entry.includes('.')) {
+      const parts = entry.split('.')
+      const ext = parts.pop()
+      if (ext) {
+        return ext
+      }
+    }
+    next = iterator.next()
+  }
+  return undefined
+}
+
 // /**
 //  *
 //  * @template {object} T
