@@ -36,6 +36,7 @@ import { useAnalytics } from '@hooks/useAnalytics'
 import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
+import { readableProbability } from '@utils/readableProbability'
 
 /**
  *
@@ -568,17 +569,6 @@ const RewardInfo = ({ with_ar, ...quest }) => {
         {questMessage || t(`ar_quest_${!!with_ar}`)}
       </Typography>
     </Grid>
-  )
-}
-
-const readableProbability = (x) => {
-  if (x <= 0) return '🚫'
-  const x_1 = Math.round(1 / x)
-  const percent = Math.round(x * 100)
-  return Math.abs(1 / x_1 - x) < Math.abs(percent * 0.01 - x) ? (
-    <>1/{x_1}</>
-  ) : (
-    `${percent}%`
   )
 }
 
