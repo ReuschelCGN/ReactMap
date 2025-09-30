@@ -6,7 +6,6 @@ import { divIcon } from 'leaflet'
 
 import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
-import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { useOpacity } from '@hooks/useOpacity'
@@ -27,7 +26,6 @@ const BaseTappableTile = (tappable) => {
   const [markerRef, setMarkerRef] = React.useState(null)
   useForcePopup(tappable.id, markerRef)
   useMarkerTimer(tappable.expire_timestamp || 0, markerRef)
-  const handlePopupOpen = useManualPopupTracker('tappables', tappable.id)
 
   const getOpacity = useOpacity('tappables')
   const opacity = React.useMemo(
@@ -120,7 +118,6 @@ const BaseTappableTile = (tappable) => {
       ref={setMarkerRef}
       position={[tappable.lat, tappable.lon]}
       icon={icon}
-      eventHandlers={{ popupopen: handlePopupOpen }}
     >
       <Popup position={[tappable.lat, tappable.lon]}>
         <TappablePopup
