@@ -5,6 +5,7 @@ import type {
   RmModelKeys,
   ModelKeys,
   Station,
+  Tappable,
   Backup,
   Nest,
   NestSubmission,
@@ -68,6 +69,7 @@ export interface Available {
   pokestops: ModelReturn<typeof Pokestop, 'getAvailable'>
   nests: ModelReturn<typeof Nest, 'getAvailable'>
   stations: ModelReturn<typeof Station, 'getAvailable'>
+  tappables: ModelReturn<typeof Tappable, 'getAvailable'>
 }
 
 export interface ApiEndpoint {
@@ -202,6 +204,7 @@ export type AdvCategories =
   | 'pokestops'
   | 'nests'
   | 'stations'
+  | 'tappables'
 
 export type UIObject = ReturnType<
   (typeof import('server/src/ui/drawer'))['drawer']
