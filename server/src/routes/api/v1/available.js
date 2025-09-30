@@ -10,6 +10,7 @@ const queryObj = /** @type {const} */ ({
   raids: { model: 'Gym', category: 'gyms' },
   nests: { model: 'Nest', category: 'nests' },
   stations: { model: 'Station', category: 'stations' },
+  tappables: { model: 'Tappable', category: 'tappables' },
 })
 
 /** @param {string} category */
@@ -28,6 +29,9 @@ const resolveCategory = (category) => {
     case 'pokemon':
     case 'pokemons':
       return 'pokemon'
+    case 'tappable':
+    case 'tappables':
+      return 'tappables'
     default:
       return 'all'
   }
@@ -42,6 +46,7 @@ const getAll = async (compare) => {
         state.db.getAvailable('Gym'),
         state.db.getAvailable('Nest'),
         state.db.getAvailable('Station'),
+        state.db.getAvailable('Tappable'),
       ])
     : [
         state.event.available.pokemon,
@@ -49,6 +54,7 @@ const getAll = async (compare) => {
         state.event.available.gyms,
         state.event.available.nests,
         state.event.available.stations,
+        state.event.available.tappables,
       ]
   return Object.fromEntries(
     Object.keys(queryObj).map((key, i) => [key, available[i]]),
@@ -121,6 +127,7 @@ router.put('/:category', async (req, res) => {
         state.event.setAvailable('gyms', 'Gym', state.db),
         state.event.setAvailable('nests', 'Nest', state.db),
         state.event.setAvailable('stations', 'Station', state.db),
+        state.event.setAvailable('tappables', 'Tappable', state.db),
       ])
     }
     res
