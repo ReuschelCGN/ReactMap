@@ -5,6 +5,9 @@ import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
 import Tooltip from '@mui/material/Tooltip'
 import { useTranslation } from 'react-i18next'
+import ExpandMore from '@mui/icons-material/ExpandMore'
+import IconButton from '@mui/material/IconButton'
+import Collapse from '@mui/material/Collapse'
 
 import { useStorage } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
@@ -24,9 +27,6 @@ import { getTimeUntil } from '@utils/getTimeUntil'
  */
 export function TappablePopup({ tappable, rewardIcon, iconSize }) {
   const { t, i18n } = useTranslation()
-  const showCoords = useStorage(
-    (s) => !!s.userSettings.tappables?.enableTappablePopupCoords,
-  )
   const masterfile = useMemory((s) => s.masterfile)
 
   const count = tappable.count ?? 1
@@ -69,15 +69,17 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
           <img
             src={rewardIcon}
             alt={itemName}
-            style={{ width: iconSize, height: iconSize, objectFit: 'contain' }}
+            style={{ width: iconSize * 1.4, height: iconSize * 1.4, objectFit: 'contain' }}
           />
         </Grid>
       )}
       <Grid xs={12}>
-        <Typography variant="h6">{itemName}</Typography>
+        {count <= 1 && (
+          <Typography variant="h6">{itemName}</Typography>
+        )}
         {count > 1 && (
-          <Typography variant="subtitle2" color="text.secondary">
-            ×{count}
+          <Typography variant="h6">
+            {itemName} x{count}
           </Typography>
         )}
         {formattedType && (
@@ -86,14 +88,6 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
           </Typography>
         )}
       </Grid>
-      <Grid xs={12}>
-        <Navigation lat={tappable.lat} lon={tappable.lon} size="medium" />
-      </Grid>
-      {showCoords && (
-        <Grid xs={12}>
-          <Coords lat={tappable.lat} lon={tappable.lon} />
-        </Grid>
-      )}
       {(tappable.expire_timestamp || tappable.updated) && (
         <Grid xs={12}>
           <Divider sx={{ my: 0.5 }} />
@@ -115,11 +109,8 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
           />
         </Grid>
       )}
-      {tappable.updated && (
-        <Grid xs={12}>
-          <TimeStamp time={tappable.updated}>{t('last_seen')}</TimeStamp>
-        </Grid>
-      )}
+      <Footer lat={tappable.lat} lon={tappable.lon} />
+      <ExtraInfo {...tappable} />
     </Grid>
   )
 }
@@ -173,5 +164,60 @@ const TappableTimer = ({ expireTimestamp, verified, locale, t }) => {
         </Tooltip>
       </Grid>
     </>
+  )
+}
+
+/**
+ *
+ * @param {Pick<import('@rm/types').Tappable, 'lat' | 'lon'>} props
+ * @returns
+ */
+const Footer = ({ lat, lon }) => {
+  const open = useStorage((s) => !!s.popups.extras)
+
+  return (
+    <Grid container xs={12} justifyContent="space-evenly" alignItems="center">
+      <Grid xs={3}>
+        <Navigation lat={lat} lon={lon} />
+      </Grid>
+      <Grid xs={3} textAlign="center">
+        <IconButton
+          className={open ? 'expanded' : 'closed'}
+          onClick={() =>
+            useStorage.setState((prev) => ({
+              popups: { ...prev.popups, extras: !open },
+            }))
+          }
+          size="large"
+        >
+          <ExpandMore />
+        </IconButton>
+      </Grid>
+    </Grid>
+  )
+}
+
+/**
+ *
+ * @param {import('@rm/types').Tappable} props
+ * @returns
+ */
+const ExtraInfo = ({ last_seen, updated, lat, lon }) => {
+  const open = useStorage((s) => s.popups.extras)
+  const enableTappablePopupCoords = useStorage(
+    (s) => s.userSettings.tappables.enableTappablePopupCoords,
+  )
+
+  return (
+    <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
+      <Grid container alignItems="center" justifyContent="center">
+        <TimeStamp time={updated}>last_seen</TimeStamp>
+        {enableTappablePopupCoords && (
+          <Grid xs={12} textAlign="center">
+            <Coords lat={lat} lon={lon} />
+          </Grid>
+        )}
+      </Grid>
+    </Collapse>
   )
 }
