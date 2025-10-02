@@ -39,8 +39,12 @@ const BaseTappableTile = (tappable) => {
       return { icon: null, rewardIcon: '', size: 24 }
     }
     const filterKey = `q${tappable.item_id}`
-    const tappableSize = Icons.getSize('tappable', itemFilters[filterKey]?.size)
-    const tappableIcon = Icons.getTappable(tappable.type)
+    const tappableSize = Icons.getSize('tappable', itemFilters[filterKey]?.size) * 1.3
+    const tappableIcon = Icons.getRewards(
+      2,
+      tappable.item_id,
+      tappable.count || 1,
+    )
     const tappableReward = Icons.getRewards(
       2,
       tappable.item_id,
@@ -52,7 +56,7 @@ const BaseTappableTile = (tappable) => {
     const [tappableMod, rewardMod] = Icons.getModifiers('tappable', 'reward')
     const popupAnchor = [
       tappableMod?.popupX || 0,
-      tappableSize * -0.7 * (tappableMod?.offsetY || 1) +
+      tappableSize * -0.3 * (tappableMod?.offsetY || 1) +
         (tappableMod?.popupY || 0),
     ]
 
@@ -61,26 +65,29 @@ const BaseTappableTile = (tappable) => {
         class="tappable-marker"
         style="--tappable-size:${tappableSize}px;opacity:${opacity};"
       >
-        ${
-          tappableReward
-            ? `
-              <div
-                class="tappable-marker__bubble"
-                style="bottom: calc(100% + 6px + ${rewardMod?.popupY || 0}px);"
-              >
-                <img src="${tappableReward}" alt="${tappable.item_id}" />
-                ${
-                  tappable.count && tappable.count > 1
-                    ? `<span>x${tappable.count}</span>`
-                    : ''
-                }
-              </div>`
-            : ''
-        }
+
+      <div
+        id="tappable-${tappable.item_id}"
+        class="marker-image-holder top-overlay"
+        style="
+          opacity: ${opacity};
+        "
+      >
+
         <img
           class="tappable-marker__icon"
           src="${tappableIcon}"
-          alt="${tappable.type || ''}"
+          alt="${tappable.item_id || ''}"
+        />
+        <img
+          src="${Icons.getMisc('tappable')}"
+          alt="tappable_item"
+          style="
+            width: ${tappableSize / 1.5}px;
+            height: auto;
+            bottom: ${(-tappableSize / 5) * tappableMod?.offsetY}px;
+            left: -50%;
+          "
         />
       </div>
     `
