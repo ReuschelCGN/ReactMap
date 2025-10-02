@@ -3,7 +3,6 @@ const { Model } = require('objection')
 const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
-const { applyManualIdFilter } = require('../utils/manualFilter')
 const { getEpoch } = require('../utils/getClientTime')
 
 class Tappable extends Model {
@@ -31,7 +30,7 @@ class Tappable extends Model {
     const { queryLimits = {}, tappableUpdateLimit = 6 } = config.getSafe('api')
     const timestamp = getEpoch()
 
-    const query = this.query().select([
+    const select = [
       'id',
       'lat',
       'lon',
@@ -41,18 +40,14 @@ class Tappable extends Model {
       'expire_timestamp',
       'expire_timestamp_verified',
       'updated',
-    ])
+    ]
 
-    applyManualIdFilter(query, {
-      manualId: filterArgs.onlyManualId,
-      latColumn: 'lat',
-      lonColumn: 'lon',
-      idColumn: 'id',
-      bounds: { minLat, maxLat, minLon, maxLon },
-    })
+    const query = this.query()
+      .whereBetween('lat', [args.minLat, args.maxLat])
+      .andWhereBetween('lon', [args.minLon, args.maxLon])
 
     const onlyAreas = filterArgs.onlyAreas || []
-    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, ctx?.isMad)) {
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, ctx)) {
       return []
     }
 
