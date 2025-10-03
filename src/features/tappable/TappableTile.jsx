@@ -39,7 +39,8 @@ const BaseTappableTile = (tappable) => {
       return { icon: null, rewardIcon: '', size: 24 }
     }
     const filterKey = `q${tappable.item_id}`
-    const tappableSize = Icons.getSize('tappable', itemFilters[filterKey]?.size) * 1.3
+    const tappableSize =
+      Icons.getSize('tappable', itemFilters[filterKey]?.size) * 1.3
     const tappableIcon = Icons.getRewards(
       2,
       tappable.item_id,
