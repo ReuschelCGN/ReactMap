@@ -69,14 +69,16 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
           <img
             src={rewardIcon}
             alt={itemName}
-            style={{ width: iconSize * 1.4, height: iconSize * 1.4, objectFit: 'contain' }}
+            style={{
+              width: iconSize * 1.4,
+              height: iconSize * 1.4,
+              objectFit: 'contain',
+            }}
           />
         </Grid>
       )}
       <Grid xs={12}>
-        {count <= 1 && (
-          <Typography variant="h6">{itemName}</Typography>
-        )}
+        {count <= 1 && <Typography variant="h6">{itemName}</Typography>}
         {count > 1 && (
           <Typography variant="h6">
             {itemName} x{count}
