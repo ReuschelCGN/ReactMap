@@ -775,6 +775,8 @@ class Pokestop extends Model {
                   'quest_gender_id',
                   'quest_shiny',
                   'quest_shiny_probability',
+                  'quest_location_card',
+                  'quest_bread_mode',
                 )
                 break
               case 9:
@@ -1394,6 +1396,8 @@ class Pokestop extends Model {
           break
         case 7:
           Object.keys(info).forEach((x) => (quest[`quest_${x}`] = info[x]))
+          quest.quest_location_card = quest.quest_location_card || 0
+          quest.quest_bread_mode = quest.quest_bread_mode || 0
           break
         case 9:
           Object.keys(info).forEach((x) => (quest[`xl_candy_${x}`] = info[x]))
