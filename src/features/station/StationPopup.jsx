@@ -276,8 +276,6 @@ function StationMedia({
   battle_pokemon_costume,
   battle_pokemon_gender,
   battle_pokemon_bread_mode,
-  battle_pokemon_move_1,
-  battle_pokemon_move_2,
   is_battle_available,
   battle_end,
   start_time,
@@ -338,8 +336,6 @@ function StationMedia({
               <PokeType key={type} id={type} size="medium" />
             ))}
           </Stack>
-          {battle_pokemon_move_1 && <PokeMove id={battle_pokemon_move_1} />}
-          {battle_pokemon_move_2 && <PokeMove id={battle_pokemon_move_2} />}
         </Stack>
       </Box>
     </CardMedia>
