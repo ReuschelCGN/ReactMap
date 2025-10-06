@@ -479,6 +479,7 @@
   "without_ar": "Ohne AR",
   "both": "Beide",
   "shiny_probability": "Shinyrate: <0/>",
+  "shiny_sample": "{{percentage}}%: {{shiny}} Shinys/{{checks}} Encounter seit {{date}}",
   "badge_0": "keiner",
   "badge_1": "Basis",
   "badge_2": "Bronze",

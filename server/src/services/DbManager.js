@@ -173,6 +173,13 @@ class DbManager extends Logger {
       .columnInfo()
       .then((columns) => ['shortcode' in columns])
 
+    let hasPokemonShinyStats
+    try {
+      hasPokemonShinyStats = await schema.schema.hasTable('pokemon_shiny_stats')
+    } catch (e) {
+      hasPokemonShinyStats = false
+    }
+
     return {
       pvpV2,
       mem: '',
@@ -193,6 +200,7 @@ class DbManager extends Logger {
       hasShowcaseType,
       hasStationedGmax,
       hasShortcode,
+      hasPokemonShinyStats,
     }
   }
 
@@ -213,6 +221,7 @@ class DbManager extends Logger {
                 // Add support for HTTP authentication
                 httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
+                hasPokemonShinyStats: false,
               }
 
           Object.entries(this.models).forEach(([category, sources]) => {
