@@ -49,8 +49,7 @@ export function useStationMarker({
     ]
   }, basicEqualFn)
   const [stationMod, battleMod] = Icons.getModifiers('station', 'dynamax')
-  const getOpacity = useOpacity('stations')
-  const stationOpacity = isInactive ? 0.3 : getOpacity(end_time)
+  const stationOpacity = useOpacity('stations')(end_time)
   const isActive = start_time < Date.now() / 1000
 
   return divIcon({
