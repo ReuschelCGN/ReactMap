@@ -155,6 +155,11 @@ const BaseGymTile = (gym) => {
       ? gym.raid_end_timestamp
       : gym.raid_battle_timestamp
 
+  const rangePathOptions = React.useMemo(
+    () => ({ color: getColor(gym.team_id), weight: 0.5 }),
+    [gym.team_id],
+  )
+
   useForcePopup(gym.id, markerRef)
   useMarkerTimer(timerToDisplay, markerRef, () => setStateChange(!stateChange))
   if (hasRaid) {
@@ -213,16 +218,14 @@ const BaseGymTile = (gym) => {
         <Circle
           center={[gym.lat, gym.lon]}
           radius={80}
-          color={getColor(gym.team_id)}
-          weight={0.5}
+          pathOptions={rangePathOptions}
         />
       )}
       {!!customRange && (
         <Circle
           center={[gym.lat, gym.lon]}
           radius={customRange}
-          color={getColor(gym.team_id)}
-          weight={0.5}
+          pathOptions={rangePathOptions}
         />
       )}
     </Marker>
