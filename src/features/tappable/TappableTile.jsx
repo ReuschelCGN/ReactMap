@@ -4,7 +4,6 @@ import * as React from 'react'
 import { Marker, Popup, Circle } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 
-import { useMemory } from '@store/useMemory'
 import { useMemory, basicEqualFn } from '@store/useMemory'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
