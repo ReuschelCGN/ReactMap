@@ -213,7 +213,7 @@ const ExtraInfo = ({ last_seen, updated, lat, lon }) => {
   return (
     <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
       <Grid container alignItems="center" justifyContent="center">
-        <TimeStamp time={updated}>last_seen</TimeStamp>
+        <TimeStamp time={updated}>last_updated</TimeStamp>
         {enableTappablePopupCoords && (
           <Grid xs={12} textAlign="center">
             <Coords lat={lat} lon={lon} />
