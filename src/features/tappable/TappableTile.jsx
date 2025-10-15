@@ -1,11 +1,11 @@
 /* eslint-disable react/destructuring-assignment */
 // @ts-check
 import * as React from 'react'
-import { Marker, Popup } from 'react-leaflet'
+import { Marker, Popup, Circle } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 
 import { useMemory } from '@store/useMemory'
-import { useStorage } from '@store/useStorage'
+import { useMemory, basicEqualFn } from '@store/useMemory'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { useOpacity } from '@hooks/useOpacity'
@@ -19,9 +19,27 @@ import { TappablePopup } from './TappablePopup'
 const BaseTappableTile = (tappable) => {
   const Icons = useMemory((s) => s.Icons)
   const itemFilters = useStorage((s) => s.filters?.tappables?.filter || {})
-  const showTimer = useStorage(
-    (s) => !!s.userSettings.tappables?.tappableTimers,
-  )
+  const [timerForced, interactionRangeZoom] = useMemory((s) => {
+    const {
+      timerList,
+      config: { general = {} },
+    } = s
+    const zoomLimit = Number.isFinite(general.interactionRangeZoom)
+      ? general.interactionRangeZoom
+      : 15
+    return [
+      tappable.id == null ? false : timerList.includes(tappable.id),
+      zoomLimit,
+    ]
+  }, basicEqualFn)
+  const [showTimerSetting, showInteractionRange] = useStorage((s) => {
+    const { userSettings, zoom } = s
+    return [
+      !!userSettings.tappables?.tappableTimers,
+      !!userSettings.tappables?.interactionRanges &&
+        zoom >= interactionRangeZoom,
+    ]
+  }, basicEqualFn)
 
   const [markerRef, setMarkerRef] = React.useState(null)
   useForcePopup(tappable.id, markerRef)
@@ -136,6 +154,13 @@ const BaseTappableTile = (tappable) => {
       </Popup>
       {showTimer && !!timers.length && (
         <TooltipWrapper offset={[0, 4]} timers={timers} />
+      )}
+      {showInteractionRange && (
+        <Circle
+          center={[tappable.lat, tappable.lon]}
+          radius={40}
+          pathOptions={{ color: '#0DA8E7', weight: 1 }}
+        />
       )}
     </Marker>
   )
