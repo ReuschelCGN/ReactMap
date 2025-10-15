@@ -156,7 +156,7 @@ const BaseTappableTile = (tappable) => {
         />
       </Popup>
       {(showTimerSetting || timerForced) && !!timers.length && (
-        <TooltipWrapper offset={[0, 4]} timers={timers} />
+        <TooltipWrapper offset={[0, 18]} timers={timers} />
       )}
       {showInteractionRange && (
         <Circle
