@@ -5,6 +5,7 @@ import { Marker, Popup, Circle } from 'react-leaflet'
 import { divIcon } from 'leaflet'
 
 import { useMemory, basicEqualFn } from '@store/useMemory'
+import { useStorage } from '@store/useStorage'
 import { useForcePopup } from '@hooks/useForcePopup'
 import { useMarkerTimer } from '@hooks/useMarkerTimer'
 import { useOpacity } from '@hooks/useOpacity'
