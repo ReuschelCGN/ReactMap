@@ -155,7 +155,7 @@ const BaseTappableTile = (tappable) => {
           iconSize={size}
         />
       </Popup>
-      {showTimer && !!timers.length && (
+      {(showTimerSetting || timerForced) && !!timers.length && (
         <TooltipWrapper offset={[0, 4]} timers={timers} />
       )}
       {showInteractionRange && (
