@@ -188,13 +188,6 @@ function clientOptions(perms) {
         perm: ['tappables'],
         category: 'markers',
       },
-      customRange: {
-        type: 'number',
-        perm: ['tappables'],
-        min: 0,
-        max: 5000,
-        category: 'markers',
-      },
       tappablesOpacity: {
         type: 'bool',
         perm: ['tappables'],
