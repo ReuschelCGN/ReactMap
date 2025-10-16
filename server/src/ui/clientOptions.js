@@ -192,7 +192,7 @@ function clientOptions(perms) {
         type: 'bool',
         perm: ['tappables'],
         category: 'markers',
-      }, 
+      },
       tappablesOpacity: {
         type: 'bool',
         perm: ['tappables'],
