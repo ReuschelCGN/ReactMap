@@ -260,7 +260,19 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
           </Grid>
         )}
         {pokemon.seen_type === 'nearby_cell' && (
-          <Typography>{t('pokemon_cell')}</Typography>
+          <Grid xs={12} textAlign="center">
+            <Typography
+              component="div"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexWrap: 'wrap',
+              }}
+            >
+              {t('pokemon_cell')}
+            </Typography>
+          </Grid>
         )}
         {!!pokemon.expire_timestamp && (
           <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
