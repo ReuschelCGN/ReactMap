@@ -905,9 +905,9 @@
         "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_INTERACTION_RANGES",
         "__format": "boolean"
       },
-      "customRange": {
-        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_CUSTOM_RANGE",
-        "__format": "number"
+      "spacialRendRange": {
+        "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_SPACIAL_REND_RANGE",
+        "__format": "boolean"
       },
       "tappablesOpacity": {
         "__name": "CLIENT_SIDE_OPTIONS_TAPPABLES_TAPPABLES_OPACITY",

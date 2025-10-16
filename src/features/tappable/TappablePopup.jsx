@@ -1,5 +1,6 @@
 // @ts-check
 import * as React from 'react'
+import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
 import Typography from '@mui/material/Typography'
 import Divider from '@mui/material/Divider'
@@ -8,8 +9,10 @@ import { useTranslation } from 'react-i18next'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
+import Menu from '@mui/material/Menu'
+import MenuItem from '@mui/material/MenuItem'
 
-import { useStorage } from '@store/useStorage'
+import { useStorage, setDeepStore } from '@store/useStorage'
 import { useMemory } from '@store/useMemory'
 import { Navigation } from '@components/popups/Navigation'
 import { Coords } from '@components/popups/Coords'
@@ -27,6 +30,10 @@ import { getTimeUntil } from '@utils/getTimeUntil'
  */
 export function TappablePopup({ tappable, rewardIcon, iconSize }) {
   const { t, i18n } = useTranslation()
+  const filterKey = tappable.item_id ? `q${tappable.item_id}` : ''
+  const filterEnabled = useStorage((s) =>
+    filterKey ? s.filters?.tappables?.filter?.[filterKey]?.enabled : undefined,
+  )
   const masterfile = useMemory((s) => s.masterfile)
 
   const count = tappable.count ?? 1
@@ -54,29 +61,104 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
   }, [tappable.type, t, i18n])
 
   const hasExpireTime = !!tappable.expire_timestamp
+  const isLure = React.useMemo(
+    () => Boolean(tappable.fort_id),
+    [tappable.fort_id],
+  )
+
+  const [menuAnchorEl, setMenuAnchorEl] = React.useState(null)
+
+  const handleMenuOpen = React.useCallback((event) => {
+    setMenuAnchorEl(event.currentTarget)
+  }, [])
+
+  const handleMenuClose = React.useCallback(() => {
+    setMenuAnchorEl(null)
+  }, [])
+
+  const handleHide = React.useCallback(() => {
+    setMenuAnchorEl(null)
+    if (tappable.id === undefined || tappable.id === null) return
+    useMemory.setState((prev) => ({
+      hideList: new Set(prev.hideList).add(tappable.id),
+    }))
+  }, [tappable.id])
+
+  const handleExclude = React.useCallback(() => {
+    setMenuAnchorEl(null)
+    if (!filterKey) return
+    setDeepStore(`filters.tappables.filter.${filterKey}.enabled`, false)
+  }, [filterKey])
+
+  const handleTimer = React.useCallback(() => {
+    setMenuAnchorEl(null)
+    if (tappable.id === undefined || tappable.id === null) return
+    useMemory.setState((prev) => {
+      if (prev.timerList.includes(tappable.id)) {
+        return {
+          timerList: prev.timerList.filter((entry) => entry !== tappable.id),
+        }
+      }
+      return { timerList: [...prev.timerList, tappable.id] }
+    })
+  }, [tappable.id])
+
+  const menuOptions = React.useMemo(() => {
+    const options = [
+      { key: 'timer', label: 'timer', action: handleTimer },
+      { key: 'hide', label: 'hide', action: handleHide },
+    ]
+    if (filterKey && filterEnabled) {
+      options.push({ key: 'exclude', label: 'exclude', action: handleExclude })
+    }
+    return options
+  }, [handleTimer, handleHide, handleExclude, filterKey, filterEnabled])
 
   return (
     <Grid
       container
       spacing={1}
-      width={220}
+      width={180}
       justifyContent="center"
       alignItems="center"
       textAlign="center"
     >
-      {rewardIcon && (
-        <Grid xs={12}>
-          <img
-            src={rewardIcon}
-            alt={itemName}
-            style={{
-              width: iconSize * 1.4,
-              height: iconSize * 1.4,
-              objectFit: 'contain',
-            }}
-          />
+      <Grid
+        xs={12}
+        container
+        alignItems="center"
+        justifyContent="center"
+        spacing={1}
+      >
+        {rewardIcon && (
+          <Grid xs={10} display="flex" justifyContent="center">
+            <img
+              src={rewardIcon}
+              alt={itemName}
+              style={{
+                width: iconSize * 1.4,
+                height: iconSize * 1.4,
+                objectFit: 'contain',
+              }}
+            />
+          </Grid>
+        )}
+        <Grid
+          xs={2}
+          display="flex"
+          justifyContent="flex-end"
+          alignItems="center"
+        >
+          <IconButton
+            aria-haspopup="true"
+            onClick={handleMenuOpen}
+            size="large"
+          >
+            <MoreVert />
+          </IconButton>
         </Grid>
-      )}
+      </Grid>
+
       <Grid xs={12}>
         {count <= 1 && <Typography variant="h6">{itemName}</Typography>}
         {count > 1 && (
@@ -90,9 +172,43 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
           </Typography>
         )}
       </Grid>
+      <Menu
+        anchorEl={menuAnchorEl}
+        keepMounted
+        open={!!menuAnchorEl}
+        onClose={handleMenuClose}
+        PaperProps={{
+          style: {
+            maxHeight: 216,
+            minWidth: '20ch',
+          },
+        }}
+      >
+        {menuOptions.map((option) => (
+          <MenuItem key={option.key} onClick={option.action}>
+            {t(option.label)}
+          </MenuItem>
+        ))}
+      </Menu>
       {(tappable.expire_timestamp || tappable.updated) && (
         <Grid xs={12}>
           <Divider sx={{ my: 0.5 }} />
+        </Grid>
+      )}
+      {isLure && (
+        <Grid xs={12} textAlign="center">
+          <Typography
+            variant="caption"
+            component="div"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 0.75,
+            }}
+          >
+            {t('seen_lure_wild')}
+          </Typography>
         </Grid>
       )}
       {hasExpireTime && (
@@ -213,7 +329,7 @@ const ExtraInfo = ({ last_seen, updated, lat, lon }) => {
   return (
     <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
       <Grid container alignItems="center" justifyContent="center">
-        <TimeStamp time={updated}>last_seen</TimeStamp>
+        <TimeStamp time={updated}>last_updated</TimeStamp>
         {enableTappablePopupCoords && (
           <Grid xs={12} textAlign="center">
             <Coords lat={lat} lon={lon} />

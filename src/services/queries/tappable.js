@@ -20,7 +20,23 @@ export const GET_ALL_TAPPABLES = gql`
       lat
       lon
       type
+      fort_id
       item_id
+      count
+      expire_timestamp
+      expire_timestamp_verified
+      updated
+    }
+  }
+`
+
+export const GET_TAPPABLE_BY_ID = gql`
+  query GetTappableById($id: ID!) {
+    tappableById(id: $id) {
+      id
+      type
+      item_id
+      fort_id
       count
       expire_timestamp
       expire_timestamp_verified

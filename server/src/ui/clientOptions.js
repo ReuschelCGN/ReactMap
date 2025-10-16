@@ -188,11 +188,9 @@ function clientOptions(perms) {
         perm: ['tappables'],
         category: 'markers',
       },
-      customRange: {
-        type: 'number',
+      spacialRendRange: {
+        type: 'bool',
         perm: ['tappables'],
-        min: 0,
-        max: 5000,
         category: 'markers',
       },
       tappablesOpacity: {

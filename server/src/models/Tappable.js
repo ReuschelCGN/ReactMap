@@ -35,6 +35,7 @@ class Tappable extends Model {
       'lat',
       'lon',
       'type',
+      'fort_id',
       'item_id',
       'count',
       'expire_timestamp',
@@ -69,13 +70,11 @@ class Tappable extends Model {
       switch (key.charAt(0)) {
         case 'q': {
           const itemId = Number.parseInt(key.slice(1), 10)
-          if (!Number.isNaN(itemId)) {
+          if (!Number.isNaN(itemId) && itemId !== 0) {
             itemIds.push(itemId)
           }
           break
         }
-        case 's':
-          break
         default:
           break
       }
@@ -89,6 +88,47 @@ class Tappable extends Model {
 
     const limit = queryLimits.tappables || queryLimits.pokestops || 5000
     const results = await query.limit(limit)
+
+    return results.map((row) => ({
+      ...row,
+      expire_timestamp_verified: !!row.expire_timestamp_verified,
+    }))
+  }
+
+  /**
+   * Retrieve tappable metadata for a specific tappable id.
+   * @param {import('@rm/types').Permissions} perms
+   * @param {string | number} tappableId
+   * @param {import('@rm/types').DbContext} ctx
+   * @returns {Promise<import('@rm/types').Tappable[]>}
+   */
+  static async getById(perms, tappableId, ctx) {
+    if (!perms?.tappables || !tappableId) {
+      return []
+    }
+
+    const query = this.query().select([
+      'id',
+      'lat',
+      'lon',
+      'type',
+      'fort_id',
+      'item_id',
+      'count',
+      'expire_timestamp',
+      'expire_timestamp_verified',
+      'updated',
+    ])
+
+    if (
+      !getAreaSql(query, perms.areaRestrictions, [], ctx?.isMad, 'tappable')
+    ) {
+      return []
+    }
+
+    query.where('id', tappableId).orderBy('updated', 'desc')
+
+    const results = await query.limit(1)
 
     return results.map((row) => ({
       ...row,
