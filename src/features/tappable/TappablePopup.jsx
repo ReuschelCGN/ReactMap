@@ -61,6 +61,10 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
   }, [tappable.type, t, i18n])
 
   const hasExpireTime = !!tappable.expire_timestamp
+  const isLure = React.useMemo(
+    () => Boolean(tappable.fort_id),
+    [tappable.fort_id],
+  )
 
   const [menuAnchorEl, setMenuAnchorEl] = React.useState(null)
 
@@ -190,6 +194,22 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
       {(tappable.expire_timestamp || tappable.updated) && (
         <Grid xs={12}>
           <Divider sx={{ my: 0.5 }} />
+        </Grid>
+      )}
+      {isLure && (
+        <Grid xs={12} textAlign="center">
+          <Typography
+            variant="caption"
+            component="div"
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 0.75,
+            }}
+          >
+            {t('seen_lure_wild')}
+          </Typography>
         </Grid>
       )}
       {hasExpireTime && (
