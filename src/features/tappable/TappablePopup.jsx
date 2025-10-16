@@ -123,7 +123,6 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
       alignItems="center"
       textAlign="center"
     >
-
       <Grid
         xs={12}
         container
