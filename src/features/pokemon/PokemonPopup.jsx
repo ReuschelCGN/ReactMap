@@ -107,7 +107,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const [shinyStats, setShinyStats] = React.useState(null)
   const pendingShinyKey = React.useRef(null)
   const [loadShinyStats] = useLazyQuery(GET_POKEMON_SHINY_STATS)
-    const canQueryTappable = !isTutorial && !!perms?.tappables
+  const canQueryTappable = !isTutorial && !!perms?.tappables
   const showTappableSource = React.useMemo(
     () => canQueryTappable && TAPPABLE_SEEN_TYPES.has(pokemon.seen_type),
     [canQueryTappable, pokemon.seen_type],
