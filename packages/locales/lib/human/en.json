@@ -376,6 +376,7 @@
   "with_ar": "With AR",
   "both": "Both",
   "without_ar": "Without AR",
+  "with_background": "with Background",
   "shiny_probability": "Shiny rate: <0/>",
   "shiny_sample": "{{percentage}}%: {{shiny}} shiny/{{checks}} checks since {{date}}",
   "exclude_quest_multi": "Exclude {{reward}}",
