@@ -171,7 +171,7 @@ export function PokestopPopup({
                         </Grid>
                         <Grid xs={4} display="flex" justifyContent="center">
                           <img
-                            src={Icons.getBackgrounds(quest.quest_location_card)}
+                            src={Icons.getBackgrounds(quest.quest_background)}
                             style={{ maxWidth: 42, maxHeight: 42 }}
                             onError={(e) => {
                               // @ts-ignore
