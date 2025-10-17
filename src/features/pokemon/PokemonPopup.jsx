@@ -233,7 +233,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
           userSettings={userSettings}
           isTutorial={isTutorial}
         />
-        {(!!pokemon.background && pokemon.seen_type === 'encounter') ? (
+        {!!pokemon.background && pokemon.seen_type === 'encounter' ? (
           <Grid
             xs={12}
             container
@@ -264,7 +264,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
                   e.target.onerror = null
                   // @ts-ignore
                   e.target.src =
-                  'https://raw.githubusercontent.com//ReuschelCGN/wwm-uicons/main/background/0.png'
+                    'https://raw.githubusercontent.com//ReuschelCGN/wwm-uicons/main/background/0.png'
                 }}
               />
             </Grid>
