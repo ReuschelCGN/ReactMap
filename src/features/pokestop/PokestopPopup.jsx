@@ -147,6 +147,43 @@ export function PokestopPopup({
                         </>
                       )}
                     </Grid>
+                    {(!!quest.quest.background && !!quest.quest_pokemon_id) ? (
+                      <Grid
+                        xs={12}
+                        container
+                        alignItems="center"
+                        justifyContent="center"
+                        spacing={1}
+                      >
+                        <Grid xs={8} textAlign="center">
+                          <Typography
+                            variant="caption"
+                            component="div"
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              flexWrap: 'wrap',
+                            }}
+                          >
+                            {t('with_background')}
+                          </Typography>
+                        </Grid>
+                        <Grid xs={4} display="flex" justifyContent="center">
+                          <img
+                            src={`https://raw.githubusercontent.com//ReuschelCGN/wwm-uicons/main/background/${quest.background}.png`}
+                            style={{ maxWidth: 42, maxHeight: 42 }}
+                            onError={(e) => {
+                              // @ts-ignore
+                              e.target.onerror = null
+                              // @ts-ignore
+                              e.target.src =
+                              'https://raw.githubusercontent.com//ReuschelCGN/wwm-uicons/main/background/0.png'
+                            }}
+                          />
+                        </Grid>
+                      </Grid>
+                    ) : null}
                   </React.Fragment>
                 ))}
               {hasLure && (
