@@ -147,7 +147,7 @@ export function PokestopPopup({
                         </>
                       )}
                     </Grid>
-                    {(!!quest.quest_background && !!quest.quest_pokemon_id) ? (
+                    {!!quest.quest_background && !!quest.quest_pokemon_id ? (
                       <Grid
                         xs={12}
                         container
@@ -178,7 +178,7 @@ export function PokestopPopup({
                               e.target.onerror = null
                               // @ts-ignore
                               e.target.src =
-                              'https://raw.githubusercontent.com//ReuschelCGN/wwm-uicons/main/background/0.png'
+                                'https://raw.githubusercontent.com//ReuschelCGN/wwm-uicons/main/background/0.png'
                             }}
                           />
                         </Grid>
