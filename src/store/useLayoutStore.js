@@ -23,6 +23,8 @@ import { useStorage } from './useStorage'
  *  resetFilters: boolean,
  *  feedback: boolean,
  *  drawer: boolean,
+ *  fence: boolean,
+ *  fenceAction: string,
  *  advancedFilter: {
  *    open: boolean,
  *    category: import('@rm/types').AdvCategories | '',
@@ -58,6 +60,8 @@ export const useLayoutStore = create(() => ({
   resetFilters: false,
   feedback: false,
   drawer: false,
+  fence: false,
+  fenceAction: '',
   slotSelection: '',
   advancedFilter: {
     open: false,

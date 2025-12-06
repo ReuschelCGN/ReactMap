@@ -185,6 +185,7 @@ const resolvers = {
           ([k, v]) => v && perms[k],
         ),
         webhooks: !!selectedWebhook,
+        fence: misc.enableFence,
       }
     },
     geocoder: (_, { search }, { perms, Event, req }) => {
@@ -371,14 +372,24 @@ const resolvers = {
     scanAreasMenu: (_, _args, { req, perms }) => {
       if (perms?.scanAreas) {
         const scanAreas = config.getAreas(req, 'scanAreasMenu')
-        if (perms.areaRestrictions.length) {
+        
+        // Dynamically recalculate areaRestrictions to include newly created fences
+        const { areaPerms } = require('../utils/areaPerms')
+        let currentAreaRestrictions = perms.areaRestrictions
+        
+        // Recalculate area permissions using stored roles
+        if (perms.roles && perms.roles.length > 0) {
+          currentAreaRestrictions = areaPerms(perms.roles)
+        }
+        
+        if (currentAreaRestrictions.length) {
           const filtered = scanAreas
             .map((parent) => ({
               ...parent,
-              children: perms.areaRestrictions.includes(parent.name)
+              children: currentAreaRestrictions.includes(parent.name)
                 ? parent.children
                 : parent.children.filter((child) =>
-                    perms.areaRestrictions.includes(child.properties.name),
+                    currentAreaRestrictions.includes(child.properties.name),
                   ),
             }))
             .filter((parent) => parent.children.length)

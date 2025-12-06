@@ -102,6 +102,7 @@ class TelegramClient extends AuthClient {
         areaRestrictions: areaPerms(groups),
         webhooks: webhookPerms(groups, 'telegramGroups', trialActive),
         scanner: scannerPerms(groups, 'telegramGroups', trialActive),
+        roles: groups, // Store roles for dynamic area permission recalculation
       },
     }
     if (newUserObj.perms.trial) {

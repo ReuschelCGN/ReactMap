@@ -22,6 +22,7 @@ import { SlotSelection } from '@components/filters/SlotSelection'
 import { HelpDialog } from '@components/dialogs/Help'
 import { NestSubmission } from '@components/dialogs/NestSubmission'
 import { Drawer, PkmnFilterHelp } from '@features/drawer'
+import { FencePanel, PublicFenceDrawer } from '@features/fence'
 import { useMemory } from '@store/useMemory'
 
 import { FloatingButtonsMemo } from './FloatingBtn'
@@ -55,6 +56,8 @@ export const Nav = React.memo(
             <HelpDialog />
             <PkmnFilterHelp />
             <NestSubmission />
+            <FencePanel />
+            <PublicFenceDrawer />
           </>
         )}
       </>

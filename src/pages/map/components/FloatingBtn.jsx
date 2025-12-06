@@ -16,6 +16,9 @@ import EuroSymbol from '@mui/icons-material/EuroSymbol'
 import Person from '@mui/icons-material/Person'
 import TrackChanges from '@mui/icons-material/TrackChanges'
 import BlurOn from '@mui/icons-material/BlurOn'
+import BorderAll from '@mui/icons-material/BorderAll'
+import CropSquare from '@mui/icons-material/CropSquare'
+import Edit from '@mui/icons-material/Edit'
 import Fab from '@mui/material/Fab'
 import { useQuery } from '@apollo/client'
 import { useTranslation } from 'react-i18next'
@@ -68,17 +71,24 @@ const DEFAULT = {
   scanZone: false,
   webhooks: false,
   search: false,
+  fence: true,
 }
 
 /** @param {Keys} name */
 const handleClick = (name) => () => {
+  console.log('Button clicked:', name)
   switch (name) {
     case 'scanZoneMode':
     case 'scanNextMode':
       return useScanStore.setState((prev) => ({
         [name]: prev[name] === 'setLocation' ? '' : 'setLocation',
       }))
+    case 'fence':
+      return useLayoutStore.setState((prev) => ({
+        fence: !prev.fence,
+      }))
     default:
+      console.log('Setting layout state:', name, true)
       return useLayoutStore.setState({ [name]: true })
   }
 }
@@ -104,6 +114,8 @@ export function FloatingButtons() {
   const scanNextMode = useScanStore((s) => s.scanNextMode)
   const scanZoneMode = useScanStore((s) => s.scanZoneMode)
 
+  const fenceMode = useLayoutStore((s) => s.fence)
+
   const ref = React.useRef(null)
 
   const fabButtons = /** @type {typeof DEFAULT} */ (data?.fabButtons || DEFAULT)
@@ -118,7 +130,7 @@ export function FloatingButtons() {
 
   const fabSize = isMobile ? 'small' : 'large'
   const iconSize = isMobile ? 'small' : 'medium'
-  const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode || !online
+  const disabled = !!webhookMode || !!scanNextMode || !!scanZoneMode || !!fenceMode || !online
 
   const handleNavBtn = React.useCallback(
     (/** @type {'zoomIn' | 'zoomOut' | 'locate'} */ name) => () => {
@@ -192,6 +204,7 @@ export function FloatingButtons() {
             />
           </Fab>
         )}
+        {/* Fence FAB removed from top-left controls */}
         {fabButtons.scanNext && (
           <Fab
             color={scanNextMode === 'setLocation' ? 'primary' : 'secondary'}

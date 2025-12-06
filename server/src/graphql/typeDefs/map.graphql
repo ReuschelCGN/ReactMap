@@ -193,6 +193,7 @@ type FabButtons {
   scanNext: Boolean
   webhooks: Boolean
   search: Boolean
+  fence: Boolean
 }
 
 type ScannerConfig {

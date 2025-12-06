@@ -2,6 +2,7 @@
 import '@assets/css/main.css'
 import 'leaflet.locatecontrol/dist/L.Control.Locate.css'
 import 'leaflet/dist/leaflet.css'
+import 'leaflet-draw/dist/leaflet.draw.css'
 
 import * as React from 'react'
 import { BrowserRouter } from 'react-router-dom'

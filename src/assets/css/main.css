@@ -643,3 +643,30 @@ input[type='time']::-webkit-calendar-picker-indicator {
 .expand-collapse-layout > :nth-child(3) {
   grid-column: 1 / span 2;
 }
+
+/* Leaflet Draw Edit Toolbar - Make Save/Cancel buttons more visible */
+.leaflet-draw-actions a {
+  background-color: #1976d2 !important;
+  color: white !important;
+  border: 2px solid #1565c0 !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+.leaflet-draw-actions a:hover {
+  background-color: #1565c0 !important;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3) !important;
+}
+
+/* Cancel button in red */
+.leaflet-draw-actions a:last-child {
+  background-color: #d32f2f !important;
+  border-color: #c62828 !important;
+}
+
+.leaflet-draw-actions a:last-child:hover {
+  background-color: #c62828 !important;
+}

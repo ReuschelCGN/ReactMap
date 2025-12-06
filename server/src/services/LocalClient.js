@@ -47,6 +47,7 @@ class LocalClient extends AuthClient {
         areaRestrictions: areaPerms(localPerms),
         webhooks: [],
         scanner: [],
+        roles: localPerms, // Store roles for dynamic area permission recalculation
       }),
       rmStrategy: this.rmStrategy,
     }

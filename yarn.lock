@@ -2366,7 +2366,7 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
-"@types/geojson@^7946.0.10", "@types/geojson@^7946.0.14":
+"@types/geojson@*", "@types/geojson@^7946.0.10", "@types/geojson@^7946.0.14":
   version "7946.0.16"
   resolved "https://registry.yarnpkg.com/@types/geojson/-/geojson-7946.0.16.tgz#8ebe53d69efada7044454e3305c19017d97ced2a"
   integrity sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==
@@ -2385,6 +2385,20 @@
   version "0.0.29"
   resolved "https://registry.yarnpkg.com/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==
+
+"@types/leaflet-draw@^1.0.13":
+  version "1.0.13"
+  resolved "https://registry.yarnpkg.com/@types/leaflet-draw/-/leaflet-draw-1.0.13.tgz#bccfee7d881c521e1b5863be7792d4579ed1240b"
+  integrity sha512-YU82kilOaU+wPNbqKCCDfHH3hqepN6XilrBwG/mSeZ/z4ewumaRCOah44s3FMxSu/Aa0SVa3PPJvhIZDUA09mw==
+  dependencies:
+    "@types/leaflet" "^1.9"
+
+"@types/leaflet@^1.9":
+  version "1.9.21"
+  resolved "https://registry.yarnpkg.com/@types/leaflet/-/leaflet-1.9.21.tgz#542e8f91250bc444f8a1416d472f5b518d83e979"
+  integrity sha512-TbAd9DaPGSnzp6QvtYngntMZgcRk+igFELwR2N99XZn7RXUdKgsXMR+28bUO0rPsWp8MIu/f47luLIQuSLYv/w==
+  dependencies:
+    "@types/geojson" "*"
 
 "@types/long@^4.0.0", "@types/long@^4.0.1":
   version "4.0.2"
@@ -6321,12 +6335,32 @@ leaflet-arrowheads@^1.4.0:
     leaflet "^1.7.1"
     leaflet-geometryutil "^0.10.0"
 
-leaflet-geometryutil@^0.10.0:
+leaflet-draw@^0.3.2:
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/leaflet-draw/-/leaflet-draw-0.3.2.tgz#717ee8fed4c2a9679c12162e1f922d2da503d109"
+  integrity sha512-0O8kEVtOvir+y4ltJAbuR7Q4jM0iGz6+Zw/T1yCdUUeReyrMn89bo/9XbfwP964Qe1szvdDDnosMKaSC8wBn9g==
+
+leaflet-draw@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/leaflet-draw/-/leaflet-draw-1.0.4.tgz#45be92f378ed253e7202fdeda1fcc71885198d46"
+  integrity sha512-rsQ6saQO5ST5Aj6XRFylr5zvarWgzWnrg46zQ1MEOEIHsppdC/8hnN8qMoFvACsPvTioAuysya/TVtog15tyAQ==
+
+leaflet-geometryutil@*, leaflet-geometryutil@^0.10.0, leaflet-geometryutil@^0.10.3:
   version "0.10.3"
   resolved "https://registry.yarnpkg.com/leaflet-geometryutil/-/leaflet-geometryutil-0.10.3.tgz#dda78546abc58723a46b47fd6ffb081f5b63cec4"
   integrity sha512-Qeas+KsnenE0Km/ydt8km3AqFe7kJhVwuLdbCYM2xe2epsxv5UFEaVJiagvP9fnxS8QvBNbm7DJlDA0tkKo9VA==
   dependencies:
     leaflet "^1.6.0"
+
+leaflet-snap@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/leaflet-snap/-/leaflet-snap-0.0.4.tgz#fddf938cb4eab04a1ec709f875916a487abfbf7d"
+  integrity sha512-p9JNYeDCwkpp7mas7KQUkdb16R0kPCJjnNr7v2h4Aeb3EPLt9ILAZxqAd60DdZo/1y+WEezzUC4UDRM0OgYRgA==
+  dependencies:
+    leaflet "^0.7.7"
+    leaflet-geometryutil "*"
+  optionalDependencies:
+    leaflet-draw "^0.3.2"
 
 leaflet.locatecontrol@0.81.0:
   version "0.81.0"
@@ -6337,6 +6371,11 @@ leaflet@1.9.4, leaflet@^1.6.0, leaflet@^1.7.1:
   version "1.9.4"
   resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-1.9.4.tgz#23fae724e282fa25745aff82ca4d394748db7d8d"
   integrity sha512-nxS1ynzJOmOlHp+iL3FyWqK89GtNL8U8rvlMOsQdTTssxZwCXh8N2NB3GDQOL+YR3XnWyZAxwQixURb+FA74PA==
+
+leaflet@^0.7.7:
+  version "0.7.7"
+  resolved "https://registry.yarnpkg.com/leaflet/-/leaflet-0.7.7.tgz#1e352ba54e63d076451fa363c900890cb2cf75ee"
+  integrity sha512-H1lR7J5VxhvQJQHlW2UywtxO63zilLrnwVsDvjKeyfntffj63Ml94gCk9YPYWBkiQgxisdiA8aJ30Zoou4VhEA==
 
 levn@^0.4.1:
   version "0.4.1"
