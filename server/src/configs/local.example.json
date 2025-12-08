@@ -1,0 +1,1169 @@
+{
+  "READ_ME": "https://github.com/WatWowMap/ReactMap/wiki/04.-Full-Config-Explanation",
+  "interface": "0.0.0.0",
+  "port": 7755,
+  "reloadConfigOnSave": true,
+  "api": {
+    "reactMapSecret": "Losdn012121223!!!!",
+    "maxSessions": 5,
+    "pvp": {
+      "reactMapHandlesPvp": false
+    },
+    "kojiOptions": {
+      "bearerToken": "Login007!"
+    }
+  },
+  "integrations": {
+    "dragonite": {
+      "baseUrl": "http://192.168.1.105:7272",
+      "instance": "And1",
+      "authHeaderName": "Authorization",
+      "authHeaderValue": "Basic YW5kMTpsb2dpbjAwNyE=",
+      "defaults": {
+        "enable_quests": true,
+        "pokemon_mode": {
+          "workers": 1,
+          "enable_scout": false,
+          "invasion": false
+        },
+        "quest_mode": {
+          "hours": [
+            1,
+            10
+          ]
+        }
+      },
+      "policy": {
+        "singleFencePerUser": true,
+        "namingPattern": "userid_name",
+        "deleteAndRecreateOnChange": true
+      }
+    }
+  },
+  "map": {
+    "customRoutes": {
+      "discordAuthUrl": "/auth/discord/callback",
+      "telegramAuthUrl": "/auth/telegram/callback",
+      "telegramBotName": "RemstalReactbot",
+      "localAuthUrl": "/auth/local/callback"
+    },
+    "general": {
+      "title": "ReactMap",
+      "headerTitle": "ReactMap",
+      "startLat": 51.16,
+      "startLon": 10.10,
+      "startZoom": 2,
+      "minZoom": 2,
+      "maxZoom": 18,
+      "geoJsonFileName": "http://192.168.1.105:8088/api/v1/geofence/feature-collection/reactmap"
+    },
+    "misc": {
+      "enableTutorial": false,
+      "enableUserProfile": false,
+      "forceTutorial": false,
+      "enableFence": true
+    }
+  },
+  "defaultFilters": {
+    "devices": {
+      "enabled": false
+    },
+    "gyms": {
+      "enabled": false,
+      "allGyms": false,
+      "levels": "all",
+      "exEligible": false,
+      "inBattle": false,
+      "raids": false,
+      "eggs": false,
+      "pokemon": true,
+      "gymBadges": false,
+      "baseGymSlotAmounts": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ]
+    },
+    "nests": {
+      "enabled": false,
+      "polygons": false,
+      "pokemon": false,
+      "allPokemon": true,
+      "onlyShowAvailable": true,
+      "avgFilter": [
+        0,
+        100
+      ],
+      "avgSliderStep": 1,
+      "active": "active"
+    },
+    "pokestops": {
+      "enabled": false,
+      "levels": "all",
+      "lures": false,
+      "quests": false,
+      "eventStops": false,
+      "showcasePokemon": true,
+      "questSet": "both",
+      "confirmed": false,
+      "excludeGrunts": false,
+      "excludeLeaders": false,
+      "items": true,
+      "megaEnergy": true,
+      "candy": true,
+      "xlCandy": true,
+      "pokemon": true,
+      "invasions": false,
+      "allInvasions": true,
+      "invasionPokemon": true,
+      "rewardTypes": false,
+      "baseMegaEnergyAmounts": [],
+      "stardust": {
+        "min": 100,
+        "max": 0,
+        "interval": 100,
+        "enabled": true
+      },
+      "xp": {
+        "min": 100,
+        "max": 0,
+        "interval": 100,
+        "enabled": true
+      }
+    },
+    "pokemon": {
+      "enabled": true,
+      "easyMode": true,
+      "onlyShowAvailable": true,
+      "legacyFilter": false,
+      "allPokemon": false,
+      "globalValues": {
+        "iv": [
+          100,
+          100
+        ],
+        "level": [
+          1,
+          55
+        ],
+        "atk_iv": [
+          0,
+          100
+        ],
+        "def_iv": [
+          0,
+          100
+        ],
+        "sta_iv": [
+          0,
+          100
+        ],
+        "pvp": [
+          1,
+          100
+        ],
+        "gender": 0,
+        "cp": [
+          10,
+          5000
+        ],
+        "xxs": false,
+        "xxl": false
+      }
+    },
+    "portals": {
+      "enabled": false
+    },
+    "routes": {
+      "enabled": false
+    },
+    "scanAreas": {
+      "enabled": false
+    },
+    "scanCells": {
+      "enabled": false
+    },
+    "spawnpoints": {
+      "enabled": false,
+      "tth": 0
+    },
+    "submissionCells": {
+      "enabled": false,
+      "rings": true,
+      "s17Cells": true,
+      "s14Cells": true,
+      "includeSponsored": true
+    },
+    "stations": {
+      "enabled": false,
+      "pokemon": false,
+      "battleTier": "all",
+      "battles": false,
+      "gmaxStationed": false
+    },
+    "s2cells": {
+      "enabled": false,
+      "cells": []
+    },
+    "weather": {
+      "enabled": true
+    }
+  },
+  "database": {
+    "schemas": [
+      {
+        "note": "Golbat Database",
+        "host": "192.168.1.105",
+        "port": 3306,
+        "username": "and1",
+        "password": "baikal89",
+        "database": "golbat",
+        "useFor": [
+          "gym",
+          "pokestop",
+          "scanCell",
+          "spawnpoint",
+          "weather",
+          "route",
+          "nest",
+          "station",
+          "tappable"
+        ]
+      },
+      {
+        "note": "This is only if you are using golbat and in memory, if you do not know what that is, remove this whole section.",
+        "type": "golbat",
+        "endpoint": "http://192.168.1.105:9001",
+        "secret": "Login007!",
+        "useFor": [
+          "pokemon",
+          "device"
+        ]
+      },
+      {
+        "note": "React Map Database, where the migrations are ran through this app",
+        "host": "192.168.1.105",
+        "port": 3306,
+        "username": "and1",
+        "password": "baikal89",
+        "database": "reactmapSelf",
+        "useFor": [
+          "user"
+        ]
+      },
+      {
+        "note": "Fletsch",
+        "host": "192.168.1.105",
+        "port": 3306,
+        "username": "and1",
+        "password": "baikal89",
+        "database": "fletsching",
+        "useFor": [
+          "nest"
+        ]
+      }
+    ]
+  },
+  "webhooks": [
+    {
+      "enabled": true,
+      "provider": "poracle",
+      "name": "My Poracle Bot",
+      "host": "http://192.168.1.105",
+      "port": 3031,
+      "poracleSecret": "vmad",
+      "addressFormat": "{{streetNumber}} {{streetName}}, \n {{city}} {{state}} {{zipcode}}",
+      "areasToSkip": [],
+      "discordRoles": [
+        "SpenderDiscord",
+        "proHeidenau",
+        "Rosenheimspender",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden"
+      ],
+      "telegramGroups": [
+        "-1001122858779",
+        "-1001197911619",
+        "-1001919613528",
+        "-1002091159092",
+        "-1002316529322",
+        "-1001355069208"
+      ]
+    }
+  ],
+  "authentication": {
+    "strategies": [
+      {
+        "enabled": true,
+        "type": "discord",
+        "name": "discord",
+        "logChannelId": "",
+        "presence": "Map Status: Online",
+        "presenceType": 3,
+        "botToken": "YOUR_DISCORD_BOT_TOKEN",
+        "clientId": "YOUR_DISCORD_CLIENT_ID",
+        "clientSecret": "YOUR_DISCORD_CLIENT_SECRET",
+        "allowedGuilds": [
+          "557594269607657472"
+        ],
+        "blockedGuilds": [],
+        "allowedUsers": []
+      },
+      {
+        "name": "telegram",
+        "type": "telegram",
+        "enabled": false,
+        "botToken": "YOUR_TELEGRAM_BOT_TOKEN",
+        "groups": [
+          "-1001355069208",
+          "-1001122858779",
+          "-1001197911619",
+          "-1001919613528",
+          "-1002091159092",
+          "-1001646693755",
+          "-1001361311830",
+          "-1002316529322"
+        ]
+      }
+    ],
+    "strictAreaRestrictions": false,
+    "areaRestrictions": [
+      {
+        "roles": [
+          "Wolfsburg"
+        ],
+        "areas": [
+          "Wolfsburg_Quest"
+        ]
+      },
+      {
+        "roles": [
+          "Gammertingen"
+        ],
+        "areas": [
+          "Gammertingen"
+        ]
+      },
+      {
+        "roles": [
+          "Kaki"
+        ],
+        "areas": [
+          "Kaki"
+        ]
+      },
+      {
+        "roles": [
+          "Osweil"
+        ],
+        "areas": [
+          "Oßweil"
+        ]
+      },
+      {
+        "roles": [
+          "Mutterstadt"
+        ],
+        "areas": [
+          "Mutterstadt"
+        ]
+      },
+      {
+        "roles": [
+          "Obertheres"
+        ],
+        "areas": [
+          "Obertheres"
+        ]
+      },
+      {
+        "roles": [
+          "Rosenheim"
+        ],
+        "areas": [
+          "Map Rosenheim"
+        ]
+      },
+      {
+        "roles": [
+          "Oberkirch"
+        ],
+        "areas": [
+          "Oberkirch",
+          "Oppenau",
+          "Lautenbach"
+        ]
+      },
+      {
+        "roles": [
+          "proHeidenau"
+        ],
+        "areas": [
+          "Heidenau-Map"
+        ]
+      },
+      {
+        "roles": [
+          "Dresden"
+        ],
+        "areas": [
+          "Neustadt",
+          "Pischen",
+          "Striesen",
+          "Vorstadt",
+          "Dresden",
+          "Löbtau",
+          "Südvorstadt"
+        ]
+      },
+      {
+        "roles": [
+          "Reutlingen"
+        ],
+        "areas": [
+          "Reutlingen-Map"
+        ]
+      },
+      {
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG"
+        ],
+        "areas": [
+          "Schwäbisch Gmünd",
+          "Magstadt",
+          "Deuten",
+          "Esslingen",
+          "Pfalz",
+          "Göppingen",
+          "Herrenberg",
+          "Ludwigshafen",
+          "Mannheim",
+          "Lampertheim",
+          "Vierheim",
+          "Edingen-Heddesheim",
+          "Nürnberg",
+          "Nürtingen",
+          "Plochingen",
+          "Rastatt-Map",
+          "Stade-Map",
+          "Tübingen",
+          "Remstal",
+          "Alfdorf",
+          "Dorsten-Map",
+          "Walheim",
+          "Wittenberg",
+          "Coswig"
+        ]
+      }
+    ],
+    "aliases": [
+      {
+        "role": "950428796325085314",
+        "name": "SpenderDiscord"
+      },
+      {
+        "role": "-1001355069208",
+        "name": "SupportTG"
+      },
+      {
+        "role": "-1002316529322",
+        "name": "Wolfsburg"
+      },
+      {
+        "role": "1002153604309852160",
+        "name": "Osweil"
+      },
+      {
+        "role": "989137898878152705",
+        "name": "Dresden"
+      },
+      {
+        "role": "1436487487471222804",
+        "name": "Obertheres"
+      },
+      {
+        "role": "1207605650906153020",
+        "name": "proHeidenau"
+      },
+      {
+        "role": "-1001122858779",
+        "name": "Oberkirch"
+      },
+      {
+        "role": "-1001197911619",
+        "name": "Reutlingen"
+      },
+      {
+        "role": "1111587241890951230",
+        "name": "Rosenheim"
+      },
+      {
+        "role": "-1001919613528",
+        "name": "Gammertingen"
+      },
+      {
+        "role": "-1001361311830",
+        "name": "Kaki"
+      },
+      {
+        "role": "-1002091159092",
+        "name": "Mutterstadt"
+      }
+    ],
+
+    "alwaysEnabledPerms": [ "map", "tappables", "pokemon", "iv", "pvp", "gyms", "raids", "pokestops", "eventStops", "quests", "lures", "portals", "submissionCells", "s2cells", "invasions", "nests", "nestSubmissions", "scanAreas", "weather", "spawnpoints", "scanCells", "devices", "donor", "gymBadges", "backups", "routes", "showcaseRankings", "stations", "dynamax", "fenceEditor", "publicFences"],
+    "perms": {
+      "map": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG",
+          "Wolfsburg",
+          "Osweil",
+          "Dresden",
+          "proHeidenau",
+          "Oberkirch",
+          "Reutlingen",
+          "Rosenheim",
+          "Gammertingen",
+          "Kaki",
+          "Mutterstadt",
+          "Obertheres"
+        ]
+      },
+      "tappables": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG",
+          "Wolfsburg",
+          "Osweil",
+          "Dresden",
+          "proHeidenau",
+          "Oberkirch",
+          "Reutlingen",
+          "Rosenheim",
+          "Gammertingen",
+          "Kaki",
+          "Mutterstadt",
+          "Obertheres"
+        ]
+      },
+      "pokemon": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG",
+          "Wolfsburg",
+          "Osweil",
+          "Dresden",
+          "proHeidenau",
+          "Oberkirch",
+          "Reutlingen",
+          "Rosenheim",
+          "Gammertingen",
+          "Kaki",
+          "Mutterstadt",
+          "Obertheres"
+        ]
+      },
+      "iv": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG",
+          "Wolfsburg",
+          "Osweil",
+          "Dresden",
+          "proHeidenau",
+          "Oberkirch",
+          "Reutlingen",
+          "Rosenheim",
+          "Gammertingen",
+          "Kaki",
+          "Mutterstadt",
+          "Obertheres"
+        ]
+      },
+      "pvp": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG",
+          "Wolfsburg",
+          "Osweil",
+          "Dresden",
+          "proHeidenau",
+          "Oberkirch",
+          "Reutlingen",
+          "Rosenheim",
+          "Gammertingen",
+          "Kaki",
+          "Mutterstadt",
+          "Obertheres"
+        ]
+      },
+      "gyms": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG",
+          "Wolfsburg",
+          "Osweil",
+          "Dresden",
+          "proHeidenau",
+          "Oberkirch",
+          "Reutlingen",
+          "Rosenheim",
+          "Gammertingen",
+          "Kaki",
+          "Mutterstadt",
+          "Obertheres"
+        ]
+      },
+      "raids": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG",
+          "Wolfsburg",
+          "Osweil",
+          "Dresden",
+          "proHeidenau",
+          "Oberkirch",
+          "Reutlingen",
+          "Rosenheim",
+          "Gammertingen",
+          "Kaki",
+          "Mutterstadt",
+          "Obertheres"
+        ]
+      },
+      "pokestops": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG",
+          "Wolfsburg",
+          "Osweil",
+          "Dresden",
+          "proHeidenau",
+          "Oberkirch",
+          "Reutlingen",
+          "Rosenheim",
+          "Gammertingen",
+          "Kaki",
+          "Mutterstadt",
+          "Obertheres"
+        ]
+      },
+      "eventStops": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": [
+          "SpenderDiscord",
+          "SupportTG",
+          "Wolfsburg",
+          "Osweil",
+          "Dresden",
+          "proHeidenau",
+          "Oberkirch",
+          "Reutlingen",
+          "Rosenheim",
+          "Gammertingen",
+          "Kaki",
+          "Mutterstadt",
+          "Obertheres"
+        ]
+      },
+      "quests": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "lures": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "portals": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "submissionCells": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "s2cells": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "invasions": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "nests": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "nestSubmissions": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "scanAreas": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "weather": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": []
+    },
+    "spawnpoints": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "scanCells": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "devices": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": []
+    },
+    "donor": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": []
+    },
+    "gymBadges": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "backups": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "routes": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "showcaseRankings": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "stations": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "dynamax": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "fenceEditor": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    },
+    "publicFences": {
+      "enabled": true,
+      "trialPeriodEligible": false,
+      "roles": [
+        "SpenderDiscord",
+        "SupportTG",
+        "Wolfsburg",
+        "Osweil",
+        "Dresden",
+        "proHeidenau",
+        "Oberkirch",
+        "Reutlingen",
+        "Rosenheim",
+        "Gammertingen",
+        "Kaki",
+        "Mutterstadt",
+        "Obertheres"
+      ]
+    }
+  }
+},
+"icons": {
+  "Read_More_Here": "https://github.com/WatWowMap/ReactMap/wiki/06.-Icons-Configuration",
+  "customizable": [
+    "gym",
+    "raid",
+    "invasion",
+    "pokemon",
+    "pokestop",
+    "reward",
+    "team",
+    "station",
+    "type"
+  ],
+  "defaultIcons": {
+    "gym": "RCgnPS",
+    "raid": "RCgnPS",
+    "invasion": "RCgnPS",
+    "pokemon": "RCgnPS",
+    "pokestop": "RCgnPS",
+    "reward": "RCgnPS",
+    "station": "RCgnPH",
+    "type": "Standart"
+  },
+  "styles": [
+    {
+      "name": "Standart",
+      "path": "https://raw.githubusercontent.com/ReuschelCGN/wwm-uicons/refs/heads/mainmod/",
+      "modifiers": {
+        "gym": {
+          "0": 1,
+          "1": 1,
+          "2": 1,
+          "3": 3,
+          "4": 4,
+          "5": 4,
+          "6": 18,
+          "sizeMultiplier": 1.2
+        },
+        "event": {
+          "offsetX": 0.2,
+          "offsetY": 1.4,
+          "sizeMultiplier": 0.8
+        }
+      }
+    },
+    {
+      "name": "RCgnPS",
+      "path": "https://raw.githubusercontent.com/ReuschelCGN/PkmnShuffleMod/refs/heads/main/UICONS_Half_Shiny_Sparkles_128/",
+      "modifiers": {
+        "reward": {
+          "offsetX": 2.3,
+          "offsetY": 1.0
+        },
+        "invasion": {
+          "offsetX": 0.05,
+          "offsetY": 1.1,
+          "removeQuest": false
+        },
+        "pokestop": {
+          "sizeMultiplier": 1.6,
+          "manualPopup": -34
+        },
+        "event": {
+          "offsetX": 0.2,
+          "offsetY": 1.4,
+          "sizeMultiplier": 0.8
+        }
+      }
+    },
+    {
+      "name": "RCgnPH",
+      "path": "https://raw.githubusercontent.com/ReuschelCGN/PkmnHomeMod/refs/heads/main/UICONS_Half_Shiny_Sparkle_128/",
+      "modifiers": {
+        "reward": {
+          "offsetX": 2.4,
+          "offsetY": 1.0,
+          "sizeMultiplier": 0.9
+        },
+        "invasion": {
+          "offsetX": 0.05,
+          "offsetY": 1.1,
+          "removeQuest": false
+        },
+        "pokestop": {
+          "sizeMult ier": 0.8
+        }
+      }
+    }
+  ]
+},
+"manualAreas": [],
+"kojiDatabase": {
+  "host": "192.168.1.105",
+  "port": 3306,
+  "username": "and1",
+  "password": "baikal89",
+  "database": "koji",
+  "ssl": false
+}
+}

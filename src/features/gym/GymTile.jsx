@@ -12,6 +12,7 @@ import { useForcePopup } from '@hooks/useForcePopup'
 import { sendNotification } from '@services/desktopNotification'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { useRouteStore, resolveRoutePoiKey } from '@features/route'
 
 import { gymMarker } from './gymMarker'
 import { GymPopup } from './GymPopup'
@@ -38,6 +39,13 @@ const getColor = (team) => {
 const BaseGymTile = (gym) => {
   const [markerRef, setMarkerRef] = React.useState(null)
   const [stateChange, setStateChange] = React.useState(false)
+  const hasRoutes = useRouteStore(
+    React.useCallback(
+      (state) => !!resolveRoutePoiKey(state.poiIndex, gym.id, gym.lat, gym.lon),
+      [gym.id, gym.lat, gym.lon],
+    ),
+  )
+  const selectPoi = useRouteStore((s) => s.selectPoi)
 
   const [
     hasRaid,
@@ -118,18 +126,17 @@ const BaseGymTile = (gym) => {
   const [
     showTimer,
     showInteractionRange,
-    show300mCircles,
     customRange,
     showDiamond,
     showExBadge,
     showArBadge,
     showRaidLevel,
+    showRsvpsBadge,
   ] = useStorage((s) => {
     const { userSettings, filters, zoom } = s
     return [
       (userSettings.gyms.raidTimers || inTimerList) && hasRaid,
       !!userSettings.gyms.interactionRanges && zoom >= interactionRangeZoom,
-      !!userSettings.gyms['300mRange'] && zoom >= interactionRangeZoom,
       zoom >= interactionRangeZoom ? +userSettings.gyms.customRange || 0 : 0,
       !!gym.badge &&
         filters.gyms.gymBadges &&
@@ -137,6 +144,7 @@ const BaseGymTile = (gym) => {
       userSettings.gyms.showExBadge && gym.ex_raid_eligible,
       userSettings.gyms.showArBadge && gym.ar_scan_eligible,
       userSettings.gyms.raidLevelBadges && !!raidIconUrl,
+      userSettings.gyms.showRsvpsBadge && gym.rsvps?.length > 0,
     ]
   }, basicEqualFn)
 
@@ -146,6 +154,11 @@ const BaseGymTile = (gym) => {
     gym.raid_pokemon_id || hasHatched
       ? gym.raid_end_timestamp
       : gym.raid_battle_timestamp
+
+  const rangePathOptions = React.useMemo(
+    () => ({ color: getColor(gym.team_id), weight: 0.5 }),
+    [gym.team_id],
+  )
 
   useForcePopup(gym.id, markerRef)
   useMarkerTimer(timerToDisplay, markerRef, () => setStateChange(!stateChange))
@@ -174,6 +187,7 @@ const BaseGymTile = (gym) => {
         showExBadge,
         showArBadge,
         showRaidLevel,
+        showRsvpsBadge,
         opacity,
         gymIconUrl,
         gymIconSize,
@@ -181,6 +195,13 @@ const BaseGymTile = (gym) => {
         raidIconSize,
         ...gym,
       })}
+      eventHandlers={{
+        click: () => {
+          if (hasRoutes) {
+            selectPoi(gym.id, gym.lat, gym.lon)
+          }
+        },
+      }}
     >
       <Popup position={[gym.lat, gym.lon]}>
         <GymPopup
@@ -197,24 +218,14 @@ const BaseGymTile = (gym) => {
         <Circle
           center={[gym.lat, gym.lon]}
           radius={80}
-          color={getColor(gym.team_id)}
-          weight={0.5}
-        />
-      )}
-      {show300mCircles && (
-        <Circle
-          center={[gym.lat, gym.lon]}
-          radius={300}
-          color={getColor(gym.team_id)}
-          weight={0.5}
+          pathOptions={rangePathOptions}
         />
       )}
       {!!customRange && (
         <Circle
           center={[gym.lat, gym.lon]}
           radius={customRange}
-          color={getColor(gym.team_id)}
-          weight={0.5}
+          pathOptions={rangePathOptions}
         />
       )}
     </Marker>

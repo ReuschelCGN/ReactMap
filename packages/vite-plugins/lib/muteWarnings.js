@@ -36,7 +36,7 @@ const muteWarningsPlugin = (warningsToIgnore) => {
     }),
     closeBundle() {
       const diff = warningsToIgnore.filter((x) => !mutedMessages.has(x.join()))
-      if (diff.length > 0) {
+      if (diff.length > 1) {
         this.warn(
           'Some of your muted warnings never appeared during the build process:',
         )

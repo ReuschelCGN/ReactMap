@@ -24,7 +24,6 @@ function clientOptions(perms) {
         perm: ['gyms', 'raids'],
         category: 'markers',
       },
-      '300mRange': { type: 'bool', perm: ['raids'], category: 'markers' },
       customRange: {
         type: 'number',
         perm: ['raids', 'gyms'],
@@ -35,6 +34,7 @@ function clientOptions(perms) {
       showExBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
       showArBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
       raidLevelBadges: { type: 'bool', perm: ['raids'], category: 'markers' },
+      showRsvpsBadge: { type: 'bool', perm: ['raids'], category: 'markers' },
       gymBadgeDiamonds: {
         type: 'bool',
         perm: ['gymBadges'],
@@ -87,6 +87,7 @@ function clientOptions(perms) {
         category: 'markers',
       },
       lureRange: { type: 'bool', perm: ['lures'], category: 'markers' },
+      showcaseRange: { type: 'bool', perm: ['pokestops'], category: 'markers' },
       customRange: {
         type: 'number',
         perm: ['raids', 'gyms'],
@@ -140,6 +141,13 @@ function clientOptions(perms) {
         perm: ['stations', 'dynamax'],
         category: 'markers',
       },
+      customRange: {
+        type: 'number',
+        perm: ['stations', 'dynamax'],
+        min: 0,
+        max: 5000,
+        category: 'markers',
+      },
       stationsOpacity: {
         type: 'bool',
         perm: ['stations', 'dynamax'],
@@ -162,6 +170,51 @@ function clientOptions(perms) {
       },
       enableStationPopupCoords: map.misc.enableStationPopupCoordsSelector
         ? { type: 'bool', perm: ['stations', 'dynamax'], category: 'popups' }
+        : undefined,
+    },
+    tappables: {
+      clustering: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'markers',
+      },
+      tappableTimers: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'tooltips',
+      },
+      interactionRanges: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'markers',
+      },
+      spacialRendRange: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'markers',
+      },
+      tappablesOpacity: {
+        type: 'bool',
+        perm: ['tappables'],
+        category: 'dynamic_opacity',
+      },
+      opacityTenMinutes: {
+        type: 'number',
+        perm: ['tappables'],
+        category: 'dynamic_opacity',
+      },
+      opacityFiveMinutes: {
+        type: 'number',
+        perm: ['tappables'],
+        category: 'dynamic_opacity',
+      },
+      opacityOneMinute: {
+        type: 'number',
+        perm: ['tappables'],
+        category: 'dynamic_opacity',
+      },
+      enableTappablePopupCoords: map.misc.enableTappablePopupCoordsSelector
+        ? { type: 'bool', perm: ['tappables'], category: 'popups' }
         : undefined,
     },
     pokemon: {

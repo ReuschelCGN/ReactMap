@@ -24,6 +24,7 @@ class DbManager extends Logger {
     'ScanCell',
     'Spawnpoint',
     'Station',
+    'Tappable',
     'Weather',
   ])
 
@@ -150,7 +151,6 @@ class DbManager extends Logger {
       ])
     const hasStationedGmax =
       'total_stationed_gmax' in (await schema('station').columnInfo())
-    const [hasLayerColumn] = [false]
     const [hasMultiInvasions, multiInvasionMs, hasConfirmed] = await schema(
       'incident',
     )
@@ -170,6 +170,16 @@ class DbManager extends Logger {
     const [polygon] = await schema('nests')
       .columnInfo()
       .then((columns) => ['polygon' in columns])
+    const [hasShortcode] = await schema('route')
+      .columnInfo()
+      .then((columns) => ['shortcode' in columns])
+
+    let hasPokemonShinyStats
+    try {
+      hasPokemonShinyStats = await schema.schema.hasTable('pokemon_shiny_stats')
+    } catch (e) {
+      hasPokemonShinyStats = false
+    }
 
     return {
       pvpV2,
@@ -180,7 +190,6 @@ class DbManager extends Logger {
       hasRewardAmount,
       hasPowerUp,
       hasAltQuests,
-      hasLayerColumn,
       hasMultiInvasions,
       multiInvasionMs,
       hasConfirmed,
@@ -191,6 +200,8 @@ class DbManager extends Logger {
       hasShowcaseForm,
       hasShowcaseType,
       hasStationedGmax,
+      hasShortcode,
+      hasPokemonShinyStats,
     }
   }
 
@@ -208,7 +219,10 @@ class DbManager extends Logger {
             : {
                 mem: this.endpoints[i].endpoint,
                 secret: this.endpoints[i].secret,
+                // Add support for HTTP authentication
+                httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
+                hasPokemonShinyStats: false,
               }
 
           Object.entries(this.models).forEach(([category, sources]) => {

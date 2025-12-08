@@ -6,8 +6,13 @@ const { log, TAGS } = require('@rm/logger')
 function secretMiddleware(req, res, next) {
   const reactMapSecret = config.getSafe('api.reactMapSecret')
   const secret = req.headers['react-map-secret'] ?? req.headers['x-react-map']
-
+  
+  // Allow authenticated users to access without secret header
   if (!secret) {
+    if (req.user) {
+      log.info(TAGS.api, TAGS.url(req.originalUrl), 'Authenticated user bypass')
+      return next()
+    }
     log.error(TAGS.api, req.originalUrl, 'Forbidden: secret header is missing')
     return res
       .status(403)

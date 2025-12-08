@@ -26,9 +26,14 @@ export function usePokestopMarker({
   events,
   invasions,
   quests,
+  hasShowcase,
 }) {
-  const [, Icons] = useStorage(
-    (s) => [s.icons, useMemory.getState().Icons],
+  const [, Icons, masterfile] = useStorage(
+    (s) => [
+      s.icons,
+      useMemory.getState().Icons,
+      useMemory.getState().masterfile,
+    ],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
   )
 
@@ -74,16 +79,164 @@ export function usePokestopMarker({
   const showcaseIcons = []
   const showcaseSizes = []
 
-  if (hasInvasion) {
+  if (hasInvasion && !hasShowcase) {
     invasions.forEach((invasion) => {
       if (invasion.grunt_type) {
         invasionIcons.unshift({
           icon: Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
           opacity: getOpacity(invasion.incident_expire_timestamp),
         })
-        invasionSizes.unshift(
-          Icons.getSize('invasion', filters[`i${invasion.grunt_type}`]?.size),
+
+        // Get base invasion type icon size
+        const invasionTypeSize = Icons.getSize(
+          'invasion',
+          filters[`i${invasion.grunt_type}`]?.size,
         )
+
+        // Exclude leaders and Giovanni (grunt_type 41-44) from size calculation
+        if (invasion.grunt_type >= 41 && invasion.grunt_type <= 44) {
+          invasionSizes.unshift(invasionTypeSize)
+        } else {
+          // Calculate potential reward icon sizes
+          let maxRewardSize = 0
+
+          // Only consider invasion type size if the invasion type is enabled
+          if (filters[`i${invasion.grunt_type}`]?.enabled) {
+            maxRewardSize = Math.max(maxRewardSize, invasionTypeSize)
+          }
+
+          const gruntData = masterfile.invasions[invasion.grunt_type]
+          if (invasion.confirmed && invasion.encounters) {
+            // If invasion has confirmed lineup from DB, use those specific rewards
+            // Check the actual confirmed reward Pokemon
+            if (gruntData?.firstReward && invasion.slot_1_pokemon_id) {
+              const pokemonKey = `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form || 0}`
+              const pokemonKeySimple = `a${invasion.slot_1_pokemon_id}`
+
+              // Only consider this Pokemon's size if it's enabled in filters
+              if (
+                filters[pokemonKey]?.enabled ||
+                filters[pokemonKeySimple]?.enabled
+              ) {
+                const rewardSize =
+                  Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                  Icons.getSize('invasion', filters[pokemonKeySimple]?.size) ||
+                  Icons.getSize('invasion')
+                maxRewardSize = Math.max(maxRewardSize, rewardSize)
+              }
+            }
+
+            if (gruntData?.secondReward && invasion.slot_2_pokemon_id) {
+              const pokemonKey = `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form || 0}`
+              const pokemonKeySimple = `a${invasion.slot_2_pokemon_id}`
+
+              // Only consider this Pokemon's size if it's enabled in filters
+              if (
+                filters[pokemonKey]?.enabled ||
+                filters[pokemonKeySimple]?.enabled
+              ) {
+                const rewardSize =
+                  Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                  Icons.getSize('invasion', filters[pokemonKeySimple]?.size) ||
+                  Icons.getSize('invasion')
+                maxRewardSize = Math.max(maxRewardSize, rewardSize)
+              }
+            }
+
+            if (gruntData?.thirdReward && invasion.slot_3_pokemon_id) {
+              const pokemonKey = `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form || 0}`
+              const pokemonKeySimple = `a${invasion.slot_3_pokemon_id}`
+
+              // Only consider this Pokemon's size if it's enabled in filters
+              if (
+                filters[pokemonKey]?.enabled ||
+                filters[pokemonKeySimple]?.enabled
+              ) {
+                const rewardSize =
+                  Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                  Icons.getSize('invasion', filters[pokemonKeySimple]?.size) ||
+                  Icons.getSize('invasion')
+                maxRewardSize = Math.max(maxRewardSize, rewardSize)
+              }
+            }
+          } else if (gruntData?.encounters) {
+            // If no confirmed lineup, use all potential rewards from masterfile
+            // Check first encounter rewards if firstReward is true
+            if (gruntData.firstReward && gruntData.encounters.first) {
+              gruntData.encounters.first.forEach((encounter) => {
+                const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                const pokemonKeySimple = `a${encounter.id}`
+
+                // Only consider this Pokemon's size if it's enabled in filters
+                if (
+                  filters[pokemonKey]?.enabled ||
+                  filters[pokemonKeySimple]?.enabled
+                ) {
+                  const rewardSize =
+                    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                    Icons.getSize(
+                      'invasion',
+                      filters[pokemonKeySimple]?.size,
+                    ) ||
+                    Icons.getSize('invasion')
+                  maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                }
+              })
+            }
+
+            // Check second encounter rewards if secondReward is true
+            if (gruntData.secondReward && gruntData.encounters.second) {
+              gruntData.encounters.second.forEach((encounter) => {
+                const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                const pokemonKeySimple = `a${encounter.id}`
+
+                // Only consider this Pokemon's size if it's enabled in filters
+                if (
+                  filters[pokemonKey]?.enabled ||
+                  filters[pokemonKeySimple]?.enabled
+                ) {
+                  const rewardSize =
+                    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                    Icons.getSize(
+                      'invasion',
+                      filters[pokemonKeySimple]?.size,
+                    ) ||
+                    Icons.getSize('invasion')
+                  maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                }
+              })
+            }
+
+            // Check third encounter rewards if thirdReward is true
+            if (gruntData.thirdReward && gruntData.encounters.third) {
+              gruntData.encounters.third.forEach((encounter) => {
+                const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                const pokemonKeySimple = `a${encounter.id}`
+
+                // Only consider this Pokemon's size if it's enabled in filters
+                if (
+                  filters[pokemonKey]?.enabled ||
+                  filters[pokemonKeySimple]?.enabled
+                ) {
+                  const rewardSize =
+                    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                    Icons.getSize(
+                      'invasion',
+                      filters[pokemonKeySimple]?.size,
+                    ) ||
+                    Icons.getSize('invasion')
+                  maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                }
+              })
+            }
+          }
+
+          // Use the maximum size found, or default invasion size if none are enabled
+          const finalInvasionSize =
+            maxRewardSize > 0 ? maxRewardSize : invasionTypeSize
+          invasionSizes.unshift(finalInvasionSize)
+        }
+
         popupYOffset += invasionMod.offsetY - 1
         popupX += invasionMod.popupX
         popupY += invasionMod.popupY
@@ -110,6 +263,7 @@ export function usePokestopMarker({
         quest_gender_id,
         quest_costume_id,
         quest_shiny,
+        quest_bread_mode = 0,
         key,
       } = quest
       switch (quest_reward_type) {
@@ -155,6 +309,7 @@ export function usePokestopMarker({
               quest_costume_id,
               0,
               !!quest_shiny,
+              quest_bread_mode,
             ),
           })
           break
@@ -190,10 +345,13 @@ export function usePokestopMarker({
   if (hasEvent && !hasInvasion && !hasQuest) {
     events.forEach((event) => {
       if (event.display_type === 8) {
-        showcaseIcons.unshift({
-          url: Icons.getPokemon(352),
-        })
-        showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
+        // Only show Kecleon if there's no active showcase blocking it
+        if (!hasShowcase) {
+          showcaseIcons.unshift({
+            url: Icons.getPokemon(352),
+          })
+          showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
+        }
       } else if (event.display_type === 9) {
         if (event.showcase_pokemon_id) {
           showcaseIcons.unshift({
@@ -351,13 +509,13 @@ export function usePokestopMarker({
                   src="${icon.url}"
                   alt="${icon.url}"
                   style="
-                    width: ${showcaseSizes[i]}px;
-                    height: ${showcaseSizes[i]}px;
+                    width: ${0.8 * showcaseSizes[i]}px;
+                    height: ${0.8 * showcaseSizes[i]}px;
                     bottom: ${
                       baseSize * 0.6 * eventMod.offsetY + showcaseSizes[i] * i
                     }px;
-                    left: ${eventMod.offsetX * 50}%;
-                    transform: translateX(-50%);
+                    left: ${eventMod.offsetX * 10}%;
+                    transform: translateX(-70%);
                   "
                 />
                 ${

@@ -175,7 +175,8 @@ const BasePokemonTile = (pkmn) => {
         showGlow ||
         showWeather ||
         opacity < 1 ||
-        pkmn.seen_type === 'nearby_cell'
+        pkmn.seen_type === 'nearby_cell' ||
+        pkmn.seen_type === 'tappable_encounter'
           ? fancyPokemonMarker({
               pkmn,
               iconUrl,

@@ -4,6 +4,8 @@ dist-*
 
 # Config files
 server/src/configs/**/*
+!server/src/configs/local.json
+!server/src/configs/default.json
 config/local.json
 config/areas.json
 !server/src/configs/.gitkeep
@@ -89,3 +91,5 @@ server/.cache/*
 
 # Misc
 ts-check.js
+
+server/src/configs/local.json

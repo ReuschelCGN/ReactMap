@@ -121,29 +121,45 @@ const getGeojson = async (location) => {
 const loadScanPolygons = async (fileName, domain) => {
   try {
     const geojson = await getGeojson(fileName)
+
+    /** @type {import('@rm/types').RMFeature[]} */
+    const safeFeatures = Array.isArray(geojson.features)
+      ? geojson.features
+          .filter((f) =>
+            f && f.geometry && f.properties && typeof f.properties.name === 'string',
+          )
+          .map((f) => {
+            /** @type {string} */
+            const name = f.properties.name
+            /** @type {string | undefined} */
+            const parent = f.properties.parent
+            /** @type {[number,number]} */
+            const ctr = /** @type {[number,number]} */ (
+              center(f).geometry.coordinates.slice().reverse()
+            )
+            return {
+              ...f,
+              properties: {
+                ...f.properties,
+                key: parent ? `${parent}-${name}` : name,
+                center: ctr,
+              },
+            }
+          })
+      : []
+
     return {
       ...geojson,
       features: [
         ...getManualGeojson().features.filter(
           (f) => !f.properties.domain || f.properties.domain === domain,
         ),
-        ...geojson.features.map((f) => ({
-          ...f,
-          properties: {
-            ...f.properties,
-            key: f.properties.parent
-              ? `${f.properties.parent}-${f.properties.name}`
-              : f.properties.name,
-            center: /** @type {[number,number]} */ (
-              center(f).geometry.coordinates.slice().reverse()
-            ),
-          },
-        })),
-      ].sort((a, b) =>
-        a.properties.name
-          ? a.properties.name.localeCompare(b.properties.name)
-          : 0,
-      ),
+        ...safeFeatures,
+      ].sort((a, b) => {
+        const an = a && a.properties && a.properties.name ? a.properties.name : ''
+        const bn = b && b.properties && b.properties.name ? b.properties.name : ''
+        return an.localeCompare(bn)
+      }),
     }
   } catch (e) {
     log.warn(
@@ -269,14 +285,15 @@ const buildAreas = (scanAreas) => {
       const noHiddenFeatures = {
         ...featureCollection,
         features: featureCollection.features.filter(
-          (f) => !f.properties.hidden,
+          (f) => f && f.properties && !f.properties.hidden,
         ),
       }
       // Finds unique parents and determines if the parents have their own properties
       noHiddenFeatures.features.forEach((feature) => {
+        if (!feature || !feature.properties) return
         if (feature.properties.parent) {
           const found = featureCollection.features.find(
-            (area) => area.properties.name === feature.properties.parent,
+            (area) => area && area.properties && area.properties.name === feature.properties.parent,
           )
           parents[feature.properties.parent] = {
             name: feature.properties.parent,
@@ -290,6 +307,7 @@ const buildAreas = (scanAreas) => {
 
       // Finds the children of each parent
       noHiddenFeatures.features.forEach((feature) => {
+        if (!feature || !feature.properties) return
         if (feature.properties.parent) {
           parents[feature.properties.parent].children.push({
             properties: feature.properties,
@@ -305,19 +323,38 @@ const buildAreas = (scanAreas) => {
       ]
     }),
   )
-  const scanAreasObj = Object.fromEntries(
-    Object.values(scanAreas)
-      .flatMap((areas) => areas.features)
-      .map((feature) => [feature.properties.key, feature]),
-  )
+  /** @type {Record<string, import('@rm/types').RMFeature>} */
+  const scanAreasObj = (() => {
+    /** @type {Array<[string, import('@rm/types').RMFeature]>} */
+    const entries = []
+    const values = Object.values(scanAreas)
+    for (const fc of values) {
+      const feats = fc && Array.isArray(fc.features) ? fc.features : []
+      for (const feature of feats) {
+        if (
+          feature &&
+          feature.properties &&
+          typeof feature.properties.key === 'string' &&
+          feature.properties.key
+        ) {
+          entries.push([feature.properties.key, feature])
+        }
+      }
+    }
+    return Object.fromEntries(entries)
+  })()
 
   const myRTree = RTree()
   myRTree.geoJSON({
     type: 'FeatureCollection',
     features: Object.values(scanAreasObj).filter(
       (f) =>
+        f &&
+        f.properties &&
         !f.properties.manual &&
         f.properties.key &&
+        f.geometry &&
+        typeof f.geometry.type === 'string' &&
         f.geometry.type.includes('Polygon'),
     ),
   })

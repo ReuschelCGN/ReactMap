@@ -63,6 +63,12 @@ function drawer(req, perms) {
             arEligible: perms.pokestops || BLOCKED,
           }
         : BLOCKED,
+    tappables:
+      perms.tappables && state.db.models.Tappable
+        ? {
+            enabled: perms.tappables || BLOCKED,
+          }
+        : BLOCKED,
     stations:
       (perms.stations || perms.dynamax) && state.db.models.Station
         ? {
@@ -109,7 +115,7 @@ function drawer(req, perms) {
                   name: 'level',
                   label: '',
                   min: 1,
-                  max: 55,
+                  max: 50,
                   perm: 'iv',
                   color: 'secondary',
                 },

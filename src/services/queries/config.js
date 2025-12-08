@@ -29,6 +29,7 @@ export const FAB_BUTTONS = gql`
       scanZone
       webhooks
       search
+      fence
     }
   }
 `

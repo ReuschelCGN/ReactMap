@@ -4,8 +4,8 @@ import Grid2 from '@mui/material/Unstable_Grid2'
 import { VirtuosoGrid } from 'react-virtuoso'
 
 const STYLE = /** @type {React.CSSProperties} */ ({
-  height: '100%',
-  width: '100%',
+  height: '104%',
+  width: '96%',
 })
 
 export const SQUARE_ITEM = /** @type {import('@mui/material').SxProps} */ ({

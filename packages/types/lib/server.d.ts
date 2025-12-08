@@ -5,6 +5,7 @@ import type {
   RmModelKeys,
   ModelKeys,
   Station,
+  Tappable,
   Backup,
   Nest,
   NestSubmission,
@@ -34,7 +35,6 @@ export interface DbContext {
   hasRewardAmount: boolean
   hasPowerUp: boolean
   hasAltQuests: boolean
-  hasLayerColumn: boolean
   hasMultiInvasions: boolean
   multiInvasionMs: boolean
   hasConfirmed: boolean
@@ -45,6 +45,8 @@ export interface DbContext {
   hasShowcaseForm: boolean
   hasShowcaseType: boolean
   hasStationedGmax: boolean
+  hasPokemonShinyStats?: boolean
+  connection?: number
 }
 
 export interface ExpressUser extends User {
@@ -67,6 +69,7 @@ export interface Available {
   pokestops: ModelReturn<typeof Pokestop, 'getAvailable'>
   nests: ModelReturn<typeof Nest, 'getAvailable'>
   stations: ModelReturn<typeof Station, 'getAvailable'>
+  tappables: ModelReturn<typeof Tappable, 'getAvailable'>
 }
 
 export interface ApiEndpoint {
@@ -201,6 +204,7 @@ export type AdvCategories =
   | 'pokestops'
   | 'nests'
   | 'stations'
+  | 'tappables'
 
 export type UIObject = ReturnType<
   (typeof import('server/src/ui/drawer'))['drawer']

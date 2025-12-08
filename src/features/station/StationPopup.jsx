@@ -38,6 +38,7 @@ import {
 } from '@components/inputs/ExpandCollapse'
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationAttackBonus } from '@utils/getAttackBonus'
+import { getStationDamageBoost } from '@utils/getAttackBonus'
 import { CopyCoords } from '@components/popups/Coords'
 import { PokeMove } from '@components/popups/PokeMove'
 
@@ -57,8 +58,10 @@ export function StationPopup(station) {
         <StationRating {...station} />
       )}
       <StationMedia {...station} />
-      {station.battle_start < Date.now() / 1000 &&
-        station.battle_end > Date.now() / 1000 && (
+      {!!station.is_battle_available &&
+        station.battle_start < Date.now() / 1000 &&
+        station.battle_end > Date.now() / 1000 &&
+        !!station.total_stationed_pokemon && (
           <ExpandCollapse>
             <StationAttackBonus {...station} />
             <ExpandWithState
@@ -116,7 +119,9 @@ function StationRating({
   const battle_start_time =
     battle_start == start_time ? battle_start + 60 * 60 : battle_start
   const battle_end_time =
-    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
+    battle_end == end_time &&
+    battle_end > Date.now() / 1000 + 60 * 60 &&
+    !is_battle_available
       ? battle_end - 60 * 60 * 8
       : battle_end
   const epoch = isStarting ? battle_start_time : battle_end_time
@@ -271,8 +276,7 @@ function StationMedia({
   battle_pokemon_costume,
   battle_pokemon_gender,
   battle_pokemon_bread_mode,
-  battle_pokemon_move_1,
-  battle_pokemon_move_2,
+  is_battle_available,
   battle_end,
   start_time,
   end_time,
@@ -282,7 +286,9 @@ function StationMedia({
     s.Icons.getStation(start_time < Date.now() / 1000),
   )
   const battle_end_time =
-    battle_end == end_time && battle_end > Date.now() / 1000 + 60 * 60
+    battle_end == end_time &&
+    battle_end > Date.now() / 1000 + 60 * 60 &&
+    !is_battle_available
       ? battle_end - 60 * 60 * 8
       : battle_end
   const types = useMemory((s) => {
@@ -330,8 +336,6 @@ function StationMedia({
               <PokeType key={type} id={type} size="medium" />
             ))}
           </Stack>
-          {battle_pokemon_move_1 && <PokeMove id={battle_pokemon_move_1} />}
-          {battle_pokemon_move_2 && <PokeMove id={battle_pokemon_move_2} />}
         </Stack>
       </Box>
     </CardMedia>
@@ -359,11 +363,13 @@ function StationAttackBonus({ total_stationed_pokemon, total_stationed_gmax }) {
         max={4}
       />
       <Typography variant="caption">
-        {t('battle_bonus')} &nbsp;(
+        {t('battle_bonus')}: +{getStationDamageBoost(total_stationed_pokemon)}%
+        <br />
+        {t('placed_pokemon')}:{' '}
         {total_stationed_gmax === undefined || total_stationed_gmax === null
           ? ''
-          : `${total_stationed_gmax} / `}
-        {total_stationed_pokemon} / 40)
+          : `${total_stationed_gmax}/`}
+        {total_stationed_pokemon}/40
       </Typography>
     </Stack>
   )

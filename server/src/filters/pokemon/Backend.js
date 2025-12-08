@@ -311,7 +311,7 @@ class PkmnBackend {
           ? PkmnBackend.ensureSafe(cp, this.standard.cp[1])
           : undefined,
         level: this.filterKeys.has('level')
-          ? PkmnBackend.ensureSafe(level)
+          ? PkmnBackend.ensureSafe(level, 50)
           : undefined,
         gender: this.filterKeys.has('gender')
           ? { min: gender, max: gender }
@@ -429,15 +429,8 @@ class PkmnBackend {
       expire_timestamp_verified: !!pokemon.expire_timestamp_verified,
       updated: pokemon.updated,
       display_pokemon_id: pokemon.display_pokemon_id,
-      ditto_form: pokemon.ditto_form,
       seen_type: pokemon.seen_type,
       changed: !!pokemon.changed,
-    }
-    if (result.pokemon_id === 132 && !result.ditto_form) {
-      result.ditto_form = result.form
-      result.form =
-        state.event.masterfile.pokemon[result.display_pokemon_id]
-          ?.defaultFormId || 0
     }
     if (!result.seen_type) {
       if (result.spawn_id === null) {

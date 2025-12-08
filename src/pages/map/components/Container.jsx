@@ -8,6 +8,7 @@ import { useMapStore } from '@store/useMapStore'
 import { ScanOnDemand } from '@features/scanner'
 import { WebhookMarker, WebhookAreaSelection } from '@features/webhooks'
 import { ActiveWeather } from '@features/weather'
+import { FenceDrawer } from '@features/fence'
 import { timeCheck } from '@utils/timeCheck'
 
 import { Effects } from './Effects'
@@ -65,6 +66,7 @@ export function Container() {
       <ScanOnDemand mode="scanZone" />
       <WebhookMarker />
       <WebhookAreaSelection />
+      <FenceDrawer />
       <Nav />
       <ActiveWeather />
     </MapContainer>

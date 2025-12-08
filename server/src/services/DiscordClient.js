@@ -29,7 +29,7 @@ class DiscordClient extends AuthClient {
       intents: ['GuildMessages', 'GuildMembers', 'Guilds'],
     })
 
-    this.client.on('ready', (c) => {
+    this.client.on('clientReady', (c) => {
       this.log.info(`Logged in as ${c.user?.tag || 'Unknown??'}!`)
       c.user.setPresence({
         activities: [
@@ -207,6 +207,23 @@ class DiscordClient extends AuthClient {
     Object.entries(permSets).forEach(([key, value]) => {
       perms[key] = [...value]
     })
+    
+    // Store all user roles for dynamic area permission recalculation
+    const allUserRoles = []
+    try {
+      await Promise.all(
+        this.strategy.allowedGuilds.map(async (guildId) => {
+          if (guilds.includes(guildId)) {
+            const userRoles = await this.getUserRoles(guildId, user.id)
+            allUserRoles.push(...userRoles)
+          }
+        }),
+      )
+    } catch (e) {
+      this.log.warn('Failed to collect user roles', e)
+    }
+    perms.roles = [...new Set(allUserRoles)]
+    
     if (perms.trial) {
       this.log.info(
         user.username,
@@ -253,9 +270,10 @@ class DiscordClient extends AuthClient {
       throw new Error('NoCodeProvided')
     }
     try {
+      const preferredName = profile.global_name || profile.displayName || profile.username
       const discordUser = {
         id: profile.id,
-        username: profile.username,
+        username: preferredName || profile.username,
         avatar: profile.avatar || '',
         locale: profile.locale,
         perms: await this.getPerms(profile),
@@ -311,6 +329,7 @@ class DiscordClient extends AuthClient {
                   discordId: discordUser.id,
                   discordPerms: JSON.stringify(discordUser.perms),
                   webhookStrategy: 'discord',
+                  username: userExists.username || discordUser.username,
                 })
                 .where('id', req.user.id)
               /** @type {import('@rm/types').FullUser} */
@@ -350,6 +369,7 @@ class DiscordClient extends AuthClient {
               userExists = await state.db.models.User.query().insertAndFetch({
                 discordId: discordUser.id,
                 strategy: 'discord',
+                username: discordUser.username,
                 tutorial: !config.getSafe('map.misc.forceTutorial'),
                 selectedWebhook,
               })
@@ -359,6 +379,12 @@ class DiscordClient extends AuthClient {
                 .update({ strategy: 'discord' })
                 .where('id', userExists.id)
               userExists.strategy = 'discord'
+            }
+            if (discordUser.username && userExists.username !== discordUser.username) {
+              await state.db.models.User.query()
+                .update({ username: discordUser.username })
+                .where('id', userExists.id)
+              userExists.username = discordUser.username
             }
             if (!userExists.selectedWebhook && selectedWebhook) {
               await state.db.models.User.query()

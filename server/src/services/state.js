@@ -105,6 +105,7 @@ const state = {
         this.event.setAvailable('pokemon', 'Pokemon', this.db),
         this.event.setAvailable('nests', 'Nest', this.db),
         this.event.setAvailable('stations', 'Station', this.db),
+        this.event.setAvailable('tappables', 'Tappable', this.db),
       )
     }
     await Promise.all(promises)
@@ -127,7 +128,7 @@ const state = {
       promises.push(this.pvp.fetchLatestPokemon())
     }
     if (!reloadReport || reloadReport.invasions) {
-      promises.push(this.event.getInvasions())
+      promises.push(this.event.getInvasions(this.db))
     }
     if (!reloadReport || reloadReport.webhooks) {
       promises.push(this.event.getWebhooks())

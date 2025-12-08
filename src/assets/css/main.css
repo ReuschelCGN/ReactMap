@@ -88,6 +88,31 @@ body {
   background-color: #ff4b4d;
 }
 
+.route-count-wrapper {
+  display: inline-flex;
+  transform: translate(10px, -12px);
+}
+
+.route-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 4px;
+  border-radius: 10px;
+  background: #2196f3;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  border: 1px solid #ffffff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+}
+
+.route-count-badge--destination {
+  background: #ff4b4d;
+}
+
 .invasion-exists {
   border: 4px solid rgb(141, 13, 13);
 }
@@ -320,6 +345,21 @@ img {
 
 .weather-icon > .fancy {
   filter: invert(75%) sepia(100%) hue-rotate(151deg) saturate(3.1);
+}
+
+.tappable-marker {
+  position: relative;
+  width: var(--tappable-size, 32px);
+  height: var(--tappable-size, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tappable-marker__icon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .quest-popup-img {
@@ -602,4 +642,31 @@ input[type='time']::-webkit-calendar-picker-indicator {
 
 .expand-collapse-layout > :nth-child(3) {
   grid-column: 1 / span 2;
+}
+
+/* Leaflet Draw Edit Toolbar - Make Save/Cancel buttons more visible */
+.leaflet-draw-actions a {
+  background-color: #1976d2 !important;
+  color: white !important;
+  border: 2px solid #1565c0 !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2) !important;
+}
+
+.leaflet-draw-actions a:hover {
+  background-color: #1565c0 !important;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.3) !important;
+}
+
+/* Cancel button in red */
+.leaflet-draw-actions a:last-child {
+  background-color: #d32f2f !important;
+  border-color: #c62828 !important;
+}
+
+.leaflet-draw-actions a:last-child:hover {
+  background-color: #c62828 !important;
 }
