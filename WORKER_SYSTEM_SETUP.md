@@ -3,6 +3,7 @@
 ## Übersicht
 
 Das neue Worker-System ermöglicht es Usern:
+
 - **3 Worker** pro User zu verwalten (konfigurierbar)
 - **Bis zu 3 Fences** zu erstellen (konfigurierbar)
 - Worker auf eigene oder fremde Fences zu verteilen
@@ -19,10 +20,11 @@ Führe das SQL-Script in deiner Koji-Datenbank aus:
 
 ```bash
 cd /home/andy/SelfReact/ReactMap/server/sql
-mariadb -h 192.168.1.105 -u and1 -p'baikal89' koji --ssl=0 < 001_setup_worker_system.sql
+mariadb -h <HOST> -u <USER> -p'<PASSWORD>' <DATABASE> --ssl=0 < 001_setup_worker_system.sql
 ```
 
 **Was wird erstellt:**
+
 - 4 neue Properties: `reactmap_owner_user_id`, `reactmap_total_workers`, `reactmap_last_worker_activity`, `reactmap_dragonite_area_id`
 - 1 neue Tabelle: `fence_workers` (für Worker-Zuweisungen)
 
@@ -36,6 +38,7 @@ npm run migrate
 ```
 
 **Was wird erstellt:**
+
 - 1 neue Tabelle: `user_settings` (für User-spezifische Worker/Fence-Limits)
 
 ### Schritt 3: Server neu starten
@@ -55,10 +58,10 @@ In `server/src/configs/default.json` (oder `local.json`):
 ```json
 {
   "fenceSystem": {
-    "workersPerUser": 3,        // Worker pro User
-    "maxFencesPerUser": 3,      // Max Fences pro User
-    "inactivityDays": 30,       // Tage ohne Worker bis Auto-Löschung
-    "allowWorkerRejection": false  // Owner kann Worker nicht ablehnen
+    "workersPerUser": 3, // Worker pro User
+    "maxFencesPerUser": 3, // Max Fences pro User
+    "inactivityDays": 30, // Tage ohne Worker bis Auto-Löschung
+    "allowWorkerRejection": false // Owner kann Worker nicht ablehnen
   }
 }
 ```
@@ -68,7 +71,7 @@ In `server/src/configs/default.json` (oder `local.json`):
 Für einzelne User kannst du custom Limits in der `user_settings` Tabelle setzen:
 
 ```sql
-INSERT INTO user_settings (user_id, max_workers, max_fences) 
+INSERT INTO user_settings (user_id, max_workers, max_fences)
 VALUES ('discord_123456789', 5, 5)
 ON DUPLICATE KEY UPDATE max_workers = 5, max_fences = 5;
 ```
@@ -85,6 +88,7 @@ Authorization: Required
 ```
 
 **Response:**
+
 ```json
 {
   "total": 3,
@@ -114,6 +118,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "status": "ok",
@@ -130,6 +135,7 @@ GET /api/v1/users/fence/:fenceId/contributors
 ```
 
 **Response:**
+
 ```json
 {
   "fenceId": 123,
@@ -158,6 +164,7 @@ GET /api/v1/users/fences/public
 ```
 
 **Response:**
+
 ```json
 [
   {
@@ -205,6 +212,7 @@ Fence hat:
 ### Auto-Cleanup
 
 **Nach 30 Tagen ohne Worker:**
+
 - Fence wird automatisch gelöscht
 - Auch in Dragonite entfernt
 - Cron-Job läuft täglich um 3 Uhr
@@ -262,6 +270,7 @@ CREATE TABLE user_settings (
 ### Properties (Koji-DB)
 
 Neue Einträge in `property` Tabelle:
+
 - `reactmap_owner_user_id` (string)
 - `reactmap_total_workers` (number)
 - `reactmap_last_worker_activity` (string)
@@ -280,8 +289,9 @@ Error: Property 'owner_user_id' not found. Did you run the setup SQL script?
 ```
 
 **Lösung:** SQL-Script erneut ausführen:
+
 ```bash
-mariadb -h 192.168.1.105 -u and1 -p'baikal89' koji --ssl=0 < server/sql/001_setup_worker_system.sql
+mariadb -h <HOST> -u <USER> -p'<PASSWORD>' <DATABASE> --ssl=0 < server/sql/001_setup_worker_system.sql
 ```
 
 ### Migration läuft nicht
@@ -295,6 +305,7 @@ node src/db/migrate.js
 ### Worker-Sync mit Dragonite fehlgeschlagen
 
 Prüfe Dragonite-Config in `local.json`:
+
 ```json
 {
   "integrations": {
@@ -311,6 +322,7 @@ Prüfe Dragonite-Config in `local.json`:
 ### Fence-Properties werden nicht gespeichert
 
 Prüfe ob Properties existieren:
+
 ```sql
 SELECT * FROM property WHERE name LIKE 'reactmap_%';
 ```
@@ -332,7 +344,7 @@ SELECT * FROM project WHERE name LIKE '%YOUR_USERNAME%';
 
 -- 2. Setze Owner für alle Fences in deinem Project
 INSERT INTO geofence_property (geofence_id, property_id, value)
-SELECT 
+SELECT
   g.id,
   (SELECT id FROM property WHERE name = 'reactmap_owner_user_id'),
   'YOUR_USER_ID'
@@ -348,12 +360,14 @@ ON DUPLICATE KEY UPDATE value = 'YOUR_USER_ID';
 ## ✅ Fertig!
 
 Das Worker-System ist jetzt einsatzbereit. User können:
+
 - Fences erstellen
 - Worker zuweisen
 - Mit anderen kollaborieren
 - Ihre Map gemeinsam aufbauen
 
 Bei Fragen oder Problemen, check die Logs:
+
 ```bash
 pm2 logs reactmap
 ```

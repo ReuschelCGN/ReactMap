@@ -56,11 +56,12 @@
 Wenn du das WorkerStatsWidget einbinden möchtest:
 
 **In `src/App.jsx` oder ähnlich:**
+
 ```jsx
 import { WorkerStatsWidget } from '@features/fence'
 
 // Am Ende des JSX:
-<WorkerStatsWidget />
+;<WorkerStatsWidget />
 ```
 
 Dann hast du ein **kleines Widget unten rechts** das deine Worker-Verteilung zeigt.
@@ -84,6 +85,7 @@ yarn start
 ## 📊 Wie Worker-Anzahl bestimmt wird:
 
 ### **Automatisch durch Summe:**
+
 ```
 Du:      2 Worker zugewiesen
 User_A:  3 Worker zugewiesen
@@ -93,15 +95,17 @@ Fence hat: 6 Worker total
 ```
 
 ### **Dragonite bekommt automatisch die Summe:**
+
 ```json
 {
   "pokemon_mode": {
-    "workers": 6  // ← Automatisch synchronisiert
+    "workers": 6 // ← Automatisch synchronisiert
   }
 }
 ```
 
 ### **Ownership:**
+
 - **User mit meisten Workern = Owner**
 - Bei Gleichstand: Erster User (nach Erstellungsdatum)
 - Owner kann sich ändern wenn andere mehr Worker zuweisen
@@ -113,10 +117,12 @@ Fence hat: 6 Worker total
 ### **Szenario: Gemeinsam eine Area scannen**
 
 1. **User A erstellt Fence "Downtown"**
+
    - Weist 2 Worker zu
    - Fence hat 2 Worker
 
 2. **User B sieht die Fence in der Liste**
+
    - Öffnet PublicFenceDrawer (Map-Button)
    - Klickt auf "Downtown"
    - Weist 3 Worker zu
@@ -124,10 +130,12 @@ Fence hat: 6 Worker total
    - **User B wird Owner** (hat mehr Worker)
 
 3. **User C spendiert auch 1 Worker**
+
    - Fence hat jetzt 6 Worker (2+3+1)
    - User B bleibt Owner (hat immer noch die meisten)
 
 4. **User A zieht seine Worker zurück**
+
    - Klickt auf [-] bis 0 Worker
    - Fence hat jetzt 4 Worker (0+3+1)
    - User B bleibt Owner
@@ -141,28 +149,32 @@ Fence hat: 6 Worker total
 ## 🐛 Troubleshooting:
 
 ### **"Property not found" Fehler:**
+
 ```bash
 # SQL-Script nochmal ausführen
 cd /home/andy/SelfReact/ReactMap
-mariadb -h 192.168.1.105 -u and1 -p'baikal89' koji --ssl=0 < server/sql/001_setup_worker_system.sql
+mariadb -h <HOST> -u <USER> -p'<PASSWORD>' <DATABASE> --ssl=0 < server/sql/001_setup_worker_system.sql
 
 # Server neu starten
 yarn start
 ```
 
 ### **Worker-Management wird nicht angezeigt:**
+
 - Stelle sicher dass du eine Fence erstellt hast
 - Scrolle im FencePanel nach unten
 - Prüfe Browser-Console auf Fehler
 
 ### **PublicFenceDrawer erscheint nicht:**
+
 - Prüfe ob der blaue Map-Button unten rechts sichtbar ist
 - Falls nicht: `npm run build` und Server neu starten
 
 ### **API-Fehler:**
+
 ```bash
 # Prüfe ob Properties existieren:
-mariadb -h 192.168.1.105 -u and1 -p'baikal89' koji --ssl=0 -e "SELECT * FROM property WHERE name LIKE 'reactmap_%';"
+mariadb -h <HOST> -u <USER> -p'<PASSWORD>' <DATABASE> --ssl=0 -e "SELECT * FROM property WHERE name LIKE 'reactmap_%';"
 
 # Sollte 4 Zeilen zurückgeben
 ```
@@ -172,10 +184,12 @@ mariadb -h 192.168.1.105 -u and1 -p'baikal89' koji --ssl=0 -e "SELECT * FROM pro
 ## 📱 UI-Komponenten:
 
 ### **Bereits integriert:**
+
 - ✅ **WorkerManager** - Im FencePanel (rechts)
 - ✅ **PublicFenceDrawer** - Map-Button (unten rechts)
 
 ### **Optional einbinden:**
+
 - ⚪ **WorkerStatsWidget** - Floating Widget (siehe oben)
 
 ---

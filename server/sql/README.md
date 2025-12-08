@@ -12,17 +12,19 @@ Sets up the collaborative worker system for ReactMap.
 mariadb -h YOUR_HOST -u YOUR_USER -p YOUR_DATABASE --ssl=0 < 001_setup_worker_system.sql
 ```
 
-**Or using the credentials from local.json:**
+**Or using your own credentials (example):**
 
 ```bash
-mariadb -h 192.168.1.105 -u and1 -p'baikal89' koji --ssl=0 < 001_setup_worker_system.sql
+mariadb -h <HOST> -u <USER> -p'<PASSWORD>' <DATABASE> --ssl=0 < 001_setup_worker_system.sql
 ```
 
 **What it does:**
-- Creates 4 new properties in the `property` table (reactmap_*)
+
+- Creates 4 new properties in the `property` table (reactmap\_\*)
 - Creates the `fence_workers` table for tracking worker assignments
 - Does NOT modify any existing tables
 
 **Safe to run:**
+
 - Uses `IF NOT EXISTS` for table creation
 - Will skip property insertion if they already exist (may show duplicate key warning)
