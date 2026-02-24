@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - develop
-      - developmod5-background
+      - developmod5
 
 jobs:
   config:
