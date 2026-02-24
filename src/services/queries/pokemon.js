@@ -10,7 +10,6 @@ const core = gql`
     pokemon_id
     form
     gender
-    background
     costume
     first_seen_timestamp
     expire_timestamp
@@ -18,6 +17,7 @@ const core = gql`
     updated
     display_pokemon_id
     seen_type
+    background
   }
 `
 
