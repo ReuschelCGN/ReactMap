@@ -162,6 +162,11 @@ const BaseGymTile = (gym) => {
 
   useForcePopup(gym.id, markerRef)
   useMarkerTimer(timerToDisplay, markerRef, () => setStateChange(!stateChange))
+  const raidForm = getFormDisplay(
+    gym.raid_pokemon_id,
+    gym.raid_pokemon_form,
+    gym.raid_pokemon_costume,
+  )
   if (hasRaid) {
     sendNotification(`${gym.id}-${hasHatched}`, gym.name, 'raids', {
       lat: gym.lat,
@@ -171,7 +176,7 @@ const BaseGymTile = (gym) => {
       body: `${t(`${hasHatched ? `raid` : 'egg'}_${gym.raid_level}`)}\n${
         gym.raid_pokemon_evolution ? t(`evo_${gym.raid_pokemon_evolution}`) : ''
       }${gym.raid_pokemon_id ? t(`poke_${gym.raid_pokemon_id}`) : ''}${
-        gym.raid_pokemon_form ? t(`form_${gym.raid_pokemon_form}`) : ''
+        raidForm && gym.raid_pokemon_id ? ` ${raidForm}` : ''
       }${gym.raid_pokemon_id ? '\n' : ''}${
         getTimeUntil(timerToDisplay * 1000, true).str
       }`,
