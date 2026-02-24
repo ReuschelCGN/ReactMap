@@ -39,6 +39,7 @@ import {
 import { VirtualGrid } from '@components/virtual/VirtualGrid'
 import { getStationAttackBonus } from '@utils/getAttackBonus'
 import { getStationDamageBoost } from '@utils/getAttackBonus'
+import { getFormDisplay } from '@utils/getFormDisplay'
 import { CopyCoords } from '@components/popups/Coords'
 import { PokeMove } from '@components/popups/PokeMove'
 
@@ -299,6 +300,11 @@ function StationMedia({
     }
     return poke?.types || []
   })
+  const pokemonFormLabel = getFormDisplay(
+    battle_pokemon_id,
+    battle_pokemon_form,
+    battle_pokemon_costume,
+  )
 
   return battle_end_time > Date.now() / 1000 ? (
     <CardMedia>
@@ -314,10 +320,10 @@ function StationMedia({
             maxHeight="80%"
             maxWidth="100%"
           />
-          {!!battle_pokemon_costume && (
+          {!!pokemonFormLabel && (
             <Box textAlign="center">
               <Typography variant="caption">
-                &nbsp;({t(`costume_${battle_pokemon_costume}`)})
+                &nbsp;({pokemonFormLabel})
               </Typography>
             </Box>
           )}
