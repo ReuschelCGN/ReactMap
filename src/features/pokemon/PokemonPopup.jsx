@@ -30,6 +30,7 @@ import { StatusIcon } from '@components/StatusIcon'
 import { readableProbability } from '@utils/readableProbability'
 import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
 import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
+import { getFormDisplay } from '@utils/getFormDisplay'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -416,10 +417,7 @@ const Header = ({
     options.push({ name: 'exclude', action: handleExclude })
   }
   const pokeName = t(`poke_${metaData.pokedexId}`)
-  const formName =
-    metaData.forms?.[form]?.name === 'Normal' || form === 0
-      ? ''
-      : t(`form_${pokemon.form}`)
+  const formName = getFormDisplay(pokemon.pokemon_id, form, pokemon.costume)
 
   return (
     <>
