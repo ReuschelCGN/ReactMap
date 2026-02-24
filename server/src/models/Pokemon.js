@@ -772,6 +772,7 @@ class Pokemon extends Model {
       'form',
       'costume',
       'gender',
+      'background',
       'iv',
       'shiny',
       'expire_timestamp',

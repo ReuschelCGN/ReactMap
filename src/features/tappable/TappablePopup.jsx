@@ -168,7 +168,7 @@ export function TappablePopup({ tappable, rewardIcon, iconSize }) {
         )}
         {formattedType && (
           <Typography variant="caption" color="text.secondary">
-           {t('appeared_as')} {formattedType}
+            {t('appeared_as')} {formattedType}
           </Typography>
         )}
       </Grid>

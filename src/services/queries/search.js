@@ -137,6 +137,7 @@ export const POKEMON = gql`
       gender
       costume
       shiny
+      background
       iv
       expire_timestamp
     }
@@ -171,7 +172,7 @@ export const QUESTS = gql`
       quest_form_id
       quest_gender_id
       quest_costume_id
-      quest_location_card
+      quest_background
       quest_bread_mode
       quest_shiny
       quest_item_id
