@@ -365,7 +365,7 @@ class Gym extends Model {
       .from('gym')
       .where('raid_end_timestamp', '>=', ts)
       .andWhere('raid_level', '>', 0)
-      .groupBy(['raid_pokemon_id', 'raid_pokemon_form', 'raid_level'])
+      .groupBy(['raid_pokemon_id', 'raid_pokemon_form'])
       .orderBy('raid_pokemon_id', 'asc')
     const teamResults = await this.query()
       .select(['team_id AS team', `${availableSlotsCol} AS slots`])
