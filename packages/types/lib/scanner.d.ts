@@ -250,6 +250,7 @@ export interface Pokemon {
   def_iv: number
   sta_iv: number
   weather: number
+  background?: number
   capture_1: number
   capture_2: number
   capture_3: number
@@ -266,7 +267,6 @@ export interface Pokemon {
   pvp_rankings_ultra_league?: import('ohbem').PvPRankEntry[]
   distance?: number
   shiny?: boolean
-  background?: number
 }
 
 export type FullPokemon = FullModel<Pokemon, PokemonModel.Pokemon>
