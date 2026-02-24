@@ -204,6 +204,7 @@ class DbManager extends Logger {
       hasStationedGmax,
       hasShortcode,
       hasPokemonShinyStats,
+      hasPokemonBackground,
     }
   }
 
@@ -221,7 +222,6 @@ class DbManager extends Logger {
             : {
                 mem: this.endpoints[i].endpoint,
                 secret: this.endpoints[i].secret,
-                // Add support for HTTP authentication
                 httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
                 hasPokemonShinyStats: false,
