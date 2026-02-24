@@ -394,12 +394,10 @@ class Gym extends Model {
     return {
       available: [
         ...teamResults,
-        ...results.flatMap((result) => {
-          if (result.raid_pokemon_id) {
-            return `${result.raid_pokemon_id}-${result.raid_pokemon_form}`
-          }
-          return [`e${result.raid_level}`, `r${result.raid_level}`]
-        }),
+        ...Array.from(seenBosses),
+        ...Array.from(seenEggLevels)
+          .sort((a, b) => Number(a) - Number(b))
+          .flatMap((level) => [`e${level}`, `r${level}`]),
       ],
     }
   }
