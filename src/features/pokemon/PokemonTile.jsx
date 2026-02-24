@@ -15,6 +15,7 @@ import { sendNotification } from '@services/desktopNotification'
 import { useMapStore } from '@store/useMapStore'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { getFormDisplay } from '@utils/getFormDisplay'
 
 import { PokemonPopup } from './PokemonPopup'
 import { basicPokemonMarker, fancyPokemonMarker } from './pokemonMarker'
@@ -138,11 +139,12 @@ const BasePokemonTile = (pkmn) => {
 
   useForcePopup(pkmn.id, markerRef)
   useMarkerTimer(pkmn.expire_timestamp, markerRef)
+
+  const pokemonForm = getFormDisplay(pkmn.pokemon_id, pkmn.form, pkmn.costume)
+
   sendNotification(
     pkmn.id,
-    `${t(`poke_${pkmn.pokemon_id}`)}${
-      pkmn.form ? ` (${t(`form_${pkmn.form}`)})` : ''
-    }`,
+    `${t(`poke_${pkmn.pokemon_id}`)}${pokemonForm ? ` (${pokemonForm})` : ''}`,
     'pokemon',
     {
       icon: iconUrl,
