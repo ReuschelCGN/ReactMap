@@ -32,6 +32,7 @@ import { ExtraInfo } from '@components/popups/ExtraInfo'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { formatInterval } from '@utils/formatInterval'
+import { getFormDisplay } from '@utils/getFormDisplay'
 
 import { useWebhook } from './useWebhook'
 
@@ -960,19 +961,6 @@ const RaidInfo = ({
     return `${t('tier')} ${raidLevel}`
   }
 
-  const getRaidForm = (id, form, costume) => {
-    if (costume) {
-      return t(`costume_${costume}`, t('unknown_costume'))
-    }
-    if (form) {
-      const raidForm = t(`form_${form}`)
-      if (raidForm === t('form_29') || !raidForm) {
-        return ''
-      }
-      return `${raidForm} ${t('form')}`
-    }
-  }
-
   return (
     <Grid xs={6} container justifyContent="space-around" alignItems="center">
       <Grid xs={12}>
@@ -982,7 +970,7 @@ const RaidInfo = ({
       </Grid>
       <Grid xs={12} style={{ paddingBottom: 4, textAlign: 'center' }}>
         <Typography variant="caption" align="center">
-          {getRaidForm(
+          {getFormDisplay(
             raid_pokemon_id,
             raid_pokemon_form,
             raid_pokemon_costume,
