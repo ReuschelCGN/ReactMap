@@ -365,8 +365,9 @@ class Gym extends Model {
       .from('gym')
       .where('raid_end_timestamp', '>=', ts)
       .andWhere('raid_level', '>', 0)
-      .groupBy(['raid_pokemon_id', 'raid_pokemon_form'])
+      .groupBy(['raid_pokemon_id', 'raid_pokemon_form', 'raid_level'])
       .orderBy('raid_pokemon_id', 'asc')
+      .orderBy('raid_level', 'asc')
     const teamResults = await this.query()
       .select(['team_id AS team', `${availableSlotsCol} AS slots`])
       .groupBy(['team_id', availableSlotsCol])
@@ -380,6 +381,16 @@ class Gym extends Model {
         })
         return [...unique]
       })
+    const seenBosses = new Set()
+    const seenEggLevels = new Set()
+    results.forEach((result) => {
+      if (result.raid_pokemon_id) {
+        seenBosses.add(`${result.raid_pokemon_id}-${result.raid_pokemon_form}`)
+      } else {
+        seenEggLevels.add(result.raid_level)
+      }
+    })
+
     return {
       available: [
         ...teamResults,
