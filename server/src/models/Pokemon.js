@@ -88,7 +88,15 @@ class Pokemon extends Model {
   static async getAll(perms, args, ctx) {
     const { iv: ivs, pvp, areaRestrictions } = perms
     const { onlyIvOr, onlyHundoIv, onlyZeroIv, onlyAreas = [] } = args.filters
-    const { hasSize, hasHeight, mem, secret, httpAuth, pvpV2 } = ctx
+    const {
+      hasSize,
+      hasHeight,
+      hasPokemonBackground,
+      mem,
+      secret,
+      httpAuth,
+      pvpV2,
+    } = ctx
     const { filterMap, globalFilter } = this.getFilters(perms, args, ctx)
 
     let queryPvp = config
@@ -124,7 +132,14 @@ class Pokemon extends Model {
     })
 
     if (!mem) {
-      query.select(['*', hasSize && !hasHeight ? 'size AS height' : 'size'])
+      const selectColumns = [
+        '*',
+        hasSize && !hasHeight ? 'size AS height' : 'size',
+      ]
+      if (hasPokemonBackground) {
+        selectColumns.push('background')
+      }
+      query.select(selectColumns)
       query
         .where('expire_timestamp', '>=', ts)
         .andWhereBetween('lat', [args.minLat, args.maxLat])
