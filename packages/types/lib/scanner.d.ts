@@ -10,6 +10,7 @@ import SpawnpointModel = require('server/src/models/Spawnpoint')
 import WeatherModel = require('server/src/models/Weather')
 import RouteModel = require('server/src/models/Route')
 import StationModel = require('server/src/models/Station')
+import TappableModel = require('server/src/models/Tappable')
 
 import { S2Polygon } from './general'
 
@@ -22,6 +23,7 @@ export interface Device {
   lat: number
   lon: number
   type: string
+  isMad: boolean
   route: any // JSON
   radius: number
 }
@@ -37,7 +39,25 @@ export interface PokemonDisplay {
   temp_evolution_finish_ms?: number
   alignment: number
   badge: number
-  location_card: number
+  background: number
+}
+
+export interface PokemonShinyStats {
+  shiny_seen: number
+  encounters_seen: number
+  since_date?: string
+}
+
+export interface Defender extends PokemonDisplay {
+  pokemon_id: number
+  deployed_ms: number
+  deployed_time: number
+  battles_won: number
+  battles_lost: number
+  times_fed: number
+  motivation_now: number
+  cp_when_deployed: number
+  cp_now: number
 }
 
 export interface Gym {
@@ -54,6 +74,7 @@ export interface Gym {
   updated: number
   guarding_pokemon_id: number
   guarding_pokemon_display: PokemonDisplay
+  defenders: Defender[]
   available_slots: number
   team_id: number
   raid_level: number
@@ -119,6 +140,8 @@ export interface Quest {
   quest_form_id: number
   quest_gender_id: Gender
   quest_costume_id: number
+  quest_background: number
+  quest_bread_mode: number
   quest_shiny: number
   quest_shiny_probability?: number
   mega_pokemon_id: number
@@ -191,7 +214,8 @@ export interface Pokestop {
   showcase_pokemon_id?: number
   showcase_ranking_standard?: number
   showcase_rankings?: ShowcaseDetails | string
-  hasShowcase: boolean
+  incident_blocker_display_type: number | null
+  incident_blocker_expire_timestamp: number | null
 }
 
 export type FullPokestop = FullModel<Pokestop, PokestopModel.Pokestop>
@@ -209,7 +233,6 @@ export interface Pokemon {
   costume: number
   gender: Gender
   display_pokemon_id: number
-  ditto_form: number
   weight: number
   height: number
   size: number
@@ -222,6 +245,7 @@ export interface Pokemon {
   def_iv: number
   sta_iv: number
   weather: number
+  background?: number
   capture_1: number
   capture_2: number
   capture_3: number
@@ -254,6 +278,21 @@ export interface Portal {
 }
 
 export type FullPortal = FullModel<Portal, PortalModel.Portal>
+
+export interface Tappable {
+  id: string
+  lat: number
+  lon: number
+  type: string
+  fort_id: string | null
+  item_id: number
+  count: number | null
+  expire_timestamp: number | null
+  expire_timestamp_verified: boolean
+  updated: number
+}
+
+export type FullTappable = FullModel<Tappable, TappableModel.Tappable>
 
 export interface ScanCell {
   id?: string
@@ -334,11 +373,8 @@ export interface Route {
 
 export type FullRoute = FullModel<Route, RouteModel.Route>
 
-export interface StationPokemon {
+export interface StationPokemon extends PokemonDisplay {
   pokemon_id: number
-  form: number
-  costume: number
-  gender: number
   bread_mode: number
 }
 
@@ -366,6 +402,9 @@ export interface Station<Parsed extends boolean = false> {
   battle_pokemon_bread_mode: number
   battle_pokemon_move_1: number
   battle_pokemon_move_2: number
+  battle_pokemon_stamina?: number
+  battle_pokemon_cp_multiplier?: number
+  battle_pokemon_estimated_cp?: number
 
   total_stationed_pokemon: number
   total_stationed_gmax: number

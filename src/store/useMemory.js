@@ -58,6 +58,7 @@ import { create } from 'zustand'
  *     pokestops: string[],
  *     nests: string[],
  *     stations: string[],
+ *     tappables: string[],
  *     questConditions: Record<string, { title: string, target?: number }[]>,
  *   }
  *   manualParams: {
@@ -121,12 +122,16 @@ export const useMemory = create(() => ({
   menuFilters: {},
   userSettings: undefined,
   settings: undefined,
+  featureFlags: {
+    supportsShinyStats: false,
+  },
   available: {
     gyms: [],
     pokemon: [],
     pokestops: [],
     nests: [],
     stations: [],
+    tappables: [],
     questConditions: {},
   },
   Icons: null,
@@ -143,6 +148,8 @@ export const useMemory = create(() => ({
     weather: {},
     raids: {},
     teams: {},
+    locationCards: {},
+    routeTypes: {},
   },
   hideList: new Set(),
   timerList: [],
@@ -158,6 +165,7 @@ export const useMemory = create(() => ({
     pokestops: { count: 0, show: 0, total: 0 },
     nests: { count: 0, show: 0, total: 0 },
     stations: { count: 0, show: 0, total: 0 },
+    tappables: { count: 0, show: 0, total: 0 },
   },
   advMenuFiltered: {
     gyms: [],
@@ -165,6 +173,7 @@ export const useMemory = create(() => ({
     pokemon: [],
     nests: [],
     stations: [],
+    tappables: [],
   },
 }))
 

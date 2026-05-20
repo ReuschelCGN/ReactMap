@@ -1,5 +1,6 @@
 // @ts-check
 import * as React from 'react'
+import { useLazyQuery } from '@apollo/client'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Grid from '@mui/material/Unstable_Grid2'
@@ -11,7 +12,7 @@ import Divider from '@mui/material/Divider'
 import Avatar from '@mui/material/Avatar'
 import Tooltip from '@mui/material/Tooltip'
 import Collapse from '@mui/material/Collapse'
-import { useTranslation } from 'react-i18next'
+import { useTranslation, Trans } from 'react-i18next'
 
 import { useMemory } from '@store/useMemory'
 import { setDeepStore, useStorage } from '@store/useStorage'
@@ -26,6 +27,13 @@ import { ExtraInfo } from '@components/popups/ExtraInfo'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { getTimeUntil } from '@utils/getTimeUntil'
 import { StatusIcon } from '@components/StatusIcon'
+import { readableProbability } from '@utils/readableProbability'
+import { GET_POKEMON_SHINY_STATS } from '@services/queries/pokemon'
+import { GET_TAPPABLE_BY_ID } from '@services/queries/tappable'
+import { usePokemonBackgroundVisual } from '@hooks/usePokemonBackgroundVisuals'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
+import { getFormDisplay } from '@utils/getFormDisplay'
+import { getWildFilterId } from '@utils/getWildFilterId'
 
 const rowClass = { width: 30, fontWeight: 'bold' }
 
@@ -33,6 +41,28 @@ const leagueLookup = {
   great: '1500',
   ultra: '2500',
   master: '9000',
+}
+
+const TAPPABLE_SEEN_TYPES = new Set([
+  'tappable_encounter',
+  'tappable_lure_encounter',
+])
+
+const formatTappableType = (type, t, i18n) => {
+  if (!type) return ''
+  const cleaned = type
+    .replace(/^TAPPABLE_TYPE_/, '')
+    .toLowerCase()
+    .replace(/_/g, ' ')
+  const translationKey = `tappable_type_${cleaned.replace(/\s+/g, '_')}`
+  if (i18n?.exists?.(translationKey)) {
+    return t(translationKey)
+  }
+  return cleaned
+    .split(' ')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ')
 }
 
 /** @param {number} ivPercent */
@@ -59,7 +89,7 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
   const perms = useMemory((s) => s.auth.perms)
   const timeOfDay = useMemory((s) => s.timeOfDay)
   const metaData = useMemory((s) => s.masterfile.pokemon[pokemon_id])
-  const Icons = useMemory((s) => s.Icons)
+  const backgroundVisuals = usePokemonBackgroundVisual(pokemon.background)
 
   const userSettings = useStorage((s) => s.userSettings.pokemon)
   const pokePerms = isTutorial
@@ -68,10 +98,133 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
         iv: true,
       }
     : perms
-  const popups = useStorage((s) => s.popups)
+  const pokemonExtrasOpen = useStorage((s) => !!s.popups.pokemonExtras)
+  const pokemonPvpOpen = useStorage((s) => !!s.popups.pokemonPvp)
+  const handlePokemonSectionToggle = React.useCallback((section) => {
+    const currentKey = section === 'extras' ? 'pokemonExtras' : 'pokemonPvp'
+    const oppositeKey = section === 'extras' ? 'pokemonPvp' : 'pokemonExtras'
+    useStorage.setState((prev) => ({
+      popups: {
+        ...prev.popups,
+        [currentKey]: !prev.popups[currentKey],
+        [oppositeKey]: false,
+      },
+    }))
+  }, [])
 
   const hasLeagues = cleanPvp ? Object.keys(cleanPvp) : []
   const hasStats = iv || cp
+
+  const supportsShinyStats = useMemory((s) => s.featureFlags.supportsShinyStats)
+  const shinyKey = React.useMemo(
+    () => `${pokemon.pokemon_id}-${pokemon.form ?? 0}`,
+    [pokemon.pokemon_id, pokemon.form],
+  )
+  const [shinyStats, setShinyStats] = React.useState(null)
+  const pendingShinyKey = React.useRef(null)
+  const [loadShinyStats] = useLazyQuery(GET_POKEMON_SHINY_STATS)
+  const canQueryTappable = !isTutorial && !!perms?.tappables
+  const showTappableSource = React.useMemo(
+    () => canQueryTappable && TAPPABLE_SEEN_TYPES.has(pokemon.seen_type),
+    [canQueryTappable, pokemon.seen_type],
+  )
+  const [tappableSource, setTappableSource] = React.useState(null)
+  const tappableRequestToken = React.useRef(0)
+  const [loadTappableSource, { loading: tappableLoading }] = useLazyQuery(
+    GET_TAPPABLE_BY_ID,
+    {
+      fetchPolicy: 'cache-first',
+    },
+  )
+
+  React.useEffect(() => {
+    setShinyStats(null)
+    pendingShinyKey.current = null
+  }, [shinyKey])
+
+  React.useEffect(() => {
+    if (!supportsShinyStats) {
+      setShinyStats(null)
+      pendingShinyKey.current = null
+    }
+  }, [supportsShinyStats])
+
+  React.useEffect(() => {
+    setTappableSource(null)
+    tappableRequestToken.current += 1
+  }, [pokemon.id])
+
+  React.useEffect(() => {
+    if (!showTappableSource) {
+      setTappableSource(null)
+      tappableRequestToken.current += 1
+    }
+  }, [showTappableSource])
+
+  React.useEffect(() => {
+    if (!supportsShinyStats) {
+      pendingShinyKey.current = null
+      return
+    }
+    if (shinyStats || !pokemon.pokemon_id) {
+      return
+    }
+    if (pendingShinyKey.current === shinyKey) {
+      return
+    }
+    let isActive = true
+    pendingShinyKey.current = shinyKey
+    loadShinyStats({
+      variables: {
+        pokemonId: pokemon.pokemon_id,
+        form: pokemon.form ?? 0,
+      },
+      fetchPolicy: 'cache-first',
+    })
+      .then(({ data }) => {
+        if (!isActive || pendingShinyKey.current !== shinyKey) {
+          return
+        }
+        if (data?.pokemonShinyStats) {
+          setShinyStats(data.pokemonShinyStats)
+        }
+      })
+      .catch(() => {
+        if (isActive && pendingShinyKey.current === shinyKey) {
+          pendingShinyKey.current = null
+        }
+      })
+    return () => {
+      isActive = false
+    }
+  }, [supportsShinyStats, shinyStats, shinyKey, loadShinyStats])
+
+  React.useEffect(() => {
+    if (!showTappableSource || !canQueryTappable || !pokemon.id) {
+      return
+    }
+    const tappableId = pokemon.id
+    tappableRequestToken.current += 1
+    const requestToken = tappableRequestToken.current
+    loadTappableSource({
+      variables: { id: tappableId },
+    })
+      .then((response) => {
+        if (tappableRequestToken.current !== requestToken) {
+          return
+        }
+        setTappableSource(response?.data?.tappableById || null)
+      })
+      .catch(() => {
+        if (tappableRequestToken.current !== requestToken) {
+          return
+        }
+        setTappableSource(null)
+      })
+    return () => {
+      tappableRequestToken.current += 1
+    }
+  }, [showTappableSource, canQueryTappable, pokemon.id, loadTappableSource])
 
   useAnalytics(
     'Popup',
@@ -79,94 +232,122 @@ export function PokemonPopup({ pokemon, iconUrl, isTutorial = false }) {
     'Pokemon',
   )
 
+  const gridContent = (
+    <Grid
+      container
+      style={{ width: 200 }}
+      alignItems="center"
+      justifyContent="center"
+      spacing={1}
+    >
+      <Header
+        pokemon={pokemon}
+        metaData={metaData}
+        iconUrl={iconUrl}
+        userSettings={userSettings}
+        isTutorial={isTutorial}
+      />
+      {pokemon.seen_type !== 'encounter' && (
+        <Grid xs={12} textAlign="center">
+          <Typography
+            variant="caption"
+            component="div"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 6,
+              flexWrap: 'wrap',
+            }}
+          >
+            <span>{t(`seen_${pokemon.seen_type}`, '')}</span>
+            {showTappableSource && (
+              <TappableOrigin
+                tappable={tappableSource}
+                loading={tappableLoading}
+              />
+            )}
+          </Typography>
+        </Grid>
+      )}
+      {pokemon.seen_type === 'nearby_cell' && (
+        <Typography>{t('pokemon_cell')}</Typography>
+      )}
+      {!!pokemon.expire_timestamp && (
+        <Timer pokemon={pokemon} hasStats={hasStats} />
+      )}
+      {hasStats && pokePerms.iv && (
+        <>
+          <Stats pokemon={pokemon} />
+          <Divider orientation="vertical" flexItem />
+        </>
+      )}
+      <Info
+        pokemon={pokemon}
+        metaData={metaData}
+        perms={pokePerms}
+        timeOfDay={timeOfDay}
+        backgroundVisuals={backgroundVisuals}
+      />
+      <ShinyOdds shinyStats={shinyStats} />
+      <Footer
+        pokemon={pokemon}
+        extrasOpen={pokemonExtrasOpen}
+        pvpOpen={pokemonPvpOpen}
+        hasPvp={!!hasLeagues.length}
+        onToggle={handlePokemonSectionToggle}
+      />
+      <Collapse in={pokemonPvpOpen && perms.pvp} timeout="auto" unmountOnExit>
+        {hasLeagues.map((league) => (
+          <PvpInfo
+            key={league}
+            league={league}
+            data={cleanPvp[league]}
+            pokemon={pokemon}
+          />
+        ))}
+      </Collapse>
+      <Collapse in={pokemonExtrasOpen} timeout="auto" unmountOnExit>
+        <ExtraPokemonInfo
+          pokemon={pokemon}
+          perms={pokePerms}
+          userSettings={userSettings}
+        />
+      </Collapse>
+    </Grid>
+  )
+
   return (
     <ErrorBoundary noRefresh style={{}} variant="h5">
-      <Grid
-        container
-        style={{ width: 200 }}
-        alignItems="center"
-        justifyContent="center"
-        spacing={1}
+      <BackgroundCard
+        visuals={backgroundVisuals}
+        fullWidth
+        wrapperProps={{ style: { display: 'block' } }}
+        fullBleed={{ horizontal: 20, vertical: 13 }}
+        surfaceStyle={
+          backgroundVisuals?.hasBackground
+            ? {
+                display: 'flex',
+                flexDirection: 'column',
+                flex: '1 1 auto',
+                alignSelf: 'stretch',
+              }
+            : undefined
+        }
       >
-        <Header
-          pokemon={pokemon}
-          metaData={metaData}
-          iconUrl={iconUrl}
-          t={t}
-          userSettings={userSettings}
-          isTutorial={isTutorial}
-        />
-        {pokemon.seen_type !== 'encounter' && (
-          <Grid xs={12} textAlign="center">
-            <Typography variant="caption">
-              {t(`seen_${pokemon.seen_type}`, '')}
-            </Typography>
-          </Grid>
-        )}
-        {pokemon.seen_type === 'nearby_cell' && (
-          <Typography>{t('pokemon_cell')}</Typography>
-        )}
-        {!!pokemon.expire_timestamp && (
-          <Timer pokemon={pokemon} hasStats={hasStats} t={t} />
-        )}
-        {hasStats && pokePerms.iv && (
-          <>
-            <Stats pokemon={pokemon} t={t} />
-            <Divider orientation="vertical" flexItem />
-          </>
-        )}
-        <Info
-          pokemon={pokemon}
-          metaData={metaData}
-          perms={pokePerms}
-          Icons={Icons}
-          timeOfDay={timeOfDay}
-          t={t}
-        />
-        <Footer
-          pokemon={pokemon}
-          popups={popups}
-          hasPvp={!!hasLeagues.length}
-          Icons={Icons}
-        />
-        <Collapse in={popups.pvp && perms.pvp} timeout="auto" unmountOnExit>
-          {hasLeagues.map((league) => (
-            <PvpInfo
-              key={league}
-              league={league}
-              data={cleanPvp[league]}
-              t={t}
-              Icons={Icons}
-              pokemon={pokemon}
-            />
-          ))}
-        </Collapse>
-        <Collapse in={popups.extras} timeout="auto" unmountOnExit>
-          <ExtraPokemonInfo
-            pokemon={pokemon}
-            perms={pokePerms}
-            userSettings={userSettings}
-            t={t}
-            Icons={Icons}
-          />
-        </Collapse>
-      </Grid>
+        {gridContent}
+      </BackgroundCard>
     </ErrorBoundary>
   )
 }
 
-const Header = ({
-  pokemon,
-  metaData,
-  t,
-  iconUrl,
-  userSettings,
-  isTutorial,
-}) => {
+const Header = ({ pokemon, metaData, iconUrl, userSettings, isTutorial }) => {
+  const { t } = useTranslation()
   const filters = useStorage((s) => s.filters)
 
   const [anchorEl, setAnchorEl] = React.useState(null)
-  const { id, pokemon_id, form, ditto_form, display_pokemon_id } = pokemon
+  const { id, pokemon_id, form, display_pokemon_id } = pokemon
+  const filterKey = getWildFilterId(pokemon_id, form)
 
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)
@@ -184,8 +365,7 @@ const Header = ({
   const handleExclude = () => {
     setAnchorEl(null)
     if (filters?.pokemon?.filter) {
-      const key = `${pokemon_id}-${form}`
-      setDeepStore(`filters.pokemon.filter.${key}.enabled`, false)
+      setDeepStore(`filters.pokemon.filter.${filterKey}.enabled`, false)
     }
   }
 
@@ -203,17 +383,11 @@ const Header = ({
     { name: 'timer', action: handleTimer },
     { name: 'hide', action: handleHide },
   ]
-  if (
-    isTutorial ||
-    filters?.pokemon?.filter?.[`${pokemon_id}-${form}`]?.enabled
-  ) {
+  if (isTutorial || filters?.pokemon?.filter?.[filterKey]?.enabled) {
     options.push({ name: 'exclude', action: handleExclude })
   }
   const pokeName = t(`poke_${metaData.pokedexId}`)
-  const formName =
-    metaData.forms?.[form]?.name === 'Normal' || form === 0
-      ? ''
-      : t(`form_${pokemon.form}`)
+  const formName = getFormDisplay(pokemon.pokemon_id, form, pokemon.costume)
 
   return (
     <>
@@ -232,7 +406,7 @@ const Header = ({
         <Typography variant={pokeName.length > 8 ? 'h6' : 'h5'}>
           {pokeName}
         </Typography>
-        {ditto_form !== null && display_pokemon_id ? (
+        {pokemon_id === 132 && display_pokemon_id ? (
           <Typography variant="caption">
             ({t(`poke_${display_pokemon_id}`)})
           </Typography>
@@ -242,7 +416,7 @@ const Header = ({
       </Grid>
       <Grid xs={3}>
         <IconButton aria-haspopup="true" onClick={handleClick} size="large">
-          <MoreVert />
+          <MoreVert data-background-icon="true" />
         </IconButton>
       </Grid>
       <Menu
@@ -267,7 +441,8 @@ const Header = ({
   )
 }
 
-const Stats = ({ pokemon, t }) => {
+const Stats = ({ pokemon }) => {
+  const { t } = useTranslation()
   const { cp, iv, atk_iv, def_iv, sta_iv, level, inactive_stats } = pokemon
 
   return (
@@ -305,10 +480,104 @@ const Stats = ({ pokemon, t }) => {
   )
 }
 
-const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
+const ShinyOdds = ({ shinyStats }) => {
+  const { t } = useTranslation()
+  if (!shinyStats) {
+    return null
+  }
+
+  const {
+    encounters_seen: encounters,
+    shiny_seen: shinySeen,
+    since_date: sinceDate,
+  } = shinyStats
+
+  const encountersNumber = Number(encounters) || 0
+  const shinyNumber = Number(shinySeen) || 0
+  const shinyRate = encountersNumber ? shinyNumber / encountersNumber : 0
+
+  if (!encountersNumber) {
+    return null
+  }
+
+  const rateNode = readableProbability(shinyRate)
+
+  const sampleText = t('shiny_sample', {
+    percentage: (shinyRate * 100).toLocaleString(),
+    checks: encountersNumber.toLocaleString(),
+    shiny: shinyNumber.toLocaleString(),
+    date: new Intl.DateTimeFormat(undefined, {
+      month: 'short',
+      day: 'numeric',
+    }).format(new Date(`${sinceDate}T00:00:00Z`)),
+  })
+
+  return (
+    <Grid xs={12} textAlign="center">
+      <Typography variant="caption">
+        <Trans
+          i18nKey="shiny_probability"
+          components={[
+            <Tooltip key="rate" title={sampleText} arrow placement="top">
+              <span
+                style={{
+                  cursor: 'help',
+                  textDecoration: 'underline dotted',
+                  display: 'inline-block',
+                  padding: '4px',
+                  margin: '-4px',
+                  borderRadius: 4,
+                  textAlign: 'center',
+                }}
+              >
+                ~{rateNode}
+              </span>
+            </Tooltip>,
+          ]}
+        />
+      </Typography>
+    </Grid>
+  )
+}
+
+const TappableOrigin = ({ tappable, loading }) => {
+  const { t, i18n } = useTranslation()
+  const Icons = useMemory((s) => s.Icons)
+  if (loading || !tappable) {
+    return null
+  }
+
+  const formattedType = formatTappableType(tappable.type, t, i18n)
+  const tappableIcon =
+    Icons && typeof Icons.getTappable === 'function'
+      ? Icons.getTappable(tappable.type)
+      : ''
+
+  return (
+    <>
+      <span>{t('tappable_origin_from')}</span>
+      {tappableIcon ? (
+        <img
+          src={tappableIcon}
+          alt={formattedType}
+          style={{ width: 20, height: 20, objectFit: 'contain' }}
+        />
+      ) : null}
+      <span>{formattedType}</span>
+    </>
+  )
+}
+
+const Info = ({ pokemon, metaData, perms, timeOfDay, backgroundVisuals }) => {
+  const Icons = useMemory((s) => s.Icons)
+  const { t } = useTranslation()
   const { gender, size, weather, form } = pokemon
   const formTypes = metaData?.forms?.[form]?.types || metaData?.types || []
   const darkMode = useStorage((s) => s.darkMode)
+  const iconStyles = backgroundVisuals?.styles?.icon
+  const hasBackground = Boolean(backgroundVisuals?.hasBackground)
+  const weatherIconUrl = Icons?.getWeather?.(weather, timeOfDay) || ''
+  const weatherIconColor = backgroundVisuals?.primaryColor || '#fff'
   return (
     <Grid
       xs={perms.iv ? 3 : 11}
@@ -319,17 +588,43 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
     >
       {weather != 0 && perms.iv && (
         <Grid
-          className={`grid-item ${darkMode ? '' : 'darken-image'}`}
           style={{
             height: 24,
             width: 24,
-            backgroundImage: `url(${Icons.getWeather(weather, timeOfDay)})`,
+            ...(iconStyles || {}),
           }}
-        />
+        >
+          <div
+            className={
+              hasBackground
+                ? 'grid-item'
+                : `grid-item ${darkMode ? '' : 'darken-image'}`
+            }
+            style={{
+              height: '100%',
+              width: '100%',
+              ...(hasBackground
+                ? {
+                    WebkitMaskImage: `url(${weatherIconUrl})`,
+                    maskImage: `url(${weatherIconUrl})`,
+                    WebkitMaskRepeat: 'no-repeat',
+                    maskRepeat: 'no-repeat',
+                    WebkitMaskPosition: 'center',
+                    maskPosition: 'center',
+                    WebkitMaskSize: 'contain',
+                    maskSize: 'contain',
+                    backgroundColor: weatherIconColor,
+                  }
+                : {
+                    backgroundImage: `url(${weatherIconUrl})`,
+                  }),
+            }}
+          />
+        </Grid>
       )}
       {!!gender && (
         <Grid textAlign="center">
-          <GenderIcon gender={gender} />
+          <GenderIcon gender={gender} data-background-icon="true" />
         </Grid>
       )}
       {!!size && Number.isInteger(size) && (
@@ -360,7 +655,8 @@ const Info = ({ pokemon, metaData, perms, Icons, timeOfDay, t }) => {
   )
 }
 
-const Timer = ({ pokemon, hasStats, t }) => {
+const Timer = ({ pokemon, hasStats }) => {
+  const { t } = useTranslation()
   const { expire_timestamp, expire_timestamp_verified } = pokemon
   const despawnTimer = expire_timestamp * 1000
   const [timer, setTimer] = React.useState(getTimeUntil(despawnTimer, true))
@@ -392,7 +688,6 @@ const Timer = ({ pokemon, hasStats, t }) => {
               : t('timer_unverified')
           }
           arrow
-          enterTouchDelay={0}
         >
           <StatusIcon status={expire_timestamp_verified} />
         </Tooltip>
@@ -401,29 +696,19 @@ const Timer = ({ pokemon, hasStats, t }) => {
   )
 }
 
-const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
+const Footer = ({ pokemon, extrasOpen, pvpOpen, hasPvp, onToggle }) => {
+  const Icons = useMemory((s) => s.Icons)
   const { lat, lon } = pokemon
   const darkMode = useStorage((s) => s.darkMode)
-
-  const handleExpandClick = (category) => {
-    const opposite = category === 'extras' ? 'pvp' : 'extras'
-    useStorage.setState((prev) => ({
-      popups: {
-        ...prev.popups,
-        [category]: !popups[category],
-        [opposite]: false,
-      },
-    }))
-  }
 
   return (
     <>
       {hasPvp && (
         <Grid xs={4}>
           <IconButton
-            className={popups.pvp ? 'expanded' : 'closed'}
+            className={pvpOpen ? 'expanded' : 'closed'}
             name="pvp"
-            onClick={() => handleExpandClick('pvp')}
+            onClick={() => onToggle?.('pvp')}
             size="large"
           >
             <img
@@ -432,6 +717,7 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
               src={Icons.getMisc('pvp')}
               height={20}
               width="auto"
+              data-background-icon="true"
             />
           </IconButton>
         </Grid>
@@ -441,18 +727,20 @@ const Footer = ({ pokemon, popups, hasPvp, Icons }) => {
       </Grid>
       <Grid xs={4}>
         <IconButton
-          className={popups.extras ? 'expanded' : 'closed'}
-          onClick={() => handleExpandClick('extras')}
+          className={extrasOpen ? 'expanded' : 'closed'}
+          onClick={() => onToggle?.('extras')}
           size="large"
         >
-          <ExpandMore />
+          <ExpandMore data-background-icon="true" />
         </IconButton>
       </Grid>
     </>
   )
 }
 
-const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
+const ExtraPokemonInfo = ({ pokemon, perms, userSettings }) => {
+  const Icons = useMemory((s) => s.Icons)
+  const { t } = useTranslation()
   const moves = useMemory((s) => s.masterfile.moves)
 
   const { move_1, move_2, first_seen_timestamp, updated, iv } = pokemon
@@ -473,7 +761,11 @@ const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
         })}
       <Divider
         flexItem
-        style={{ width: '100%', height: 2, margin: '10px 0' }}
+        style={{
+          width: '100%',
+          height: 2,
+          margin: '10px 0',
+        }}
       />
       <TimeStamp time={first_seen_timestamp}>first_seen</TimeStamp>
       <TimeStamp time={updated}>last_seen</TimeStamp>
@@ -494,7 +786,9 @@ const ExtraPokemonInfo = ({ pokemon, perms, userSettings, t, Icons }) => {
   )
 }
 
-const PvpInfo = ({ pokemon, league, data, t, Icons }) => {
+const PvpInfo = ({ pokemon, league, data }) => {
+  const Icons = useMemory((s) => s.Icons)
+  const { t } = useTranslation()
   if (data === null) return ''
 
   const rows = data

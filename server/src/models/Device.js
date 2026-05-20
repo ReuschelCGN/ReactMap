@@ -20,26 +20,49 @@ class Device extends Model {
     const { areaRestrictions } = perms
     const { onlyAreas } = args.filters
     const query = this.query()
-    query
-      .leftJoin('instance', 'device.instance_name', 'instance.name')
-      .select(
-        'uuid AS id',
-        'last_seen AS updated',
-        'last_lat AS lat',
-        'last_lon AS lon',
-        'type',
-        'instance_name',
-        raw('json_extract(data, "$.area")').as('route'),
-        raw('json_extract(data, "$.radius")').as('radius'),
-      )
-    if (!getAreaSql(query, areaRestrictions, onlyAreas, 'device')) {
+    if (context.isMad) {
+      query
+        .join('trs_status', 'settings_device.device_id', 'trs_status.device_id')
+        .join('settings_area', 'trs_status.area_id', 'settings_area.area_id')
+        .select([
+          'settings_device.name AS id',
+          'settings_area.name AS instance_name',
+          'mode AS type',
+          raw('UNIX_TIMESTAMP(lastProtoDateTime)').as('updated'),
+          raw('X(currentPos)').as('lat'),
+          raw('Y(currentPos)').as('lon'),
+          raw('true').as('isMad'),
+        ])
+    } else {
+      query
+        .leftJoin('instance', 'device.instance_name', 'instance.name')
+        .select(
+          'uuid AS id',
+          'last_seen AS updated',
+          'last_lat AS lat',
+          'last_lon AS lon',
+          'type',
+          'instance_name',
+          raw('json_extract(data, "$.area")').as('route'),
+          raw('json_extract(data, "$.radius")').as('radius'),
+        )
+    }
+    if (
+      !getAreaSql(query, areaRestrictions, onlyAreas, context.isMad, 'device')
+    ) {
       return []
     }
     const results = context.mem
       ? await fetchJson(`${context.mem}/api/devices/all`, {
           method: 'GET',
           headers: {
-            'X-Golbat-Secret': context.secret || undefined,
+            // Support both secret-based and HTTP authentication
+            ...(context.secret ? { 'X-Golbat-Secret': context.secret } : {}),
+            ...(context.httpAuth
+              ? {
+                  Authorization: `Basic ${Buffer.from(`${context.httpAuth.username}:${context.httpAuth.password}`).toString('base64')}`,
+                }
+              : {}),
           },
         }).then((res) =>
           Object.entries(res.devices)
@@ -54,7 +77,7 @@ class Device extends Model {
               filterRTree(device, areaRestrictions, onlyAreas),
             ),
         )
-      : await query.from('device')
+      : await query.from(context.isMad ? 'settings_device' : 'device')
     // @ts-ignore
     return results.filter((device) => device.id && device.lat && device.lon)
   }

@@ -24,6 +24,7 @@ class DbManager extends Logger {
     'ScanCell',
     'Spawnpoint',
     'Station',
+    'Tappable',
     'Weather',
   ])
 
@@ -108,13 +109,20 @@ class DbManager extends Logger {
 
   /**
    * @param {{ lat: number, lon: number }} args
+   * @param {boolean} isMad
    * @returns {ReturnType<typeof raw>}
    */
-  static getDistance(args) {
+  static getDistance(args, isMad) {
     const radLat = args.lat * (Math.PI / 180)
     const radLon = args.lon * (Math.PI / 180)
     return raw(
-      `ROUND(( 6371000 * acos( cos( ${radLat} ) * cos( radians( ${'lat'} ) ) * cos( radians( ${'lon'} ) - ${radLon} ) + sin( ${radLat} ) * sin( radians( ${'lat'} ) ) ) ), 2)`,
+      `ROUND(( 6371000 * acos( cos( ${radLat} ) * cos( radians( ${
+        isMad ? 'latitude' : 'lat'
+      } ) ) * cos( radians( ${
+        isMad ? 'longitude' : 'lon'
+      } ) - ${radLon} ) + sin( ${radLat} ) * sin( radians( ${
+        isMad ? 'latitude' : 'lat'
+      } ) ) ) ), 2)`,
     ).as('distance')
   }
 
@@ -123,14 +131,16 @@ class DbManager extends Logger {
    * @returns {Promise<import("@rm/types").DbContext>}
    */
   static async schemaCheck(schema) {
-    const [pvpV2, hasSize, hasHeight] = await schema('pokemon')
-      .columnInfo()
-      .then((columns) => [
-        'cp_multiplier' in columns,
-        'pvp' in columns,
-        'size' in columns,
-        'height' in columns,
-      ])
+    const [isMad, pvpV2, hasSize, hasHeight, hasPokemonBackground] =
+      await schema('pokemon')
+        .columnInfo()
+        .then((columns) => [
+          'cp_multiplier' in columns,
+          'pvp' in columns,
+          'size' in columns,
+          'height' in columns,
+          'background' in columns,
+        ])
     const [
       hasRewardAmount,
       hasPowerUp,
@@ -141,22 +151,29 @@ class DbManager extends Logger {
     ] = await schema('pokestop')
       .columnInfo()
       .then((columns) => [
-        'quest_reward_amount' in columns,
+        'quest_reward_amount' in columns || isMad,
         'power_up_level' in columns,
         'alternative_quest_type' in columns,
         'showcase_pokemon_id' in columns,
         'showcase_pokemon_form_id' in columns,
         'showcase_pokemon_type_id' in columns,
       ])
-    const hasStationedGmax =
-      'total_stationed_gmax' in (await schema('station').columnInfo())
-    const [hasLayerColumn] = [false]
+    const stationColumns = await schema('station').columnInfo()
+    const hasStationedGmax = 'total_stationed_gmax' in stationColumns
+    const hasBattlePokemonStats =
+      'battle_pokemon_stamina' in stationColumns &&
+      'battle_pokemon_cp_multiplier' in stationColumns
+    const [hasLayerColumn] = isMad
+      ? await schema('trs_quest')
+          .columnInfo()
+          .then((columns) => ['layer' in columns])
+      : [false]
     const [hasMultiInvasions, multiInvasionMs, hasConfirmed] = await schema(
-      'incident',
+      isMad ? 'pokestop_incident' : 'incident',
     )
       .columnInfo()
       .then((columns) => [
-        'character' in columns,
+        (isMad ? 'character_display' : 'character') in columns,
         'expiration_ms' in columns,
         'confirmed' in columns,
       ])
@@ -170,8 +187,19 @@ class DbManager extends Logger {
     const [polygon] = await schema('nests')
       .columnInfo()
       .then((columns) => ['polygon' in columns])
+    const [hasShortcode] = await schema('route')
+      .columnInfo()
+      .then((columns) => ['shortcode' in columns])
+
+    let hasPokemonShinyStats
+    try {
+      hasPokemonShinyStats = await schema.schema.hasTable('pokemon_shiny_stats')
+    } catch (e) {
+      hasPokemonShinyStats = false
+    }
 
     return {
+      isMad,
       pvpV2,
       mem: '',
       secret: '',
@@ -191,6 +219,10 @@ class DbManager extends Logger {
       hasShowcaseForm,
       hasShowcaseType,
       hasStationedGmax,
+      hasBattlePokemonStats,
+      hasShortcode,
+      hasPokemonShinyStats,
+      hasPokemonBackground,
     }
   }
 
@@ -208,6 +240,7 @@ class DbManager extends Logger {
             : {
                 mem: this.endpoints[i].endpoint,
                 secret: this.endpoints[i].secret,
+                httpAuth: this.endpoints[i].httpAuth,
                 pvpV2: true,
               }
 
@@ -271,7 +304,7 @@ class DbManager extends Logger {
     try {
       const results = await Promise.all(
         (this.models.Pokemon ?? []).map(async (source) =>
-          source.mem
+          source.isMad || source.mem
             ? []
             : source.SubModel.query()
                 .select('pokemon_id', raw('SUM(count) as total'))
@@ -370,6 +403,52 @@ class DbManager extends Logger {
   }
 
   /**
+   * @param {import("../models").ScannerModelKeys} model
+   * @param {{ connection?: number, mem?: string }} source
+   * @returns {string}
+   */
+  static sourceLabel(model, source) {
+    if (source.mem) {
+      return `${model}:endpoint:${source.mem}`
+    }
+    if (typeof source.connection === 'number') {
+      return `${model}:connection:${source.connection}`
+    }
+    return `${model}:unknown-source`
+  }
+
+  /**
+   * @template T
+   * @param {import("../models").ScannerModelKeys} model
+   * @param {(source: any) => Promise<T>} handler
+   * @returns {Promise<T[]>}
+   */
+  async runScannerSources(model, handler) {
+    const settled = await Promise.allSettled(
+      this.models[model].map(async ({ SubModel, ...source }) =>
+        handler({ SubModel, ...source }),
+      ),
+    )
+
+    /** @type {T[]} */
+    const successful = []
+    settled.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        successful.push(result.value)
+      } else {
+        const source = this.models[model][index]
+        this.log.warn(
+          TAGS[model.toLowerCase()] || `[${model.toUpperCase()}]`,
+          DbManager.sourceLabel(model, source),
+          result.reason,
+        )
+      }
+    })
+
+    return successful
+  }
+
+  /**
    * @template {import("@rm/types").BaseRecord} T
    * @param {import("../models").ScannerModelKeys} model
    * @param {import("@rm/types").Permissions} perms
@@ -379,17 +458,12 @@ class DbManager extends Logger {
    * @returns {Promise<T[]>}
    */
   async getAll(model, perms, args, userId, method = 'getAll') {
-    try {
-      const data = await Promise.all(
-        this.models[model].map(async ({ SubModel, ...source }) =>
-          SubModel[method](perms, args, source, userId),
-        ),
-      )
-      return DbManager.deDupeResults(data)
-    } catch (e) {
-      this.log.error(TAGS[model.toLowerCase()], e)
-      throw e
-    }
+    const data = await this.runScannerSources(
+      model,
+      async ({ SubModel, ...source }) =>
+        SubModel[method](perms, args, source, userId),
+    )
+    return DbManager.deDupeResults(data)
   }
 
   /**
@@ -454,7 +528,7 @@ class DbManager extends Logger {
             perms,
             args,
             source,
-            DbManager.getDistance(args),
+            DbManager.getDistance(args, source.isMad),
             bbox,
           ),
         ),
@@ -550,10 +624,9 @@ class DbManager extends Logger {
    */
   async query(model, method, ...args) {
     if (Array.isArray(this.models[model])) {
-      const data = await Promise.all(
-        this.models[model].map(async ({ SubModel, ...source }) =>
-          SubModel[method](...args, source),
-        ),
+      const data = await this.runScannerSources(
+        model,
+        async ({ SubModel, ...source }) => SubModel[method](...args, source),
       )
       return DbManager.deDupeResults(data.filter(Boolean))
     }
@@ -568,49 +641,44 @@ class DbManager extends Logger {
   async getAvailable(model) {
     if (this.models[model]) {
       this.log.info(`Querying available for ${model}`)
-      try {
-        const results = await Promise.all(
-          this.models[model].map(async ({ SubModel, ...source }) =>
-            SubModel.getAvailable(source),
-          ),
-        )
-        this.log.info(`Setting available for ${model}`)
-        if (model === 'Pokestop') {
-          const newQuestConditions = {}
-          results.forEach((result) => {
-            if ('conditions' in result) {
-              config.util.extendDeep(newQuestConditions, result.conditions)
-            }
-          })
-          this.questConditions = Object.fromEntries(
-            Object.entries(newQuestConditions).map(([key, titles]) => [
-              key,
-              Object.values(titles),
-            ]),
-          )
-        }
-        if (model === 'Pokemon') {
-          this.setRarity(results, false)
-        }
-        if (results.length === 1) return results[0].available
-        if (results.length > 1) {
-          const returnSet = new Set()
-          for (let i = 0; i < results.length; i += 1) {
-            for (let j = 0; j < results[i].available.length; j += 1) {
-              returnSet.add(results[i].available[j])
-            }
+      const results = await this.runScannerSources(
+        model,
+        async ({ SubModel, ...source }) => SubModel.getAvailable(source),
+      )
+      this.log.info(`Setting available for ${model}`)
+      if (model === 'Pokestop') {
+        const newQuestConditions = {}
+        results.forEach((result) => {
+          if ('conditions' in result) {
+            config.util.extendDeep(newQuestConditions, result.conditions)
           }
-          return [...returnSet]
-        }
-      } catch (e) {
-        this.log.warn('Unable to query available for:', model, '\n', e)
-        if (model === 'Nest') {
-          this.log.warn(
-            'This is likely due to "nest" being in a useFor array but not in the database',
-          )
-        }
-        return []
+        })
+        this.questConditions = Object.fromEntries(
+          Object.entries(newQuestConditions).map(([key, titles]) => [
+            key,
+            Object.values(titles),
+          ]),
+        )
       }
+      if (model === 'Pokemon') {
+        this.setRarity(results, false)
+      }
+      if (results.length === 1) return results[0].available
+      if (results.length > 1) {
+        const returnSet = new Set()
+        for (let i = 0; i < results.length; i += 1) {
+          for (let j = 0; j < results[i].available.length; j += 1) {
+            returnSet.add(results[i].available[j])
+          }
+        }
+        return [...returnSet]
+      }
+      if (results.length === 0 && model === 'Nest') {
+        this.log.warn(
+          'This is likely due to "nest" being in a useFor array but not in the database',
+        )
+      }
+      return []
     }
     return []
   }
@@ -622,7 +690,9 @@ class DbManager extends Logger {
     if (this.models.Route) {
       try {
         const results = await Promise.all(
-          this.models.Route.map(({ SubModel }) => SubModel.getFilterContext()),
+          this.models.Route.map(({ SubModel, ...source }) =>
+            SubModel.getFilterContext(source),
+          ),
         )
         this.filterContext.Route.maxDistance = Math.max(
           ...results.map((result) => result.max_distance),

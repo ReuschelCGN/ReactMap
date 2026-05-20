@@ -48,6 +48,7 @@ Pokemon GO Map frontend built with React.
 ## Backends Supported
 
 - [Chuck](https://github.com/WatWowMap/Chuck)
+- ~~[Map-A-Droid (MAD)](https://github.com/Map-A-Droid/MAD)~~ (YMMV, see deprecated features)
 - [RealDeviceMap (RDM)](https://github.com/realdevicemap/realdevicemap)
 - [Golbat](https://github.com/UnownHash/Golbat)
 
@@ -58,6 +59,11 @@ Pokemon GO Map frontend built with React.
 ## Support
 
 - Join the [Discord](https://discord.gg/EYYsKPVawn)!
+
+## Deprecated Features
+
+- Map-A-Droid (MAD): This backend is no longer supported. It may still work, but it is not tested and will not receive updates.
+- Basic and Intermediate Pokemon filters: The logics are too complicated for any human to understand so they will not receive any further updates unless an obvious bug is found.
 
 ## Credits
 

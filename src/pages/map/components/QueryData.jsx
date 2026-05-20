@@ -11,8 +11,11 @@ import { RobustTimeout } from '@services/apollo/RobustTimeout'
 import { FILTER_SKIP_LIST } from '@assets/constants'
 import { Notification } from '@components/Notification'
 import { GenerateCells } from '@features/s2cell'
+import { RouteLayer } from '@features/route'
+import { ActiveWeather } from '@features/weather'
 import { useAnalytics } from '@hooks/useAnalytics'
 import { useProcessError } from '@hooks/useProcessError'
+import { normalizeCategory } from '@utils/normalizeCategory'
 
 import { Clustering } from './Clustering'
 import { TILES } from '../tileObject'
@@ -32,6 +35,17 @@ const userSettingsCategory = (category) => {
       return category
   }
 }
+
+const MANUAL_ID_CATEGORIES = new Set([
+  'gyms',
+  'pokestops',
+  'pokemon',
+  'nests',
+  'portals',
+  'stations',
+  'routes',
+  'tappables',
+])
 
 /**
  * @template {keyof import('@rm/types').AllFilters} T
@@ -104,6 +118,7 @@ function QueryData({ category, timeout }) {
 
   const hideList = useMemory((s) => s.hideList)
   const active = useMemory((s) => s.active)
+  const manualParams = useMemory((s) => s.manualParams)
 
   const userSettings = useStorage(
     (s) => s.userSettings[userSettingsCategory(category)],
@@ -115,13 +130,40 @@ function QueryData({ category, timeout }) {
       s.filters?.scanAreas?.filter?.areas,
   )
 
-  const initial = React.useMemo(
-    () => ({
-      ...getQueryArgs(),
-      filters: trimFilters(filters, userSettings, category, onlyAreas),
-    }),
-    [],
+  const normalizedCategory = React.useMemo(
+    () => normalizeCategory(category),
+    [category],
   )
+  const manualId = React.useMemo(() => {
+    if (
+      manualParams?.id === undefined ||
+      manualParams.id === '' ||
+      manualParams.id === null
+    ) {
+      return undefined
+    }
+    const manualCategory = normalizeCategory(manualParams.category)
+    return manualCategory === normalizedCategory ? manualParams.id : undefined
+  }, [manualParams, normalizedCategory])
+
+  const buildVariables = React.useCallback(() => {
+    const args = getQueryArgs()
+    const trimmedFilters = trimFilters(
+      filters,
+      userSettings,
+      category,
+      onlyAreas,
+    )
+    if (manualId && MANUAL_ID_CATEGORIES.has(normalizedCategory)) {
+      trimmedFilters.onlyManualId = manualId
+    }
+    return {
+      ...args,
+      filters: trimmedFilters,
+    }
+  }, [filters, userSettings, category, onlyAreas, manualId, normalizedCategory])
+
+  const initial = React.useMemo(() => buildVariables(), [buildVariables])
   const { data, previousData, error, refetch } = useQuery(
     Query[category](filters),
     {
@@ -150,10 +192,7 @@ function QueryData({ category, timeout }) {
   React.useEffect(() => {
     const refetchData = () => {
       if (category !== 'scanAreas') {
-        timeout.current.doRefetch({
-          ...getQueryArgs(),
-          filters: trimFilters(filters, userSettings, category, onlyAreas),
-        })
+        timeout.current.doRefetch(buildVariables())
       }
     }
     map.on('fetchdata', refetchData)
@@ -161,7 +200,7 @@ function QueryData({ category, timeout }) {
     return () => {
       map.off('fetchdata', refetchData)
     }
-  }, [filters, userSettings, onlyAreas, timeout.current.refetch])
+  }, [category, map, buildVariables, timeout])
 
   const errorState = useProcessError(error)
 
@@ -185,14 +224,20 @@ function QueryData({ category, timeout }) {
     ) : null
   }
 
+  const filteredData = returnData.filter((each) => !hideList.has(each.id))
+
+  if (category === 'routes') {
+    return <RouteLayer routes={filteredData} />
+  }
+
   return (
-    <Clustering category={category}>
-      {returnData.map((each) => {
-        if (!hideList.has(each.id)) {
-          return <Component key={each.id || category} {...each} />
-        }
-        return null
-      })}
-    </Clustering>
+    <>
+      <Clustering category={category}>
+        {filteredData.map((each) => (
+          <Component key={each.id || category} {...each} />
+        ))}
+      </Clustering>
+      {category === 'weather' && <ActiveWeather weatherData={filteredData} />}
+    </>
   )
 }

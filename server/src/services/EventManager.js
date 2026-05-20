@@ -19,9 +19,9 @@ class EventManager extends Logger {
     super('event')
     /** @type {import("@rm/masterfile").Masterfile} */
     this.masterfile = read()
-    /** @type {import("@rm/masterfile").Masterfile['invasions'] | {}} */
-    this.invasions =
-      'invasions' in this.masterfile ? this.masterfile.invasions : {}
+    this.setInvasions(
+      'invasions' in this.masterfile ? this.masterfile.invasions : {},
+    )
 
     /** @type {{[key in keyof import('@rm/types').Available]: string[] }} */
     this.available = getCache('available.json', {
@@ -30,6 +30,7 @@ class EventManager extends Logger {
       pokemon: [],
       nests: [],
       stations: [],
+      tappables: [],
     })
     this.uicons = getCache('uicons.json', [])
     this.uaudio = getCache('uaudio.json', [])
@@ -58,6 +59,21 @@ class EventManager extends Logger {
     )
     /** @type {ClientObject} */
     this.authClients = {}
+  }
+
+  /** @param {import("@rm/masterfile").Masterfile['invasions'] | {}} invasions */
+  setInvasions(invasions) {
+    this.invasions = invasions
+    this.rocketGruntIDs = Object.keys(invasions)
+      .filter((key) => invasions[key].grunt === 'Grunt')
+      .map(Number)
+    this.rocketLeaderIDs = Object.keys(invasions)
+      .filter(
+        (key) =>
+          invasions[key].grunt === 'Executive' ||
+          invasions[key].grunt === 'Giovanni',
+      )
+      .map(Number)
   }
 
   /**
@@ -245,7 +261,7 @@ class EventManager extends Logger {
     if (config.getSafe('api.pogoApiEndpoints.invasions')) {
       this.intervals.invasions = setInterval(
         async () => {
-          await this.getInvasions()
+          await this.getInvasions(Db)
           await this.chatLog('event', { description: 'Refreshed invasions' })
         },
         1000 * 60 * 60 * (config.getSafe('map.misc.invasionCacheHrs') || 1),
@@ -355,7 +371,11 @@ class EventManager extends Logger {
     this[type] = Object.values(this[`${type}Backup`])
   }
 
-  async getInvasions() {
+  /**
+   *
+   * @param {import('./DbManager').DbManager} [Db] - Database manager instance
+   */
+  async getInvasions(Db) {
     const endpoint = config.getSafe('api.pogoApiEndpoints.invasions')
     if (endpoint) {
       this.log.info('Fetching Latest Invasions')
@@ -363,19 +383,12 @@ class EventManager extends Logger {
         /** @type {import('@rm/masterfile').Masterfile['invasions']} */
         const newInvasions = await fetch(endpoint).then((res) => res.json())
         if (newInvasions) {
-          this.rocketGruntIDs = Object.keys(newInvasions)
-            .filter((key) => newInvasions[key].grunt === 'Grunt')
-            .map(Number)
+          this.setInvasions(newInvasions)
 
-          this.rocketLeaderIDs = Object.keys(newInvasions)
-            .filter(
-              (key) =>
-                newInvasions[key].grunt === 'Executive' ||
-                newInvasions[key].grunt === 'Giovanni',
-            )
-            .map(Number)
-
-          this.invasions = newInvasions
+          // Update available rocket Pokemon whenever invasions are refreshed
+          if (Db) {
+            await this.setAvailable('pokestops', 'Pokestop', Db)
+          }
         }
       } catch (e) {
         this.log.warn('Unable to generate latest invasions:\n', e)
@@ -405,6 +418,11 @@ class EventManager extends Logger {
       if (!Number.isNaN(parseInt(item.charAt(0)))) {
         const [id, form] = item.split('-')
         const formId = form || '0'
+        if (category === 'pokemon' && id === '132' && formId === '0') {
+          // Wild Ditto uses a synthetic filter key here. Do not backfill it
+          // into the masterfile as a real form entry.
+          return
+        }
         if (!this.masterfile.pokemon[id]) {
           this.masterfile.pokemon[id] = {
             name: '',

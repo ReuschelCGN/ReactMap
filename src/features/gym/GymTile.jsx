@@ -9,9 +9,12 @@ import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
 import { useForcePopup } from '@hooks/useForcePopup'
+import { useManualPopupTracker } from '@hooks/useManualPopupTracker'
 import { sendNotification } from '@services/desktopNotification'
 import { TooltipWrapper } from '@components/ToolTipWrapper'
 import { getTimeUntil } from '@utils/getTimeUntil'
+import { getFormDisplay } from '@utils/getFormDisplay'
+import { useRouteStore, resolveRoutePoiKey } from '@features/route'
 
 import { gymMarker } from './gymMarker'
 import { GymPopup } from './GymPopup'
@@ -38,6 +41,13 @@ const getColor = (team) => {
 const BaseGymTile = (gym) => {
   const [markerRef, setMarkerRef] = React.useState(null)
   const [stateChange, setStateChange] = React.useState(false)
+  const hasRoutes = useRouteStore(
+    React.useCallback(
+      (state) => !!resolveRoutePoiKey(state.poiIndex, gym.id, gym.lat, gym.lon),
+      [gym.id, gym.lat, gym.lon],
+    ),
+  )
+  const selectPoi = useRouteStore((s) => s.selectPoi)
 
   const [
     hasRaid,
@@ -118,7 +128,6 @@ const BaseGymTile = (gym) => {
   const [
     showTimer,
     showInteractionRange,
-    show300mCircles,
     customRange,
     showDiamond,
     showExBadge,
@@ -129,7 +138,6 @@ const BaseGymTile = (gym) => {
     return [
       (userSettings.gyms.raidTimers || inTimerList) && hasRaid,
       !!userSettings.gyms.interactionRanges && zoom >= interactionRangeZoom,
-      !!userSettings.gyms['300mRange'] && zoom >= interactionRangeZoom,
       zoom >= interactionRangeZoom ? +userSettings.gyms.customRange || 0 : 0,
       !!gym.badge &&
         filters.gyms.gymBadges &&
@@ -147,10 +155,22 @@ const BaseGymTile = (gym) => {
       ? gym.raid_end_timestamp
       : gym.raid_battle_timestamp
 
+  const rangePathOptions = React.useMemo(
+    () => ({ color: getColor(gym.team_id), weight: 0.5 }),
+    [gym.team_id],
+  )
+
   useForcePopup(gym.id, markerRef)
   useMarkerTimer(timerToDisplay, markerRef, () => setStateChange(!stateChange))
+  const handlePopupOpen = useManualPopupTracker('gyms', gym.id)
+  const raidForm = getFormDisplay(
+    gym.raid_pokemon_id,
+    gym.raid_pokemon_form,
+    gym.raid_pokemon_costume,
+  )
   if (hasRaid) {
     sendNotification(`${gym.id}-${hasHatched}`, gym.name, 'raids', {
+      manualId: gym.id,
       lat: gym.lat,
       lon: gym.lon,
       expire: timerToDisplay,
@@ -158,7 +178,7 @@ const BaseGymTile = (gym) => {
       body: `${t(`${hasHatched ? `raid` : 'egg'}_${gym.raid_level}`)}\n${
         gym.raid_pokemon_evolution ? t(`evo_${gym.raid_pokemon_evolution}`) : ''
       }${gym.raid_pokemon_id ? t(`poke_${gym.raid_pokemon_id}`) : ''}${
-        gym.raid_pokemon_form ? t(`form_${gym.raid_pokemon_form}`) : ''
+        raidForm && gym.raid_pokemon_id ? ` ${raidForm}` : ''
       }${gym.raid_pokemon_id ? '\n' : ''}${
         getTimeUntil(timerToDisplay * 1000, true).str
       }`,
@@ -181,6 +201,14 @@ const BaseGymTile = (gym) => {
         raidIconSize,
         ...gym,
       })}
+      eventHandlers={{
+        click: () => {
+          if (hasRoutes) {
+            selectPoi(gym.id, gym.lat, gym.lon)
+          }
+        },
+        popupopen: handlePopupOpen,
+      }}
     >
       <Popup position={[gym.lat, gym.lon]}>
         <GymPopup
@@ -197,24 +225,14 @@ const BaseGymTile = (gym) => {
         <Circle
           center={[gym.lat, gym.lon]}
           radius={80}
-          color={getColor(gym.team_id)}
-          weight={0.5}
-        />
-      )}
-      {show300mCircles && (
-        <Circle
-          center={[gym.lat, gym.lon]}
-          radius={300}
-          color={getColor(gym.team_id)}
-          weight={0.5}
+          pathOptions={rangePathOptions}
         />
       )}
       {!!customRange && (
         <Circle
           center={[gym.lat, gym.lon]}
           radius={customRange}
-          color={getColor(gym.team_id)}
-          weight={0.5}
+          pathOptions={rangePathOptions}
         />
       )}
     </Marker>

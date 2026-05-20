@@ -29,6 +29,9 @@ const battle = gql`
     battle_pokemon_bread_mode
     battle_pokemon_move_1
     battle_pokemon_move_2
+    battle_pokemon_stamina
+    battle_pokemon_cp_multiplier
+    battle_pokemon_estimated_cp
     total_stationed_pokemon
     total_stationed_gmax
   }
@@ -85,6 +88,12 @@ export const GET_STATION_POKEMON = gql`
       form
       costume
       gender
+      shiny
+      temp_evolution
+      temp_evolution_finish_ms
+      alignment
+      badge
+      background
       bread_mode
     }
   }

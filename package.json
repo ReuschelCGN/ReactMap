@@ -1,6 +1,6 @@
 {
   "name": "reactmap",
-  "version": "1.36.0-develop.16",
+  "version": "1.43.1",
   "private": true,
   "description": "React based frontend map.",
   "license": "MIT",
@@ -47,7 +47,7 @@
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
-      "eslint \"**/*.{js,jsx}\" --fix"
+      "eslint --cache --fix"
     ],
     "**/*": [
       "prettier --write --ignore-unknown"
@@ -99,8 +99,9 @@
   },
   "dependencies": {
     "@apollo/client": "3.11.4",
-    "@apollo/server": "4.11.0",
-    "@emotion/react": "11.13.0",
+    "@apollo/server": "5.5.0",
+    "@as-integrations/express5": "1.1.2",
+    "@emotion/react": "11.14.0",
     "@emotion/styled": "11.13.0",
     "@graphql-tools/graphql-file-loader": "8.0.1",
     "@graphql-tools/load": "8.0.2",
@@ -117,7 +118,7 @@
     "@sentry/react": "^7.65.0",
     "@turf/boolean-contains": "7.1.0",
     "@turf/boolean-overlap": "7.1.0",
-    "@turf/boolean-point-in-polygon": "7.1.0",
+    "@turf/boolean-point-in-polygon": "7.3.1",
     "@turf/center": "7.1.0",
     "@turf/destination": "7.1.0",
     "@turf/distance": "7.1.0",
@@ -135,29 +136,31 @@
     "discord.js": "^14.18.0",
     "dlv": "^1.1.3",
     "dotenv": "^16.3.1",
-    "express": "5.0.1",
+    "express": "5.2.1",
     "express-mysql-session": "3.0.3",
     "express-rate-limit": "7.4.0",
     "express-session": "^1.18.1",
     "geo-tz": "^7.0.7",
-    "graphql": "16.9.0",
+    "graphql": "16.11.0",
     "graphql-type-json": "0.3.2",
     "helmet": "7.1.0",
     "i18next": "23.12.3",
     "i18next-browser-languagedetector": "8.0.0",
-    "i18next-fs-backend": "2.3.2",
-    "i18next-http-backend": "2.5.2",
+    "i18next-fs-backend": "2.6.4",
+    "i18next-http-backend": "3.0.5",
     "knex": "3.1.0",
     "leaflet": "1.9.4",
-    "leaflet.locatecontrol": "0.81.0",
-    "lodash": "^4.17.21",
-    "moment-timezone": "^0.5.43",
+    "leaflet-arrowheads": "^1.4.0",
+    "leaflet.locatecontrol": "0.85.1",
+    "lodash": "^4.17.23",
+    "long": "^4.0.0",
+    "moment-timezone": "^0.6.0",
     "mysql2": "3.11.0",
     "node-cache": "^5.1.2",
     "node-fetch": "2.7.0",
     "node-geocoder": "^4.2.0",
     "nodes2ts": "3.0.0",
-    "objection": "3.1.4",
+    "objection": "3.1.5",
     "ohbem": "1.5.3",
     "passport": "^0.6.0",
     "passport-discord": "https://github.com/tonestrike/passport-discord.git",
@@ -168,12 +171,12 @@
     "react-i18next": "15.0.1",
     "react-leaflet": "4.2.1",
     "react-router-dom": "^6.15.0",
-    "react-virtuoso": "4.10.1",
+    "react-virtuoso": "4.16.1",
     "rtree": "^1.4.2",
     "source-map": "^0.7.4",
     "suncalc": "^1.9.0",
     "supercluster": "^8.0.1",
-    "uicons.js": "2.0.3",
+    "uicons.js": "2.2.0",
     "zustand": "4.4.6"
   },
   "devDependencies": {
@@ -208,16 +211,16 @@
     "rollup-plugin-delete": "^2.0.0",
     "semantic-release": "^22",
     "typescript": "5.5.4",
-    "vite": "^6.2.6",
+    "vite": "^6.4.2",
     "vite-plugin-checker": "0.7.2"
   },
   "resolutions": {
     "got": ">=11.8.5",
-    "dot-prop": ">=4.2.1"
+    "dot-prop": ">=4.2.1",
+    "tmp": ">=0.2.4"
   },
   "engines": {
-    "node": ">=18",
+    "node": ">=20",
     "yarn": "^1.22.x"
-  },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  }
 }

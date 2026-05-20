@@ -39,8 +39,14 @@ export function useMapData(once = false) {
 
   useEffect(() => {
     if (data?.available) {
-      const { masterfile, filters, icons, audio, questConditions } =
-        data.available
+      const {
+        masterfile,
+        filters,
+        icons,
+        audio,
+        questConditions,
+        supportsShinyStats,
+      } = data.available
       const { icons: userIcons, audio: userAudio } = useStorage.getState()
       const existing = useMemory.getState()
 
@@ -60,10 +66,10 @@ export function useMapData(once = false) {
           ? structuredClone(audio.styles)
           : JSON.parse(JSON.stringify(audio.styles)),
       )
-      if (icons.defaultIcons && !existing) {
+      if (icons.defaultIcons && !existing.Icons) {
         Icons.setSelection(icons.defaultIcons)
       }
-      if (audio.defaultAudio && !existing) {
+      if (audio.defaultAudio && !existing.Audio) {
         Audio.setSelection(audio.defaultAudio)
       }
       if (Icons.checkValid(userIcons)) {
@@ -93,6 +99,13 @@ export function useMapData(once = false) {
         available: {
           ...prev.available,
           questConditions,
+        },
+        featureFlags: {
+          ...prev.featureFlags,
+          supportsShinyStats:
+            typeof supportsShinyStats === 'boolean'
+              ? supportsShinyStats
+              : prev.featureFlags.supportsShinyStats,
         },
       }))
       useStorage.setState((prev) => {

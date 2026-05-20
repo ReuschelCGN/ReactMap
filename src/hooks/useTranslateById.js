@@ -1,10 +1,11 @@
 /* eslint-disable no-fallthrough */
 // @ts-check
-import { useEffect, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
+import { getFormDisplay } from '@utils/getFormDisplay'
 
 /**
- * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean, quest?: boolean }} CustomTOptions
+ * @typedef {{ plural?: boolean, amount?: boolean, alt?: boolean, newLine?: boolean, quest?: boolean, omitFormSuffix?: boolean }} CustomTOptions
  * @typedef {(id: string, options?: CustomTOptions) => string} CustomT
  */
 
@@ -14,16 +15,14 @@ import { useTranslation } from 'react-i18next'
  */
 export function useTranslateById(options = {}) {
   const i18n = useTranslation()
-  const formsToIgnore = useRef(new Set([i18n.t('form_0'), i18n.t('form_45')]))
-
-  useEffect(() => {
-    formsToIgnore.current = new Set([i18n.t('form_0'), i18n.t('form_45')])
-  }, [i18n.i18n.language])
 
   return useMemo(
     () => ({
       language: i18n.i18n.language,
-      t: (id, { plural, amount, alt, newLine, quest } = options) => {
+      t: (
+        id,
+        { plural, amount, alt, newLine, quest, omitFormSuffix } = options,
+      ) => {
         if (typeof id !== 'string') {
           return ''
         }
@@ -115,18 +114,27 @@ export function useTranslateById(options = {}) {
             // pokemon
             const [pokemon, form] = id.split('-', 2)
             const pokemonName = i18n.t(`poke_${pokemon}`)
-            const possibleForm = i18n.t(`form_${form}`)
-            const hideForm =
-              quest || pokemon === '51' // Dugtrio (unset) != Dugtrio (normal)
-                ? form === undefined
-                : formsToIgnore.current.has(possibleForm)
-            return hideForm
-              ? pokemonName
-              : `${pokemonName}${newLine ? '\n' : ' '}(${possibleForm})`
+            const formLabel =
+              form === undefined
+                ? ''
+                : getFormDisplay(pokemon, form, undefined, {
+                    showDefaultForms: quest,
+                    appendFormSuffix: !omitFormSuffix,
+                  })
+            return formLabel
+              ? `${pokemonName}${newLine ? '\n' : ' '}(${formLabel})`
+              : pokemonName
           }
         }
       },
     }),
-    [i18n, options.alt, options.amount, options.plural, options.newLine],
+    [
+      i18n,
+      options.alt,
+      options.amount,
+      options.plural,
+      options.newLine,
+      options.omitFormSuffix,
+    ],
   )
 }

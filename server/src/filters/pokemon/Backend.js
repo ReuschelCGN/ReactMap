@@ -4,6 +4,7 @@
 const config = require('@rm/config')
 const { log, TAGS } = require('@rm/logger')
 const { AND_KEYS, BASE_KEYS } = require('./constants')
+const { getWildFilterKey } = require('./getWildFilterKey')
 const {
   deepCompare,
   between,
@@ -30,6 +31,7 @@ class PkmnBackend {
    * @param {boolean} mods.onlyLinkGlobal
    * @param {boolean} mods.pvpV2
    * @param {boolean} mods.hasSize
+   * @param {boolean} mods.isMad
    * @param {boolean} mods.mem
    * @param {boolean} mods.onlyPvpMega
    * @param {boolean} mods.onlyPvp40
@@ -275,19 +277,19 @@ class PkmnBackend {
       xxl,
       ...rest
     } = this.filter
+    if (pokemon === undefined && this.id !== 'global') {
+      pokemon = [{ id: this.pokemon, form: this.form }]
+    }
+    if (this.mods.onlyLegacy) {
+      return dnfifyIvFilter(adv, pokemon)
+    }
     if (this.id !== 'global') {
-      if (pokemon === undefined) {
-        pokemon = [{ id: this.pokemon, form: this.form }]
-      }
       if (!this.filterKeys.size || (!this.perms.iv && !this.perms.pvp)) {
         return [{ pokemon, iv: { min: -1, max: 100 } }]
       }
       if (this.isEqualToGlobal) {
         return []
       }
-    }
-    if (this.mods.onlyLegacy) {
-      return dnfifyIvFilter(adv, pokemon)
     }
     const results = /** @type {import('@rm/types').DnfFilter[]} */ ([])
     if (
@@ -371,7 +373,7 @@ class PkmnBackend {
         return true
       if (
         !this.mods.onlyLinkGlobal ||
-        (this.pokemon === pokemon.pokemon_id && this.form === pokemon.form)
+        this.id === getWildFilterKey(pokemon.pokemon_id, pokemon.form)
       ) {
         if (!this.expertFilter || !this.expertGlobal) return true
         if (this.expertFilter(pokemon)) {
@@ -429,15 +431,9 @@ class PkmnBackend {
       expire_timestamp_verified: !!pokemon.expire_timestamp_verified,
       updated: pokemon.updated,
       display_pokemon_id: pokemon.display_pokemon_id,
-      ditto_form: pokemon.ditto_form,
       seen_type: pokemon.seen_type,
       changed: !!pokemon.changed,
-    }
-    if (result.pokemon_id === 132 && !result.ditto_form) {
-      result.ditto_form = result.form
-      result.form =
-        state.event.masterfile.pokemon[result.display_pokemon_id]
-          ?.defaultFormId || 0
+      background: pokemon.background,
     }
     if (!result.seen_type) {
       if (result.spawn_id === null) {

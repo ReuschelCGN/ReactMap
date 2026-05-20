@@ -2,16 +2,18 @@
 // TODO: Not sure if this is possible to actually type correctly with how the leaflet.locatecontrol library is written
 
 import { useEffect, useMemo, useState } from 'react'
-import { LayerGroup, DomEvent, DomUtil, Control } from 'leaflet'
+import { LayerGroup, DomEvent, DomUtil } from 'leaflet'
 import { useTranslation } from 'react-i18next'
 import { useMap } from 'react-leaflet'
-import 'leaflet.locatecontrol'
+import { LocateControl } from 'leaflet.locatecontrol'
 
 import { useStorage } from '@store/useStorage'
+import { useLocationError } from '@hooks/useLocationError'
+import { useStopFollowingOnFly } from '@hooks/useStopFollowingOnFly'
 
 /**
  * Use location hook
- * @returns {{ lc: Control.Locate & { _onClick: () => void }, requesting: boolean, color: import('@mui/material').ButtonProps['color'] }}
+ * @returns {{ lc: import('leaflet.locatecontrol').LocateControl & { _onClick: () => void }, requesting: boolean, color: import('@mui/material').ButtonProps['color'], locationError: { show: boolean, message: string }, hideLocationError: () => void }}
  */
 export function useLocation(dependency = false) {
   const map = useMap()
@@ -21,9 +23,11 @@ export function useLocation(dependency = false) {
   const [requesting, setRequesting] = useState(false)
   const { t } = useTranslation()
   const metric = useStorage((s) => s.settings.distanceUnit === 'kilometers')
+  const { locationError, hideLocationError, handleLocationError } =
+    useLocationError()
 
   const lc = useMemo(() => {
-    const LocateFab = Control.Locate.extend({
+    const LocateFab = LocateControl.extend({
       _setClasses(state) {
         if (state === 'requesting') setColor('secondary')
         else if (state === 'active') setColor('success')
@@ -101,6 +105,7 @@ export function useLocation(dependency = false) {
         return container
       },
     })
+
     const result = new LocateFab({
       // @ts-ignore
       keepCurrentZoomLevel: true,
@@ -109,6 +114,7 @@ export function useLocation(dependency = false) {
       locateOptions: {
         maximumAge: 5000,
       },
+      onLocationError: handleLocationError,
       strings: {
         metersUnit: t('lc_metersUnit'),
         feetUnit: t('lc_feetUnit'),
@@ -118,7 +124,9 @@ export function useLocation(dependency = false) {
       },
     })
     return result
-  }, [t, metric])
+  }, [t, metric, handleLocationError])
+
+  useStopFollowingOnFly(map, dependency ? lc : null)
 
   useEffect(() => {
     if (lc) {
@@ -131,5 +139,5 @@ export function useLocation(dependency = false) {
   }, [lc, map, dependency])
 
   // @ts-ignore
-  return { lc, requesting, color }
+  return { lc, requesting, color, locationError, hideLocationError }
 }

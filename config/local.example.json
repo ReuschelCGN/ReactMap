@@ -36,6 +36,7 @@
           "scanCell",
           "spawnpoint",
           "weather",
+          "tappable",
           "route",
           "nest",
           "station"
@@ -83,7 +84,8 @@
         "redirectUri": "http://localhost:8080/auth/discord/callback",
         "allowedGuilds": [],
         "blockedGuilds": [],
-        "allowedUsers": []
+        "allowedUsers": [],
+        "clientPrompt": "none"
       }
     ],
     "areaRestrictions": [
@@ -134,6 +136,11 @@
         "roles": []
       },
       "raids": {
+        "enabled": true,
+        "trialPeriodEligible": false,
+        "roles": []
+      },
+      "tappables": {
         "enabled": true,
         "trialPeriodEligible": false,
         "roles": []

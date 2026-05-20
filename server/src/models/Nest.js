@@ -5,6 +5,7 @@ const config = require('@rm/config')
 
 const { state } = require('../services/state')
 const { getAreaSql } = require('../utils/getAreaSql')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 
 /** @typedef {Nest & Partial<import("@rm/types").Nest>} FullNest */
 
@@ -27,11 +28,14 @@ class Nest extends Model {
   static async getAll(perms, args, { polygon }) {
     const { areaRestrictions } = perms
     const { minLat, minLon, maxLat, maxLon, filters } = args
-    const query = this.query()
-      .select(['*', 'nest_id AS id'])
-      // .whereNotNull('pokemon_id')
-      .whereBetween('lat', [minLat, maxLat])
-      .andWhereBetween('lon', [minLon, maxLon])
+    const query = this.query().select(['*', 'nest_id AS id'])
+    applyManualIdFilter(query, {
+      manualId: filters.onlyManualId,
+      latColumn: 'lat',
+      lonColumn: 'lon',
+      idColumn: 'nest_id',
+      bounds: { minLat, maxLat, minLon, maxLon },
+    })
 
     const pokemon = []
     if (filters.onlyPokemon) {
@@ -164,7 +168,7 @@ class Nest extends Model {
    * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<FullNest[]>}
    */
-  static async search(perms, args, distance, bbox) {
+  static async search(perms, args, { isMad }, distance, bbox) {
     const { search, locale, onlyAreas = [] } = args
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
       (pkmn) =>
@@ -190,8 +194,8 @@ class Nest extends Model {
         'pokemon_form AS nest_pokemon_form',
         distance,
       ])
-      .whereBetween('lat', [bbox.minLat, bbox.maxLat])
-      .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .whereNotNull('pokemon_id')
       .where((builder) => {
         builder
@@ -204,7 +208,7 @@ class Nest extends Model {
       })
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
-    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
       return []
     }
     const results = /** @type {FullNest[]} */ (await query)

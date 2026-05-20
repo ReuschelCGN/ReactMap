@@ -8,7 +8,7 @@ const config = require('@rm/config')
 const { logUserAuth } = require('./logUserAuth')
 const { areaPerms } = require('../utils/areaPerms')
 const { webhookPerms } = require('../utils/webhookPerms')
-const { scannerPerms } = require('../utils/scannerPerms')
+const { scannerPerms, scannerCooldownBypass } = require('../utils/scannerPerms')
 const { mergePerms } = require('../utils/mergePerms')
 const { AuthClient } = require('./AuthClient')
 const { state } = require('./state')
@@ -29,7 +29,7 @@ class DiscordClient extends AuthClient {
       intents: ['GuildMessages', 'GuildMembers', 'Guilds'],
     })
 
-    this.client.on('ready', (c) => {
+    this.client.on('clientReady', (c) => {
       this.log.info(`Logged in as ${c.user?.tag || 'Unknown??'}!`)
       c.user.setPresence({
         activities: [
@@ -87,23 +87,36 @@ class DiscordClient extends AuthClient {
     this.client.login(this.strategy.botToken)
   }
 
-  /** @param {string} guildId @param {string} userId */
+  /**
+   * @param {string} guildId
+   * @param {string} userId
+   * @returns {Promise<string[]>}
+   */
   async getUserRoles(guildId, userId) {
     try {
-      const members = await this.client.guilds.cache
-        .get(guildId)
-        ?.members.fetch()
-      if (members) {
-        const member = members.get(userId)
-        return member?.roles.cache.map((role) => role.id) || []
-      }
-      return []
+      const guild =
+        this.client.guilds.cache.get(guildId) ||
+        (await this.client.guilds.fetch(guildId))
+      const member = await guild?.members.fetch(userId)
+      return member?.roles.cache.map((role) => role.id) || []
     } catch (e) {
+      const code =
+        e && typeof e === 'object' && 'code' in e ? Number(e.code) : null
+      if (code === 10007) {
+        this.log.debug(
+          'Discord member not found in guild',
+          guildId,
+          'for user',
+          userId,
+        )
+        return []
+      }
       this.log.error(
         'Failed to get roles in guild',
         guildId,
         'for user',
         userId,
+        e,
       )
     }
     return []
@@ -128,6 +141,7 @@ class DiscordClient extends AuthClient {
       areaRestrictions: new Set(),
       webhooks: new Set(),
       scanner: new Set(),
+      scannerCooldownBypass: new Set(),
       blockedGuildNames: new Set(),
     }
     const scanner = config.getSafe('scanner')
@@ -141,9 +155,12 @@ class DiscordClient extends AuthClient {
         Object.keys(this.perms).forEach((key) => (perms[key] = true))
         perms.admin = true
         config.getSafe('webhooks').forEach((x) => permSets.webhooks.add(x.name))
-        Object.keys(scanner).forEach(
-          (x) => scanner[x]?.enabled && permSets.scanner.add(x),
-        )
+        Object.keys(scanner).forEach((x) => {
+          if (scanner[x]?.enabled) {
+            permSets.scanner.add(x)
+            permSets.scannerCooldownBypass.add(x)
+          }
+        })
         this.log.debug(
           `User ${user.username} (${user.id}) in allowed users list, skipping guild and role check.`,
         )
@@ -196,6 +213,9 @@ class DiscordClient extends AuthClient {
               )
               scannerPerms(userRoles, 'discordRoles', trialActive).forEach(
                 (x) => permSets.scanner.add(x),
+              )
+              scannerCooldownBypass(userRoles, 'discordRoles').forEach((x) =>
+                permSets.scannerCooldownBypass.add(x),
               )
             }
           }),

@@ -52,15 +52,21 @@ function drawer(req, perms) {
           }
         : BLOCKED,
     pokestops:
-      (perms.pokestops || perms.lures || perms.quests || perms.invasions) &&
+      (perms.pokestops || perms.quests || perms.invasions || perms.lures) &&
       state.db.models.Pokestop
         ? {
             allPokestops: perms.pokestops || BLOCKED,
-            lures: perms.lures || BLOCKED,
-            eventStops: perms.eventStops || BLOCKED,
             quests: perms.quests || BLOCKED,
             invasions: perms.invasions || BLOCKED,
+            eventStops: perms.eventStops || BLOCKED,
+            lures: perms.lures || BLOCKED,
             arEligible: perms.pokestops || BLOCKED,
+          }
+        : BLOCKED,
+    tappables:
+      perms.tappables && state.db.models.Tappable
+        ? {
+            enabled: perms.tappables || BLOCKED,
           }
         : BLOCKED,
     stations:
@@ -69,6 +75,7 @@ function drawer(req, perms) {
             allStations: perms.stations || BLOCKED,
             maxBattles: perms.dynamax || BLOCKED,
             gmaxStationed: perms.dynamax || BLOCKED,
+            inactiveStations: perms.stations || BLOCKED,
           }
         : BLOCKED,
     pokemon:

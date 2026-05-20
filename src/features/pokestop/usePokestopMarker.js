@@ -4,47 +4,73 @@ import { divIcon } from 'leaflet'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
+import { INCIDENT_DISPLAY_TYPES } from './incidentPriority'
+import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
 
 /**
  *
  * @param {{
  *  hasQuest: boolean,
  *  hasLure: boolean,
- *  hasInvasion: boolean,
- *  hasEvent: boolean,
+ *  markerEvents: Array<{ display_type?: number | string | null }>,
+ *  markerInvasions: Array<import('@rm/types').Invasion>,
+ *  baseIncidentDisplay: number | string,
  * } & import('@rm/types').Pokestop} param0
  * @returns
  */
 export function usePokestopMarker({
   hasQuest,
   hasLure,
-  hasInvasion,
-  hasEvent,
   lure_id,
   ar_scan_eligible,
   power_up_level,
-  events,
-  invasions,
   quests,
+  markerEvents,
+  markerInvasions,
+  baseIncidentDisplay,
 }) {
-  const [, Icons] = useStorage(
-    (s) => [s.icons, useMemory.getState().Icons],
+  const [, Icons, masterfile] = useStorage(
+    (s) => [
+      s.icons,
+      useMemory.getState().Icons,
+      useMemory.getState().masterfile,
+    ],
     (a, b) => Object.entries(a[0]).every(([k, v]) => b[0][k] === v),
   )
 
+  const hasVisibleInvasion = markerInvasions.some(
+    (invasion) => !!invasion.grunt_type,
+  )
+  const shouldShowStandaloneKecleonBadge =
+    !hasQuest &&
+    !hasVisibleInvasion &&
+    markerEvents.length > 0 &&
+    markerEvents.every(
+      (event) =>
+        Number(event.display_type ?? 0) === INCIDENT_DISPLAY_TYPES.KECLEON,
+    )
+
   const getOpacity = useOpacity('pokestops', 'invasion')
-  const [showArBadge, baseIcon, baseSize] = useStorage((s) => {
+  const [
+    showArBadge,
+    showArQuestDotBadge,
+    showNoArQuestDotBadge,
+    baseIcon,
+    baseSize,
+  ] = useStorage((s) => {
     const { filters, userSettings } = s
+    const pokestops = userSettings.pokestops || {}
     return [
-      userSettings.pokestops.showArBadge,
+      pokestops.showArBadge,
+      pokestops.showArQuestDotBadge ?? false,
+      pokestops.showNoArQuestDotBadge ?? true,
       Icons.getPokestops(
         hasLure ? lure_id : 0,
-        hasInvasion,
-        hasQuest && userSettings.pokestops.hasQuestIndicator,
-        ar_scan_eligible &&
-          (userSettings.pokestops.showArBadge || !!power_up_level),
+        hasVisibleInvasion,
+        hasQuest && pokestops.hasQuestIndicator,
+        ar_scan_eligible && (pokestops.showArBadge || !!power_up_level),
         power_up_level,
-        hasEvent ? Math.max(...events.map((event) => event.display_type)) : 0,
+        baseIncidentDisplay,
       ),
       hasLure
         ? Icons.getSize(
@@ -71,19 +97,167 @@ export function usePokestopMarker({
   const invasionSizes = []
   const questIcons = []
   const questSizes = []
-  const showcaseIcons = []
-  const showcaseSizes = []
+  const eventIcons = []
+  const eventSizes = []
 
-  if (hasInvasion) {
-    invasions.forEach((invasion) => {
+  if (hasVisibleInvasion) {
+    markerInvasions.forEach((invasion) => {
       if (invasion.grunt_type) {
         invasionIcons.unshift({
           icon: Icons.getInvasions(invasion.grunt_type, invasion.confirmed),
           opacity: getOpacity(invasion.incident_expire_timestamp),
         })
-        invasionSizes.unshift(
-          Icons.getSize('invasion', filters[`i${invasion.grunt_type}`]?.size),
+
+        // Get base invasion type icon size
+        const invasionTypeSize = Icons.getSize(
+          'invasion',
+          filters[`i${invasion.grunt_type}`]?.size,
         )
+
+        // Exclude leaders and Giovanni (grunt_type 41-44) from size calculation
+        if (invasion.grunt_type >= 41 && invasion.grunt_type <= 44) {
+          invasionSizes.unshift(invasionTypeSize)
+        } else {
+          // Calculate potential reward icon sizes
+          let maxRewardSize = 0
+
+          // Only consider invasion type size if the invasion type is enabled
+          if (filters[`i${invasion.grunt_type}`]?.enabled) {
+            maxRewardSize = Math.max(maxRewardSize, invasionTypeSize)
+          }
+
+          const gruntData = masterfile.invasions[invasion.grunt_type]
+          if (invasion.confirmed) {
+            // If invasion has confirmed lineup from DB, use those specific rewards
+            // Only check Pokemon that are actually rewards based on grunt data
+            if (gruntData?.firstReward && invasion.slot_1_pokemon_id) {
+              const pokemonKey = `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form || 0}`
+              const pokemonKeySimple = `a${invasion.slot_1_pokemon_id}`
+
+              // Only consider this Pokemon's size if it's enabled in filters
+              if (
+                filters[pokemonKey]?.enabled ||
+                filters[pokemonKeySimple]?.enabled
+              ) {
+                const rewardSize =
+                  Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                  Icons.getSize('invasion', filters[pokemonKeySimple]?.size) ||
+                  Icons.getSize('invasion')
+                maxRewardSize = Math.max(maxRewardSize, rewardSize)
+              }
+            }
+
+            if (gruntData?.secondReward && invasion.slot_2_pokemon_id) {
+              const pokemonKey = `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form || 0}`
+              const pokemonKeySimple = `a${invasion.slot_2_pokemon_id}`
+
+              // Only consider this Pokemon's size if it's enabled in filters
+              if (
+                filters[pokemonKey]?.enabled ||
+                filters[pokemonKeySimple]?.enabled
+              ) {
+                const rewardSize =
+                  Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                  Icons.getSize('invasion', filters[pokemonKeySimple]?.size) ||
+                  Icons.getSize('invasion')
+                maxRewardSize = Math.max(maxRewardSize, rewardSize)
+              }
+            }
+
+            if (gruntData?.thirdReward && invasion.slot_3_pokemon_id) {
+              const pokemonKey = `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form || 0}`
+              const pokemonKeySimple = `a${invasion.slot_3_pokemon_id}`
+
+              // Only consider this Pokemon's size if it's enabled in filters
+              if (
+                filters[pokemonKey]?.enabled ||
+                filters[pokemonKeySimple]?.enabled
+              ) {
+                const rewardSize =
+                  Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                  Icons.getSize('invasion', filters[pokemonKeySimple]?.size) ||
+                  Icons.getSize('invasion')
+                maxRewardSize = Math.max(maxRewardSize, rewardSize)
+              }
+            }
+          } else if (gruntData?.encounters) {
+            // If no confirmed lineup, use all potential rewards from masterfile
+            // Check first encounter rewards if firstReward is true
+            if (gruntData.firstReward && gruntData.encounters.first) {
+              gruntData.encounters.first.forEach((encounter) => {
+                const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                const pokemonKeySimple = `a${encounter.id}`
+
+                // Only consider this Pokemon's size if it's enabled in filters
+                if (
+                  filters[pokemonKey]?.enabled ||
+                  filters[pokemonKeySimple]?.enabled
+                ) {
+                  const rewardSize =
+                    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                    Icons.getSize(
+                      'invasion',
+                      filters[pokemonKeySimple]?.size,
+                    ) ||
+                    Icons.getSize('invasion')
+                  maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                }
+              })
+            }
+
+            // Check second encounter rewards if secondReward is true
+            if (gruntData.secondReward && gruntData.encounters.second) {
+              gruntData.encounters.second.forEach((encounter) => {
+                const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                const pokemonKeySimple = `a${encounter.id}`
+
+                // Only consider this Pokemon's size if it's enabled in filters
+                if (
+                  filters[pokemonKey]?.enabled ||
+                  filters[pokemonKeySimple]?.enabled
+                ) {
+                  const rewardSize =
+                    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                    Icons.getSize(
+                      'invasion',
+                      filters[pokemonKeySimple]?.size,
+                    ) ||
+                    Icons.getSize('invasion')
+                  maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                }
+              })
+            }
+
+            // Check third encounter rewards if thirdReward is true
+            if (gruntData.thirdReward && gruntData.encounters.third) {
+              gruntData.encounters.third.forEach((encounter) => {
+                const pokemonKey = `a${encounter.id}-${encounter.form || 0}`
+                const pokemonKeySimple = `a${encounter.id}`
+
+                // Only consider this Pokemon's size if it's enabled in filters
+                if (
+                  filters[pokemonKey]?.enabled ||
+                  filters[pokemonKeySimple]?.enabled
+                ) {
+                  const rewardSize =
+                    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
+                    Icons.getSize(
+                      'invasion',
+                      filters[pokemonKeySimple]?.size,
+                    ) ||
+                    Icons.getSize('invasion')
+                  maxRewardSize = Math.max(maxRewardSize, rewardSize)
+                }
+              })
+            }
+          }
+
+          // Use the maximum size found, or default invasion size if none are enabled
+          const finalInvasionSize =
+            maxRewardSize > 0 ? maxRewardSize : invasionTypeSize
+          invasionSizes.unshift(finalInvasionSize)
+        }
+
         popupYOffset += invasionMod.offsetY - 1
         popupX += invasionMod.popupX
         popupY += invasionMod.popupY
@@ -91,7 +265,7 @@ export function usePokestopMarker({
     })
   }
 
-  if (hasQuest && !(hasInvasion && invasionMod?.removeQuest)) {
+  if (hasQuest && !(hasVisibleInvasion && invasionMod?.removeQuest)) {
     quests.forEach((quest) => {
       const {
         quest_item_id,
@@ -110,43 +284,48 @@ export function usePokestopMarker({
         quest_gender_id,
         quest_costume_id,
         quest_shiny,
+        quest_bread_mode = 0,
+        quest_background,
+        with_ar = true,
         key,
       } = quest
+      const showQuestDot = with_ar ? showArQuestDotBadge : showNoArQuestDotBadge
+      let questIcon = { url: Icons.getRewards(quest_reward_type) }
       switch (quest_reward_type) {
         case 1:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(quest_reward_type, xp_amount),
             amount: xp_amount,
-          })
+          }
           break
         case 2:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               quest_item_id,
               item_amount,
             ),
             amount: item_amount > 1 && item_amount,
-          })
+          }
           break
         case 3:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(quest_reward_type, stardust_amount),
             amount: stardust_amount,
-          })
+          }
           break
         case 4:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               candy_pokemon_id,
               candy_amount,
             ),
             amount: candy_amount,
-          })
+          }
           break
         case 7:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getPokemon(
               quest_pokemon_id,
               quest_form_id,
@@ -155,74 +334,80 @@ export function usePokestopMarker({
               quest_costume_id,
               0,
               !!quest_shiny,
+              quest_bread_mode,
             ),
-          })
+            backgroundUrl:
+              quest_reward_type === 7
+                ? Icons.getBackground(quest_background)
+                : '',
+          }
           break
         case 9:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               xl_candy_pokemon_id,
               xl_candy_amount,
             ),
             amount: xl_candy_amount,
-          })
+          }
           break
         case 12:
-          questIcons.unshift({
+          questIcon = {
             url: Icons.getRewards(
               quest_reward_type,
               mega_pokemon_id,
               mega_amount,
             ),
             amount: mega_amount,
-          })
+          }
           break
         default:
-          questIcons.unshift({ url: Icons.getRewards(quest_reward_type) })
+          break
       }
+      questIcons.unshift({
+        ...questIcon,
+        rewardType: quest_reward_type,
+        questDotColor: showQuestDot ? (with_ar ? '#1e88e5' : '#9e9e9e') : '',
+      })
       questSizes.unshift(Icons.getSize('reward', filters[key]?.size))
       popupYOffset += rewardMod.offsetY - 1
       popupX += rewardMod.popupX
       popupY += rewardMod.popupY
     })
   }
-  if (hasEvent && !hasInvasion && !hasQuest) {
-    events.forEach((event) => {
-      if (event.display_type === 8) {
-        showcaseIcons.unshift({
+  if (markerEvents.length && !hasQuest) {
+    markerEvents.forEach((event) => {
+      const displayType = Number(event.display_type ?? 0)
+      if (displayType === INCIDENT_DISPLAY_TYPES.KECLEON) {
+        if (!shouldShowStandaloneKecleonBadge || eventIcons.length) {
+          return
+        }
+        eventIcons.unshift({
           url: Icons.getPokemon(352),
         })
-        showcaseSizes.unshift(Icons.getSize('event', filters.b7?.size))
-      } else if (event.display_type === 9) {
-        if (event.showcase_pokemon_id) {
-          showcaseIcons.unshift({
-            url: Icons.getPokemon(
-              event.showcase_pokemon_id,
-              event.showcase_pokemon_form_id,
-            ),
-            decoration: true,
-          })
-          showcaseSizes.unshift(
-            Icons.getSize(
-              'event',
-              filters[
-                `f${event.showcase_pokemon_id}-${event.showcase_pokemon_form_id}`
-              ]?.size,
-            ),
-          )
-        } else if (event.showcase_pokemon_type_id) {
-          showcaseIcons.unshift({
-            url: Icons.getTypes(event.showcase_pokemon_type_id),
-            decoration: true,
-          })
-          showcaseSizes.unshift(
-            Icons.getSize(
-              'event',
-              filters[`h${event.showcase_pokemon_type_id}`]?.size,
-            ),
-          )
-        }
+        eventSizes.unshift(
+          Icons.getSize(
+            'event',
+            filters[`b${INCIDENT_DISPLAY_TYPES.KECLEON}`]?.size,
+          ),
+        )
+      } else if (displayType === INCIDENT_DISPLAY_TYPES.SHOWCASE) {
+        const showcaseIcon = resolveShowcaseEventIcon(event, Icons)
+        eventIcons.unshift({
+          url: showcaseIcon.url,
+          decoration: showcaseIcon.decoration,
+        })
+        eventSizes.unshift(
+          Icons.getSize('event', filters[showcaseIcon.sizeFilterKey]?.size),
+        )
+      } else {
+        eventIcons.unshift({
+          url: Icons.getEventStops(displayType),
+        })
+        eventSizes.unshift(
+          Icons.getSize('event', filters[`b${displayType}`]?.size),
+        )
       }
       popupYOffset += eventMod.offsetY - 1
       popupX += eventMod.popupX
@@ -231,9 +416,147 @@ export function usePokestopMarker({
   }
   const totalQuestSize = questSizes.reduce((a, b) => a + b, 0)
   const totalInvasionSize = invasionSizes.reduce((a, b) => a + b, 0)
-  const totalShowcaseSize = showcaseSizes.reduce((a, b) => a + b, -3)
+  const totalEventSize = eventSizes.length
+    ? eventSizes.reduce((a, b) => a + b, -3)
+    : 0
 
   const showAr = showArBadge && ar_scan_eligible && !baseIcon.includes('_ar')
+
+  const stackItems = []
+
+  invasionIcons.forEach((invasion, index) => {
+    stackItems.push({
+      type: 'invasion',
+      url: invasion.icon,
+      size: invasionSizes[index],
+      modifier: invasionMod,
+      opacity: invasion.opacity,
+    })
+  })
+
+  questIcons.forEach((icon, index) => {
+    stackItems.push({
+      type: 'quest',
+      url: icon.url,
+      size: questSizes[index],
+      modifier: rewardMod,
+      amount: icon.amount,
+      rewardType: icon.rewardType,
+      backgroundUrl: icon.backgroundUrl,
+      questDotColor: icon.questDotColor,
+    })
+  })
+
+  eventIcons.forEach((icon, index) => {
+    stackItems.push({
+      type: 'event',
+      url: icon.url,
+      size: eventSizes[index],
+      modifier: eventMod,
+      decoration: icon.decoration,
+    })
+  })
+
+  const stackBottom = stackItems.length
+    ? invasionIcons.length
+      ? baseSize * 0.5 * invasionMod.offsetY
+      : questIcons.length
+        ? baseSize * 0.6 * rewardMod.offsetY
+        : baseSize * 0.6 * eventMod.offsetY
+    : 0
+
+  const stackMarkup = stackItems
+    .map((item) => {
+      const showAmount =
+        item.type === 'quest' && item.amount
+          ? item.url.includes('stardust') || item.url.includes('experience')
+            ? item.url.includes('/0.')
+            : !item.url.includes('_a')
+          : false
+      const amountHtml =
+        showAmount && item.amount
+          ? `
+                <span class="pokestop-marker__amount">
+                  x${item.amount}
+                </span>
+              `
+          : ''
+      const opacityStyle =
+        typeof item.opacity === 'number' ? `opacity: ${item.opacity};` : ''
+      const decorationHtml =
+        item.type === 'event' && item.decoration
+          ? `
+                <img
+                  src="${Icons.getMisc('showcase')}"
+                  alt="showcase"
+                  class="pokestop-marker__decoration"
+                  style="width: ${item.size * 0.66}px; height: ${
+                    item.size * 0.66
+                  }px;"
+                />
+              `
+          : ''
+      const questDotHtml =
+        item.type === 'quest' && item.questDotColor
+          ? `
+                <span
+                  class="pokestop-marker__quest-dot"
+                  style="background-color: ${item.questDotColor};"
+                ></span>
+              `
+          : ''
+      const backgroundStyle = item.backgroundUrl
+        ? `
+                background-image: url(${item.backgroundUrl});
+                background-size: contain;
+                background-repeat: no-repeat;
+                background-position: center;
+                width: ${item.size}px;
+                height: ${item.size}px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+              `
+        : ''
+      return `
+            <div
+              class="pokestop-marker__stack-item pokestop-marker__stack-item--${
+                item.type
+              }"
+              data-reward-type="${
+                typeof item.rewardType !== 'undefined' ? item.rewardType : ''
+              }"
+              style="
+                --marker-size: ${item.size}px;
+                left: ${item.modifier.offsetX * 50}%;
+                ${backgroundStyle}
+              "
+            >
+              <img
+                src="${item.url}"
+                alt="${item.url}"
+                style="${opacityStyle}"
+              />
+              ${amountHtml}
+              ${questDotHtml}
+              ${decorationHtml}
+            </div>
+      `
+    })
+    .join('')
+
+  const stackHtml = stackItems.length
+    ? `
+          <div
+            class="pokestop-marker__stack"
+            style="
+              bottom: ${stackBottom}px;
+            "
+          >
+            ${stackMarkup}
+          </div>
+        `
+    : ''
 
   return divIcon({
     popupAnchor: [
@@ -242,7 +565,7 @@ export function usePokestopMarker({
         ? pokestopMod.manualPopup -
           totalInvasionSize * 0.25 -
           totalQuestSize * 0.1
-        : -(baseSize + totalInvasionSize + totalQuestSize + totalShowcaseSize) /
+        : -(baseSize + totalInvasionSize + totalQuestSize + totalEventSize) /
           popupYOffset) + popupY,
     ],
     className: 'pokestop-marker',
@@ -276,111 +599,7 @@ export function usePokestopMarker({
             `
             : ''
         }
-        ${questIcons
-          .map(
-            (icon, i) => `
-              <img
-                src="${icon.url}"
-                alt="${icon.url}"
-                style="
-                  width: ${questSizes[i]}px;
-                  height: ${questSizes[i]}px;
-                  bottom: ${
-                    (baseSize * 0.6 +
-                      (invasionMod?.removeQuest ? 10 : totalInvasionSize)) *
-                      rewardMod.offsetY +
-                    questSizes[i] * i
-                  }px;
-                  left: ${rewardMod.offsetX * 50}%;
-                  transform: translateX(-50%);
-                "
-              />
-              ${
-                (
-                  icon.url.includes('stardust') ||
-                  icon.url.includes('experience')
-                    ? icon.url.includes('/0.')
-                    : !icon.url.includes('_a') && icon.amount
-                )
-                  ? /* html */ `
-                  <div
-                    class="amount-holder"
-                    style="
-                      bottom: ${
-                        (baseSize * 0.6 +
-                          (invasionMod?.removeQuest ? 10 : totalInvasionSize)) *
-                          rewardMod.offsetY +
-                        questSizes[i] * i
-                      }px;
-                      left: ${rewardMod.offsetX * 50}%;
-                      transform: translateX(-50%);
-                    "
-                  >
-                    x${icon.amount}
-                  </div>
-                `
-                  : ''
-              }
-          `,
-          )
-          .join('')}
-        ${invasionIcons
-          .map(
-            (invasion, i) => /* html */ `
-              <img
-                src="${invasion.icon}"
-                alt="${invasion.icon}"
-                style="
-                  opacity: ${invasion.opacity};
-                  width: ${invasionSizes[i]}px;
-                  height: ${invasionSizes[i]}px;
-                  bottom: ${
-                    baseSize * 0.5 * invasionMod.offsetY + invasionSizes[i] * i
-                  }px;
-                  left: ${invasionMod.offsetX * 50}%;
-                  transform: translateX(-50%);
-                "
-              />
-          `,
-          )
-          .join('')}
-          ${showcaseIcons
-            .map(
-              (icon, i) => `
-                <img
-                  src="${icon.url}"
-                  alt="${icon.url}"
-                  style="
-                    width: ${showcaseSizes[i]}px;
-                    height: ${showcaseSizes[i]}px;
-                    bottom: ${
-                      baseSize * 0.6 * eventMod.offsetY + showcaseSizes[i] * i
-                    }px;
-                    left: ${eventMod.offsetX * 50}%;
-                    transform: translateX(-50%);
-                  "
-                />
-                ${
-                  icon.decoration
-                    ? `
-                  <img
-                    src="${Icons.getMisc('showcase')}"
-                    style="
-                      width: ${showcaseSizes[i] * 0.66}px;
-                      height: ${showcaseSizes[i] * 0.66}px;
-                      bottom: ${
-                        baseSize * 0.3 * eventMod.offsetY + showcaseSizes[i] * i
-                      }px;
-                      left: ${eventMod.offsetX * 50}%;
-                      transform: translateX(-50%);
-                    "
-                  />
-                `
-                    : ''
-                }
-            `,
-            )
-            .join('')}
+        ${stackHtml}
         </div>`,
   })
 }

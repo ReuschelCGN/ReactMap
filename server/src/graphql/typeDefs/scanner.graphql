@@ -5,6 +5,7 @@ type Device {
   lat: Float
   lon: Float
   type: String
+  isMad: Boolean
   route: JSON
   radius: Int
 }
@@ -23,6 +24,7 @@ type Gym {
   updated: Int
   guarding_pokemon_id: Int
   guarding_pokemon_display: JSON
+  defenders: JSON
   available_slots: Int
   team_id: Int
   raid_level: Int
@@ -81,6 +83,8 @@ type Quest {
   quest_form_id: Int
   quest_gender_id: Int
   quest_costume_id: Int
+  quest_background: Int
+  quest_bread_mode: Int
   quest_shiny: Int
   quest_shiny_probability: Float
   mega_pokemon_id: Int
@@ -143,7 +147,15 @@ type Pokestop {
   power_up_level: Int
   power_up_points: Int
   power_up_end_timestamp: Int
-  hasShowcase: Boolean
+  showcase_expiry: Int
+  incident_blocker_display_type: Int
+  incident_blocker_expire_timestamp: Int
+}
+
+type PokemonShinyStats {
+  shiny_seen: Int
+  encounters_seen: Int
+  since_date: String
 }
 
 type Pokemon {
@@ -157,7 +169,6 @@ type Pokemon {
   costume: Int
   gender: Int
   display_pokemon_id: Int
-  ditto_form: Int
   weight: Float
   height: Float
   size: Float
@@ -170,6 +181,7 @@ type Pokemon {
   def_iv: Int
   sta_iv: Int
   weather: Int
+  background: Int
   capture_1: Float
   capture_2: Float
   capture_3: Float
@@ -191,6 +203,19 @@ type Portal {
   name: String
   url: String
   imported: Int
+  updated: Int
+}
+
+type Tappable {
+  id: ID
+  lat: Float
+  lon: Float
+  type: String
+  fort_id: String
+  item_id: Int
+  count: Int
+  expire_timestamp: Int
+  expire_timestamp_verified: Boolean
   updated: Int
 }
 
@@ -244,6 +269,7 @@ type Waypoint {
 type Route {
   id: ID
   name: String
+  shortcode: String
   description: String
   distance_meters: Int
   duration_seconds: Int
@@ -289,6 +315,9 @@ type Station {
   battle_pokemon_bread_mode: Int
   battle_pokemon_move_1: Int
   battle_pokemon_move_2: Int
+  battle_pokemon_stamina: Int
+  battle_pokemon_cp_multiplier: Float
+  battle_pokemon_estimated_cp: Int
 }
 
 type StationPokemon {
@@ -296,5 +325,11 @@ type StationPokemon {
   form: Int
   costume: Int
   gender: Int
+  shiny: Boolean
+  temp_evolution: Int
+  temp_evolution_finish_ms: Float
+  alignment: Int
+  badge: Int
+  background: Int
   bread_mode: Int
 }

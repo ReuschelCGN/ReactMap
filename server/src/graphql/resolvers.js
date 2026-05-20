@@ -24,6 +24,14 @@ const resolvers = {
   JSON: GraphQLJSON,
   Query: {
     available: (_, _args, { Event, Db, perms }) => {
+      const supportsShinyStats = Array.isArray(Db.models?.Pokemon)
+        ? Db.models.Pokemon.some(({ SubModel, ...ctx }) =>
+            typeof SubModel.supportsShinyStats === 'function'
+              ? SubModel.supportsShinyStats(ctx)
+              : false,
+          )
+        : false
+
       const data = {
         questConditions: perms.quests ? Db.questConditions : {},
         masterfile: { ...Event.masterfile, invasions: Event.invasions },
@@ -36,6 +44,7 @@ const resolvers = {
           ...config.getSafe('icons'),
           styles: Event.uicons,
         },
+        supportsShinyStats,
       }
       return data
     },
@@ -83,6 +92,8 @@ const resolvers = {
       }),
     availableStations: (_, _args, { Event, perms }) =>
       perms?.dynamax ? Event.available.stations : [],
+    availableTappables: (_, _args, { Event, perms }) =>
+      perms?.tappables ? Event.available.tappables : [],
     backup: (_, args, { req, perms, Db }) => {
       if (perms?.backups && req?.user?.id) {
         return Db.models.Backup.getOne(args.id, req?.user?.id)
@@ -167,7 +178,9 @@ const resolvers = {
             : '',
         profileButton: !!(username && misc.enableFloatingProfileButton),
         scanZone:
-          scanner.scanZone.enabled && perms.scanner.includes('scanZone'),
+          scanner.backendConfig.platform !== 'mad' &&
+          scanner.scanZone.enabled &&
+          perms.scanner.includes('scanZone'),
         scanNext:
           scanner.scanNext.enabled && perms.scanner.includes('scanNext'),
         search: Object.entries(config.getSafe('api.searchable')).some(
@@ -266,6 +279,23 @@ const resolvers = {
         return Db.getOne('Pokemon', args.id)
       }
       return {}
+    },
+    pokemonShinyStats: async (_, args, { perms, Db }) => {
+      if (!perms?.pokemon) {
+        return null
+      }
+      const sources = Db.models?.Pokemon
+      if (!Array.isArray(sources)) {
+        return null
+      }
+      const results = await Promise.all(
+        sources.map(({ SubModel, ...ctx }) =>
+          typeof SubModel.getShinyStats === 'function'
+            ? SubModel.getShinyStats(perms, args, ctx)
+            : Promise.resolve(null),
+        ),
+      )
+      return results.find(Boolean) || null
     },
     portals: (_, args, { perms, Db }) => {
       if (perms?.portals) {
@@ -375,30 +405,38 @@ const resolvers = {
     },
     scannerConfig: (_, { mode }, { perms }) => {
       const scanner = config.getSafe('scanner')
+      const modeConfig = scanner[mode]
 
-      if (perms.scanner?.includes(mode) && scanner[mode].enabled) {
-        return mode === 'scanZone'
-          ? {
-              scannerType: scanner.backendConfig.platform,
-              showScanCount: scanner.scanZone.showScanCount,
-              showScanQueue: scanner.scanZone.showScanQueue,
-              advancedOptions: scanner.scanZone.advancedScanZoneOptions,
-              pokemonRadius: scanner.scanZone.scanZoneRadius.pokemon,
-              gymRadius: scanner.scanZone.scanZoneRadius.gym,
-              spacing: scanner.scanZone.scanZoneSpacing,
-              maxSize: scanner.scanZone.scanZoneMaxSize,
-              cooldown: scanner.scanZone.userCooldownSeconds,
-              refreshQueue: scanner.backendConfig.queueRefreshInterval,
-              enabled: scanner[mode].enabled,
-            }
-          : {
-              scannerType: scanner.backendConfig.platform,
-              showScanCount: scanner.scanNext.showScanCount,
-              showScanQueue: scanner.scanNext.showScanQueue,
-              cooldown: scanner.scanNext.userCooldownSeconds,
-              refreshQueue: scanner.backendConfig.queueRefreshInterval,
-              enabled: scanner[mode].enabled,
-            }
+      if (perms.scanner?.includes(mode) && modeConfig?.enabled) {
+        const bypassCooldown = perms.scannerCooldownBypass?.includes(mode)
+        const cooldownSeconds = bypassCooldown
+          ? 0
+          : modeConfig.userCooldownSeconds
+
+        if (mode === 'scanZone') {
+          return {
+            scannerType: scanner.backendConfig.platform,
+            showScanCount: scanner.scanZone.showScanCount,
+            showScanQueue: scanner.scanZone.showScanQueue,
+            advancedOptions: scanner.scanZone.advancedScanZoneOptions,
+            pokemonRadius: scanner.scanZone.scanZoneRadius.pokemon,
+            gymRadius: scanner.scanZone.scanZoneRadius.gym,
+            spacing: scanner.scanZone.scanZoneSpacing,
+            maxSize: scanner.scanZone.scanZoneMaxSize,
+            cooldown: cooldownSeconds,
+            refreshQueue: scanner.backendConfig.queueRefreshInterval,
+            enabled: modeConfig.enabled,
+          }
+        }
+
+        return {
+          scannerType: scanner.backendConfig.platform,
+          showScanCount: scanner.scanNext.showScanCount,
+          showScanQueue: scanner.scanNext.showScanQueue,
+          cooldown: cooldownSeconds,
+          refreshQueue: scanner.backendConfig.queueRefreshInterval,
+          enabled: modeConfig.enabled,
+        }
       }
       return null
     },
@@ -497,6 +535,19 @@ const resolvers = {
         return Db.query('Station', 'getDynamaxMons', id)
       }
       return []
+    },
+    tappables: (_, args, { perms, Db }) => {
+      if (perms?.tappables) {
+        return Db.query('Tappable', 'getAll', perms, args)
+      }
+      return []
+    },
+    tappableById: async (_, { id }, { perms, Db }) => {
+      if (perms?.tappables) {
+        const results = await Db.query('Tappable', 'getById', perms, id)
+        return Array.isArray(results) ? results[0] || null : results
+      }
+      return null
     },
     submissionCells: async (_, args, { req, perms, Db }) => {
       const { submissionZoom } = config.getMapConfig(req).general
@@ -611,18 +662,24 @@ const resolvers = {
       if (category === 'getQueue') {
         return scannerApi(category, method, data, req?.user)
       }
+      const bypassCooldown = perms?.scannerCooldownBypass?.includes(category)
+      const cooldownExpired =
+        !req.session.cooldown || req.session.cooldown < Date.now()
+
       if (
         perms?.scanner?.includes(category) &&
-        (!req.session.cooldown || req.session.cooldown < Date.now())
+        (bypassCooldown || cooldownExpired)
       ) {
         const validCoords = getValidCoords(category, data?.scanCoords, perms)
 
-        const cooldown =
-          config.getSafe(`scanner.${category}.userCooldownSeconds`) *
-            validCoords.filter(Boolean).length *
-            1000 +
-          Date.now()
-        req.session.cooldown = cooldown
+        if (!bypassCooldown) {
+          const cooldown =
+            config.getSafe(`scanner.${category}.userCooldownSeconds`) *
+              validCoords.filter(Boolean).length *
+              1000 +
+            Date.now()
+          req.session.cooldown = cooldown
+        }
         return scannerApi(
           category,
           method,

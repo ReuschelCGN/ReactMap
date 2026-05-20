@@ -354,20 +354,58 @@ export class UAssets {
   }
 
   /**
+   * @param {number | string | null | undefined} [backgroundId]
+   */
+  getBackground(backgroundId = 0) {
+    const parsed =
+      typeof backgroundId === 'string'
+        ? parseInt(backgroundId, 10)
+        : backgroundId
+    if (!parsed) {
+      return ''
+    }
+    try {
+      const selected = this.selected.background
+      const backgroundClass = selected ? this[selected]?.class : undefined
+      const result = backgroundClass?.background?.(backgroundId)
+      if (result) {
+        return result
+      }
+      return `${this.fallback}/background/${parsed}.${this.fallbackExt}`
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+      return `${this.fallback}/background/0.${this.fallbackExt}`
+    }
+  }
+
+  /**
    * @param {string|number} pokemonId
    * @param {import('@rm/types').PokemonDisplay} pokemonDisplay
    */
   getPokemonByDisplay(pokemonId, pokemonDisplay) {
+    const {
+      form,
+      gender,
+      costume,
+      alignment,
+      shiny,
+      temp_evolution,
+      temp_evolution_finish_ms,
+      bread_mode,
+    } = pokemonDisplay || {}
+    const evolution =
+      temp_evolution_finish_ms && Date.now() > temp_evolution_finish_ms
+        ? 0
+        : temp_evolution
     return this.getPokemon(
       pokemonId,
-      pokemonDisplay.form,
-      Date.now() > pokemonDisplay.temp_evolution_finish_ms
-        ? 0
-        : pokemonDisplay.temp_evolution,
-      pokemonDisplay.gender,
-      pokemonDisplay.costume,
-      pokemonDisplay.alignment,
-      pokemonDisplay.shiny,
+      form,
+      evolution,
+      gender,
+      costume,
+      alignment,
+      shiny,
+      bread_mode,
     )
   }
 
@@ -411,6 +449,26 @@ export class UAssets {
       console.error(`[${this.assetType.toUpperCase()}]`, e)
       return `${this.fallback}/pokestop/0.${this.fallbackExt}`
     }
+  }
+
+  /**
+   * @param {string} [type]
+   * @returns {string}
+   */
+  getTappable(type = 'TAPPABLE_TYPE_POKEBALL') {
+    try {
+      const selection = this.selected.tappable
+      const pack = selection ? this[selection] : undefined
+      if (pack?.class && typeof pack.class.tappable === 'function') {
+        const iconPath = pack.class.tappable(type)
+        if (iconPath) {
+          return iconPath
+        }
+      }
+    } catch (e) {
+      console.error(`[${this.assetType.toUpperCase()}]`, e)
+    }
+    return this.getRewards(2, 1)
   }
 
   /**

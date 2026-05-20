@@ -10,6 +10,7 @@ import { setDeep } from '@utils/setDeep'
 /**
  * @typedef {{
  *   darkMode: boolean,
+ *   enhancedGraphics: boolean,
  *   location: [number, number],
  *   popups: Record<string, boolean>,
  *   zoom: number,
@@ -28,6 +29,7 @@ import { setDeep } from '@utils/setDeep'
  *    pokestops: string,
  *    nests: string,
  *    stations: string,
+ *    tappables: string,
  *   }
  *   searches: Record<string, string>,
  *   tabs: Record<string, number>,
@@ -60,6 +62,7 @@ export const useStorage = create(
   persist(
     (set, get) => ({
       darkMode: !!window?.matchMedia('(prefers-color-scheme: dark)').matches,
+      enhancedGraphics: true,
       location: [
         CONFIG.map.general.startLat || 0,
         CONFIG.map.general.startLon || 0,
@@ -145,6 +148,7 @@ export const useStorage = create(
         pokestops: 'categories',
         nests: 'others',
         stations: 'others',
+        tappables: 'categories',
       },
       search: '',
       searchTab: '',
@@ -159,8 +163,9 @@ export const useStorage = create(
         invasions: false,
         extras: false,
         raids: true,
-        pvp: false,
         names: true,
+        pokemonExtras: false,
+        pokemonPvp: false,
       },
       motdIndex: 0,
       profiling: false,

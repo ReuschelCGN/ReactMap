@@ -3,6 +3,7 @@ const { Model } = require('objection')
 const config = require('@rm/config')
 
 const { getAreaSql } = require('../utils/getAreaSql')
+const { applyManualIdFilter } = require('../utils/manualFilter')
 
 class Portal extends Model {
   static get tableName() {
@@ -29,13 +30,18 @@ class Portal extends Model {
       maxLon,
     } = args
     const query = this.query()
-      .whereBetween('lat', [minLat, maxLat])
-      .andWhereBetween('lon', [minLon, maxLon])
-      .andWhere(
-        'updated',
-        '>',
-        Date.now() / 1000 - portalUpdateLimit * 60 * 60 * 24,
-      )
+    applyManualIdFilter(query, {
+      manualId: args.filters.onlyManualId,
+      latColumn: 'lat',
+      lonColumn: 'lon',
+      idColumn: 'id',
+      bounds: { minLat, maxLat, minLon, maxLon },
+    })
+    query.andWhere(
+      'updated',
+      '>',
+      Date.now() / 1000 - portalUpdateLimit * 60 * 60 * 24,
+    )
     if (!getAreaSql(query, areaRestrictions, onlyAreas)) {
       return []
     }
@@ -51,7 +57,7 @@ class Portal extends Model {
    * @param {ReturnType<typeof import("server/src/utils/getBbox").getBboxFromCenter>} bbox
    * @returns {Promise<import("@rm/types").FullPortal[]>}
    */
-  static async search(perms, args, distance, bbox) {
+  static async search(perms, args, { isMad }, distance, bbox) {
     const { areaRestrictions } = perms
     const { onlyAreas = [], search = '' } = args
     const { searchResultsLimit, portalUpdateLimit } = config.getSafe('api')
@@ -59,8 +65,8 @@ class Portal extends Model {
     const query = this.query()
       .select(['name', 'id', 'lat', 'lon', 'url', distance])
       .whereILike('name', `%${search}%`)
-      .whereBetween('lat', [bbox.minLat, bbox.maxLat])
-      .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
+      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
       .andWhere(
         'updated',
         '>',
@@ -68,7 +74,7 @@ class Portal extends Model {
       )
       .limit(searchResultsLimit)
       .orderBy('distance')
-    if (!getAreaSql(query, areaRestrictions, onlyAreas)) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
       return []
     }
     return query

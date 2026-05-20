@@ -3,18 +3,15 @@ import * as React from 'react'
 import ExpandMore from '@mui/icons-material/ExpandMore'
 import MoreVert from '@mui/icons-material/MoreVert'
 import Divider from '@mui/material/Divider'
+import Box from '@mui/material/Box'
 import Grid from '@mui/material/Unstable_Grid2'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
-import TableCell from '@mui/material/TableCell'
-import TableRow from '@mui/material/TableRow'
-import Table from '@mui/material/Table'
-import TableBody from '@mui/material/TableBody'
-import styled from '@mui/material/styles/styled'
 import Check from '@mui/icons-material/Check'
 import Help from '@mui/icons-material/Help'
 import { useTranslation, Trans } from 'react-i18next'
+import { useTheme } from '@mui/material/styles'
 
 import { ErrorBoundary } from '@components/ErrorBoundary'
 import { useMemory } from '@store/useMemory'
@@ -32,9 +29,24 @@ import { Timer } from '@components/popups/Timer'
 import { PowerUp } from '@components/popups/PowerUp'
 import { NameTT } from '@components/popups/NameTT'
 import { TimeStamp } from '@components/popups/TimeStamps'
+import { BackgroundCard } from '@components/popups/BackgroundCard'
 import { useAnalytics } from '@hooks/useAnalytics'
+import { useGetAvailable } from '@hooks/useGetAvailable'
 import { parseQuestConditions } from '@utils/parseConditions'
 import { Img } from '@components/Img'
+import { readableProbability } from '@utils/readableProbability'
+import {
+  usePokemonBackgroundVisuals,
+  usePokemonBackgroundVisual,
+} from '@hooks/usePokemonBackgroundVisuals'
+import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
+import {
+  INCIDENT_DISPLAY_TYPES,
+  getEventIncidentPriority,
+  getIncidentBlockReason,
+  getInvasionIncidentPriority,
+  isIncidentBlockedBy,
+} from './incidentPriority'
 
 /**
  *
@@ -43,6 +55,9 @@ import { Img } from '@components/Img'
  *   hasInvasion: boolean
  *   hasQuest: boolean
  *   hasEvent: boolean
+ *   popupInvasions: import('@rm/types').Invasion[]
+ *   popupEvents: import('@rm/types').Event[]
+ *   incidentBlocker: { event: { display_type?: number | string | null }, priority: number } | null
  * }} props
  * @returns
  */
@@ -51,11 +66,15 @@ export function PokestopPopup({
   hasInvasion,
   hasQuest,
   hasEvent,
+  popupInvasions,
+  popupEvents,
+  incidentBlocker,
   ...pokestop
 }) {
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
-  const { lure_expire_timestamp, lure_id, invasions, events } = pokestop
+  const { lure_expire_timestamp, lure_id } = pokestop
+  const incidentBlockReason = getIncidentBlockReason(incidentBlocker)
 
   useAnalytics(
     'Popup',
@@ -65,6 +84,18 @@ export function PokestopPopup({
       .join(','),
     'Pokestop',
   )
+
+  const getPokemonBackgroundVisuals = usePokemonBackgroundVisuals()
+  const questVisuals = React.useMemo(() => {
+    if (!Array.isArray(pokestop.quests)) {
+      return []
+    }
+    return pokestop.quests.map((quest) =>
+      quest.quest_reward_type === 7
+        ? getPokemonBackgroundVisuals(quest.quest_background)
+        : undefined,
+    )
+  }, [getPokemonBackgroundVisuals, pokestop.quests])
 
   const plainPokestop = !hasLure && !hasQuest && !hasInvasion && !hasEvent
 
@@ -114,36 +145,25 @@ export function PokestopPopup({
               />
               {hasQuest &&
                 // eslint-disable-next-line no-unused-vars
-                pokestop.quests.map(({ key, ...quest }, index) => (
-                  <React.Fragment key={`${quest.with_ar}`}>
-                    {index ? (
-                      <Divider light flexItem className="popup-divider" />
-                    ) : null}
-                    <RewardInfo {...quest} />
-                    <Grid
-                      xs={9}
-                      style={{
-                        textAlign: 'center',
-                        maxHeight: 150,
-                        overflow: 'auto',
-                      }}
-                    >
-                      <QuestConditions {...quest} />
-                      {!!quest.quest_shiny_probability && (
-                        <>
-                          <br />
-                          <Typography variant="caption">
-                            {t('shiny_probability', {
-                              p: readableProbability(
-                                quest.quest_shiny_probability,
-                              ),
-                            })}
-                          </Typography>
-                        </>
-                      )}
-                    </Grid>
-                  </React.Fragment>
-                ))}
+                pokestop.quests.map(({ key, ...quest }, index) => {
+                  const visuals = questVisuals[index]
+                  const hasBackground = Boolean(visuals?.hasBackground)
+                  const previousHasBackground =
+                    index > 0
+                      ? Boolean(questVisuals[index - 1]?.hasBackground)
+                      : false
+                  const showDivider =
+                    index && !(hasBackground || previousHasBackground)
+
+                  return (
+                    <React.Fragment key={`${quest.with_ar}`}>
+                      {showDivider ? (
+                        <Divider light flexItem className="popup-divider" />
+                      ) : null}
+                      <QuestRewardRow quest={quest} visuals={visuals} />
+                    </React.Fragment>
+                  )
+                })}
               {hasLure && (
                 <>
                   {hasQuest && (
@@ -160,7 +180,7 @@ export function PokestopPopup({
               )}
               {hasInvasion && (
                 <>
-                  {invasions.map((invasion, index) => (
+                  {popupInvasions.map((invasion, index) => (
                     <React.Fragment
                       key={`${invasion.grunt_type}-${invasion.incident_expire_timestamp}`}
                     >
@@ -174,7 +194,14 @@ export function PokestopPopup({
                           invasion.grunt_type,
                           invasion.confirmed,
                         )}
-                        disabled={pokestop.hasShowcase ? 'showcase_block' : ''}
+                        disabled={
+                          isIncidentBlockedBy(
+                            incidentBlocker,
+                            getInvasionIncidentPriority(invasion),
+                          )
+                            ? incidentBlockReason
+                            : ''
+                        }
                         tt={
                           invasion.grunt_type === 44 && !invasion.confirmed
                             ? [`grunt_a_${invasion.grunt_type}`, ' / ', 'decoy']
@@ -192,9 +219,14 @@ export function PokestopPopup({
                   {(hasQuest || hasLure || hasInvasion) && (
                     <Divider light flexItem className="popup-divider" />
                   )}
-                  {events.map(({ showcase_rankings, ...event }, index) => {
+                  {popupEvents.map(({ showcase_rankings, ...event }, index) => {
+                    const displayType = Number(event.display_type ?? 0)
                     const { contest_entries = [], ...showcase } =
                       showcase_rankings || { contest_entries: [] }
+                    const showcaseIcon =
+                      displayType === INCIDENT_DISPLAY_TYPES.SHOWCASE
+                        ? resolveShowcaseEventIcon(event, Icons)
+                        : null
                     return (
                       <React.Fragment
                         key={`${event.display_type}-${event.event_expire_timestamp}`}
@@ -205,69 +237,45 @@ export function PokestopPopup({
                         <TimeTile
                           expireTime={event.event_expire_timestamp}
                           expandKey={
-                            event.display_type === 9
-                              ? `event_${event.display_type}`
+                            displayType === INCIDENT_DISPLAY_TYPES.SHOWCASE
+                              ? `event_${displayType}`
                               : undefined
                           }
                           disabled={
-                            event.display_type !== 9 && pokestop.hasShowcase
-                              ? 'showcase_block'
+                            isIncidentBlockedBy(
+                              incidentBlocker,
+                              getEventIncidentPriority(event),
+                            )
+                              ? incidentBlockReason
                               : ''
                           }
                           icon={
-                            event.showcase_pokemon_id ? (
+                            showcaseIcon?.tooltipKey ? (
                               <NameTT
-                                key={event.showcase_pokemon_id}
-                                title={[`poke_${event.showcase_pokemon_id}`]}
+                                key={showcaseIcon.tooltipKey}
+                                title={[showcaseIcon.tooltipKey]}
                               >
                                 <div className="invasion-reward">
                                   <img
                                     className="invasion-reward"
                                     alt="invasion reward"
-                                    src={Icons.getPokemon(
-                                      event.showcase_pokemon_id,
-                                      event.showcase_pokemon_form_id,
-                                    )}
+                                    src={showcaseIcon.url}
                                   />
                                   <img
                                     className="invasion-reward-shadow"
                                     alt="shadow"
-                                    src={Icons.getEventStops(
-                                      event.display_type,
-                                    )}
+                                    src={Icons.getEventStops(displayType)}
                                   />
                                 </div>
                               </NameTT>
-                            ) : event.showcase_pokemon_type_id ? (
-                              <NameTT
-                                key={event.showcase_pokemon_type_id}
-                                title={[
-                                  `poke_type_${event.showcase_pokemon_type_id}`,
-                                ]}
-                              >
-                                <div className="invasion-reward">
-                                  <img
-                                    className="invasion-reward"
-                                    alt="invasion reward"
-                                    src={Icons.getTypes(
-                                      event.showcase_pokemon_type_id,
-                                    )}
-                                  />
-                                  <img
-                                    className="invasion-reward-shadow"
-                                    alt="shadow"
-                                    src={Icons.getEventStops(
-                                      event.display_type,
-                                    )}
-                                  />
-                                </div>
-                              </NameTT>
+                            ) : showcaseIcon ? (
+                              showcaseIcon.url
                             ) : (
-                              Icons.getEventStops(event.display_type)
+                              Icons.getEventStops(displayType)
                             )
                           }
                           tt={t(
-                            `display_type_${event.display_type}`,
+                            `display_type_${displayType}`,
                             t('unknown_event'),
                           )}
                         >
@@ -277,19 +285,12 @@ export function PokestopPopup({
                               event.showcase_ranking_standard
                             }
                           >
-                            <Table
-                              size="small"
-                              className="table-invasion three-quarters-width"
-                            >
-                              <TableBody>
-                                {(contest_entries || []).map((position) => (
-                                  <ShowcaseEntry
-                                    key={position.rank}
-                                    {...position}
-                                  />
-                                ))}
-                              </TableBody>
-                            </Table>
+                            {(contest_entries || []).map((position) => (
+                              <ShowcaseEntry
+                                key={position.rank}
+                                {...position}
+                              />
+                            ))}
                           </Showcase>
                         </TimeTile>
                       </React.Fragment>
@@ -328,6 +329,8 @@ const MenuActions = ({
   const { t } = useTranslation()
   const masterfile = useMemory((s) => s.masterfile)
   const filters = useStorage((s) => s.filters)
+  const { available } = useGetAvailable('pokestops')
+  const hasConfirmed = available.some((x) => x.startsWith('a'))
 
   const [anchorEl, setAnchorEl] = React.useState(false)
 
@@ -421,55 +424,87 @@ const MenuActions = ({
             action: () => excludeInvasion(i),
           })
         }
-        const reference = masterfile.invasions[invasion.grunt_type]
-        if (reference) {
-          const encounters = new Set()
-          if (
-            invasion.slot_1_pokemon_id &&
-            reference.firstReward &&
-            filters.pokestops.filter[
-              `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
-            ]?.enabled
-          ) {
-            encounters.add(
-              `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`,
-            )
-          }
-          if (
-            invasion.slot_2_pokemon_id &&
-            reference.secondReward &&
-            filters.pokestops.filter[
-              `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
-            ]?.enabled
-          ) {
-            encounters.add(
-              `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`,
-            )
-          }
-          if (
-            invasion.slot_3_pokemon_id &&
-            reference.thirdReward &&
-            filters.pokestops.filter[
-              `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
-            ]?.enabled
-          ) {
-            encounters.add(
-              `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`,
-            )
-          }
-          if (encounters.size)
-            options.push(
-              ...[...encounters].map((x) => ({
-                key: x,
-                name: t('exclude_quest_multi', {
-                  reward: t(`poke_${x.slice(1).split('-')[0]}`),
-                }),
-                action: () => {
-                  setAnchorEl(null)
-                  setState(x)
+
+        if (hasConfirmed) {
+          const reference = masterfile.invasions[invasion.grunt_type]
+          if (reference) {
+            const encounters = new Set()
+
+            // Check actual invasion slots first (confirmed invasions)
+            if (
+              invasion.slot_1_pokemon_id &&
+              reference.firstReward &&
+              filters.pokestops.filter[
+                `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`
+              ]?.enabled
+            ) {
+              encounters.add(
+                `a${invasion.slot_1_pokemon_id}-${invasion.slot_1_form}`,
+              )
+            }
+            if (
+              invasion.slot_2_pokemon_id &&
+              reference.secondReward &&
+              filters.pokestops.filter[
+                `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`
+              ]?.enabled
+            ) {
+              encounters.add(
+                `a${invasion.slot_2_pokemon_id}-${invasion.slot_2_form}`,
+              )
+            }
+            if (
+              invasion.slot_3_pokemon_id &&
+              reference.thirdReward &&
+              filters.pokestops.filter[
+                `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`
+              ]?.enabled
+            ) {
+              encounters.add(
+                `a${invasion.slot_3_pokemon_id}-${invasion.slot_3_form}`,
+              )
+            }
+
+            // If no specific Pokemon IDs are set (forced mode), iterate over all possible rewards from masterfile
+            if (
+              !invasion.slot_1_pokemon_id &&
+              !invasion.slot_2_pokemon_id &&
+              !invasion.slot_3_pokemon_id
+            ) {
+              // Iterate over all encounters in the masterfile for this grunt type
+              Object.entries(reference.encounters || {}).forEach(
+                ([position, lineup]) => {
+                  const hasReward =
+                    (position === 'first' && reference.firstReward) ||
+                    (position === 'second' && reference.secondReward) ||
+                    (position === 'third' && reference.thirdReward)
+
+                  if (hasReward && Array.isArray(lineup)) {
+                    lineup.forEach((pokemon) => {
+                      const key = `a${pokemon.id}-${pokemon.form || 0}`
+                      if (filters.pokestops.filter[key]?.enabled) {
+                        encounters.add(key)
+                      }
+                    })
+                  }
                 },
-              })),
-            )
+              )
+            }
+
+            if (encounters.size)
+              options.push(
+                ...[...encounters].map((x) => ({
+                  key: x,
+                  name: t('exclude_quest_multi', {
+                    reward: t(`poke_${x.slice(1).split('-')[0]}`),
+                  }),
+                  action: () => {
+                    setAnchorEl(null)
+                    setState(x)
+                  },
+                })),
+              )
+          }
         }
       })
     }
@@ -494,7 +529,9 @@ const MenuActions = ({
 
 /**
  *
- * @param {Omit<import('@rm/types').Quest, 'key'>} props
+ * @param {{
+ *  with_ar: boolean
+ * } & Omit<import('@rm/types').Quest, 'key'>} props
  * @returns
  */
 const RewardInfo = ({ with_ar, ...quest }) => {
@@ -502,13 +539,38 @@ const RewardInfo = ({ with_ar, ...quest }) => {
   const { src, amount, tt } = getRewardInfo(quest)
   const questMessage = useMemory((s) => s.config.misc.questMessage)
 
+  const labelKeys = Array.isArray(tt) ? tt.filter(Boolean) : tt ? [tt] : []
+  const translatedLabel = labelKeys.length
+    ? labelKeys.map((key) => t(key)).join(' ')
+    : ''
+  const fallbackLabel = labelKeys.join(' ') || 'quest reward'
+  const altLabel = (translatedLabel || fallbackLabel).trim()
+
+  const overrideAmount = Number(
+    {
+      1: quest.xp_amount,
+      2: quest.item_amount,
+      3: quest.stardust_amount,
+      4: quest.candy_amount,
+      9: quest.xl_candy_amount,
+      12: quest.mega_amount,
+    }[quest.quest_reward_type] ?? 0,
+  )
+  const altAmount =
+    typeof amount === 'number' && amount > 0
+      ? amount
+      : Number.isFinite(overrideAmount) && overrideAmount > 0
+        ? overrideAmount
+        : 0
+  const altText = altAmount > 0 ? `${altLabel} x${altAmount}` : altLabel
+
   return (
-    <Grid xs={3} style={{ textAlign: 'center', position: 'relative' }}>
-      <NameTT title={tt}>
+    <>
+      <NameTT title={altText}>
         <img
           src={src}
           style={{ maxWidth: 35, maxHeight: 35 }}
-          alt={typeof tt === 'string' ? tt : tt.join(' ')}
+          alt={altText}
           onError={(e) => {
             // @ts-ignore
             e.target.onerror = null
@@ -521,7 +583,10 @@ const RewardInfo = ({ with_ar, ...quest }) => {
       {!!amount && (
         <div
           className="search-amount-holder"
-          style={{ fontSize: 'medium', bottom: 20 }}
+          style={{
+            fontSize: 'medium',
+            bottom: 20,
+          }}
         >
           x{amount}
         </div>
@@ -529,17 +594,73 @@ const RewardInfo = ({ with_ar, ...quest }) => {
       <Typography variant="caption" className="ar-task" noWrap>
         {questMessage || t(`ar_quest_${!!with_ar}`)}
       </Typography>
-    </Grid>
+    </>
   )
 }
 
-const readableProbability = (x) => {
-  if (x <= 0) return '🚫'
-  const x_1 = Math.round(1 / x)
-  const percent = Math.round(x * 100)
-  return Math.abs(1 / x_1 - x) < Math.abs(percent * 0.01 - x)
-    ? `1:${x_1}`
-    : `${percent}%`
+/**
+ *
+ * @param {{
+ *  quest: Omit<import('@rm/types').Quest, 'key'>
+ *  visuals?: ReturnType<typeof usePokemonBackgroundVisual>
+ * }} props
+ * @returns
+ */
+const QuestRewardRow = ({ quest, visuals }) => {
+  const { quest_reward_type, quest_shiny_probability } = quest
+  const hasBackground = visuals?.hasBackground ?? false
+  const applyBackground = quest_reward_type === 7 && hasBackground
+  const rowContent = (
+    <Grid container justifyContent="center" alignItems="center">
+      <Grid
+        xs={3}
+        style={{
+          textAlign: 'center',
+          position: 'relative',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 4,
+        }}
+      >
+        <RewardInfo {...quest} />
+      </Grid>
+      <Grid
+        xs={9}
+        style={{
+          textAlign: 'center',
+          maxHeight: 150,
+          overflow: 'auto',
+        }}
+      >
+        <QuestConditions {...quest} />
+        {!!quest_shiny_probability && (
+          <>
+            <br />
+            <Typography variant="caption">
+              <Trans
+                i18nKey="shiny_probability"
+                components={[readableProbability(quest_shiny_probability)]}
+              />
+            </Typography>
+          </>
+        )}
+      </Grid>
+    </Grid>
+  )
+
+  const wrappedRow = (
+    <BackgroundCard
+      visuals={applyBackground ? visuals : undefined}
+      fullWidth={applyBackground}
+      fullBleed={applyBackground ? 21 : undefined}
+    >
+      {rowContent}
+    </BackgroundCard>
+  )
+
+  return <Grid xs={12}>{wrappedRow}</Grid>
 }
 
 /**
@@ -548,12 +669,18 @@ const readableProbability = (x) => {
  * @returns
  */
 const QuestConditions = ({
+  quest_task,
   quest_type,
   quest_target,
   quest_conditions,
   quest_title,
 }) => {
   const { i18n, t } = useTranslation()
+  const madQuestText = useStorage((s) => s.userSettings.pokestops.madQuestText)
+
+  if (madQuestText && quest_task) {
+    return <Typography variant="caption">{quest_task}</Typography>
+  }
 
   if (quest_title && !quest_title.includes('geotarget')) {
     const normalized = `quest_title_${quest_title.toLowerCase()}`
@@ -746,7 +873,6 @@ const ENCOUNTER_NUM = { first: '#1', second: '#2', third: '#3' }
  * @returns
  */
 const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
-  const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
   const info = useMemory((s) => s.masterfile.invasions[grunt_type])
 
@@ -782,7 +908,6 @@ const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
                         lineup.map((data) => (
                           <ShadowPokemon
                             key={`${data.id}-${data.form}`}
-                            Icons={Icons}
                             {...data}
                           />
                         ))
@@ -850,47 +975,121 @@ const Showcase = ({
   )
 }
 
-const NoBorderCell = styled(TableCell, {
-  shouldForwardProp: (prop) => prop !== 'textAlign',
-  // @ts-ignore
-})(({ textAlign = 'right' }) => ({
-  borderBottom: 'none',
-  padding: 2,
-  textAlign,
-}))
-
-const ShowcaseEntry = (entry) => {
-  const { rank, score, pokemon_id, badge } = entry
+const ShowcaseEntry = ({
+  rank,
+  score,
+  pokemon_id,
+  badge,
+  background,
+  ...display
+}) => {
   const Icons = useMemory((s) => s.Icons)
   const { t } = useTranslation()
-  return (
-    <TableRow>
-      <NoBorderCell>
-        <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
-      </NoBorderCell>
-      <NoBorderCell
-        // @ts-ignore
-        textAlign="center"
+  const theme = useTheme()
+  const visuals = usePokemonBackgroundVisual(background)
+  const { hasBackground } = visuals
+  const entry = (
+    <Box display="flex" justifyContent="center" width="100%">
+      <Box
+        sx={{
+          width: '75%',
+          mx: 'auto',
+          py: 0.25,
+          display: 'grid',
+          gridTemplateColumns: '60px 1fr 60px',
+          alignItems: 'center',
+          justifyItems: 'center',
+          textAlign: 'center',
+          ...theme.typography.body2,
+        }}
       >
-        {score.toFixed(2)}
-      </NoBorderCell>
-      {pokemon_id && (
-        <NoBorderCell>
-          <img
-            src={Icons.getPokemonByDisplay(pokemon_id, entry)}
-            alt="rank"
-            height={20}
-          />
-          {badge === 1 && (
-            <Img
-              src={Icons.getMisc('bestbuddy')}
-              alt={t('best_buddy')}
-              maxHeight={15}
-              maxWidth={15}
-            />
-          )}
-        </NoBorderCell>
-      )}
-    </TableRow>
+        <Box
+          component="span"
+          sx={{
+            width: 40,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <img src={Icons.getMisc(getBadge(rank))} alt="rank" height={20} />
+        </Box>
+        <Box
+          component="span"
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            minWidth: 0,
+            width: '100%',
+          }}
+        >
+          <Typography
+            variant="body2"
+            component="div"
+            sx={{ fontWeight: 'inherit' }}
+          >
+            {score.toFixed(2)}
+          </Typography>
+        </Box>
+        <Box
+          component="span"
+          sx={{
+            width: 40,
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
+          <Box
+            sx={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: theme.spacing(0.5),
+              width: '100%',
+            }}
+          >
+            <Box
+              component="span"
+              sx={{
+                width: 40,
+                height: 20,
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Img
+                src={Icons.getPokemonByDisplay(pokemon_id, {
+                  ...display,
+                  badge,
+                  background,
+                })}
+                alt={t(`poke_${pokemon_id}`)}
+                maxHeight={20}
+                maxWidth={20}
+              />
+            </Box>
+            {badge === 1 && (
+              <Img
+                src={Icons.getMisc('bestbuddy')}
+                alt={t('best_buddy')}
+                maxHeight={20}
+                maxWidth={20}
+              />
+            )}
+          </Box>
+        </Box>
+      </Box>
+    </Box>
+  )
+
+  return (
+    <BackgroundCard
+      visuals={hasBackground ? visuals : undefined}
+      fullWidth
+      wrapWhenNoTooltip
+      fullBleed={hasBackground ? 21 : undefined}
+    >
+      {entry}
+    </BackgroundCard>
   )
 }

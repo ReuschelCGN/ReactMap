@@ -1,5 +1,5 @@
 // @ts-check
-const { expressMiddleware } = require('@apollo/server/express4')
+const { expressMiddleware } = require('@as-integrations/express5')
 const { ApolloServerErrorCode } = require('@apollo/server/errors')
 const { GraphQLError } = require('graphql')
 const { parse } = require('graphql')
@@ -44,7 +44,10 @@ function apolloMiddleware(server) {
         endpoint: userDataLimit.category,
       }
 
-      if (clientV && serverV && clientV !== serverV) {
+      // Allow the hot-reload dev client to bypass strict version matching
+      const isDevClient = clientV === 'development'
+
+      if (clientV && serverV && clientV !== serverV && !isDevClient) {
         throw new GraphQLError('old_client', {
           extensions: {
             ...errorCtx,

@@ -16,8 +16,8 @@ const core = gql`
     expire_timestamp_verified
     updated
     display_pokemon_id
-    ditto_form
     seen_type
+    background
   }
 `
 
@@ -133,6 +133,16 @@ export const GET_IVS_PVP = gql`
       ...CorePokemon
       ...Iv
       ...Pvp
+    }
+  }
+`
+
+export const GET_POKEMON_SHINY_STATS = gql`
+  query PokemonShinyStats($pokemonId: Int!, $form: Int) {
+    pokemonShinyStats(pokemon_id: $pokemonId, form: $form) {
+      shiny_seen
+      encounters_seen
+      since_date
     }
   }
 `
