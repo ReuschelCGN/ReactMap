@@ -62,7 +62,11 @@ export class Poracle {
             ? 'kecleon'
             : item.grunt_type === 'showcase'
               ? 'showcase'
-              : `i${item.real_grunt_id}`
+              : item.grunt_type === 'steel' && item.gender == 1
+                ? 'i28'
+                : item.grunt_type === 'steel' && item.gender == 2
+                  ? 'i29'
+                  : `i${item.real_grunt_id}`
       case 'lure':
         return `l${item.lure_id}`
       case 'gym':
@@ -317,9 +321,13 @@ export class Poracle {
               ? 'poke_352'
               : item.grunt_type === 'showcase'
                 ? 'showcase'
-                : item.real_grunt_id
-                  ? `grunt_${item.real_grunt_id}`
-                  : 'poke_global',
+                : item.grunt_type === 'steel' && item.gender == 1
+                  ? `grunt_28`
+                  : item.grunt_type === 'steel' && item.gender == 2
+                    ? `grunt_29`
+                    : item.real_grunt_id
+                      ? `grunt_${item.real_grunt_id}`
+                      : 'poke_global',
         )
         if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
         return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${
