@@ -4,7 +4,7 @@ on:
     branches:
       - main
       - develop
-      - developmod5-upstream02
+      - developmod5-up02dev
 
 jobs:
   config:
