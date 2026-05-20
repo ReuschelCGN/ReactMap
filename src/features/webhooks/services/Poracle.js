@@ -62,7 +62,7 @@ export class Poracle {
             ? 'kecleon'
             : item.grunt_type === 'showcase'
               ? 'showcase'
-              : item.grunt_type === 'steel' && item.gender == 1
+              : item.grunt_type === 'steel' && item.gender != 2
                 ? 'i28'
                 : item.grunt_type === 'steel' && item.gender == 2
                   ? 'i29'
@@ -321,7 +321,7 @@ export class Poracle {
               ? 'poke_352'
               : item.grunt_type === 'showcase'
                 ? 'showcase'
-                : item.grunt_type === 'steel' && item.gender == 1
+                : item.grunt_type === 'steel' && item.gender != 2
                   ? `grunt_28`
                   : item.grunt_type === 'steel' && item.gender == 2
                     ? `grunt_29`
