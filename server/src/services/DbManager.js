@@ -124,16 +124,17 @@ class DbManager extends Logger {
    * @returns {Promise<import("@rm/types").DbContext>}
    */
   static async schemaCheck(schema) {
-    const [pvpV2, hasSize, hasHeight, hasPokemonBackground] =
-      await schema('pokemon')
-        .columnInfo()
-        .then((columns) => [
-          'cp_multiplier' in columns,
-          'pvp' in columns,
-          'size' in columns,
-          'height' in columns,
-          'background' in columns,
-        ])
+    const [pvpV2, hasSize, hasHeight, hasPokemonBackground] = await schema(
+      'pokemon',
+    )
+      .columnInfo()
+      .then((columns) => [
+        'cp_multiplier' in columns,
+        'pvp' in columns,
+        'size' in columns,
+        'height' in columns,
+        'background' in columns,
+      ])
     const [
       hasRewardAmount,
       hasPowerUp,
