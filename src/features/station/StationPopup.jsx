@@ -399,10 +399,10 @@ function StationContent({ start_time, end_time, id }) {
 }
 
 /** @param {import('@rm/types').Station} props */
-function StationMons({ id }) {
+function StationMons({ id, updated }) {
   const { t: tId } = useTranslateById()
   const { t } = useTranslation()
-  const mons = useGetStationMons(id)
+  const mons = useGetStationMons(id, updated)
   const icons = useMemory((s) => s.Icons)
 
   return (
