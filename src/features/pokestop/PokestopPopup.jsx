@@ -576,7 +576,7 @@ const RewardInfo = ({ with_ar, ...quest }) => {
             e.target.onerror = null
             // @ts-ignore
             e.target.src =
-              'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/misc/0.webp'
+              'https://raw.githubusercontent.com/ReuschelCGN/wwm-uicons/main/background/0.png'
           }}
         />
       </NameTT>
