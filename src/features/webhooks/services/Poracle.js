@@ -352,9 +352,9 @@ export class Poracle {
                 item.amount ? ` | x${item.amount}` : ''
               }`
             case 7:
-              return `${t(`poke_${item.reward}`)} ${t('form')}: ${t(
-                `form_${item.form}`,
-              )}`
+              return item.form == 0
+                ? `${t(`poke_${item.reward}`)}`
+                : `${t(`poke_${item.reward}`)} ${t('form')}: ${t(`form_${item.form}`)}`
             case 12:
               return `${t(`poke_${item.reward}`)}${
                 item.amount ? ` | x${item.amount}` : ''
