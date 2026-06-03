@@ -24,7 +24,7 @@ function StationLevels() {
     'filters.stations.battleTier',
     'all',
   )
-  
+
   const battleTiers = React.useMemo(() => {
     const availableTiers = available
       .filter((x) => x.startsWith('j'))
