@@ -339,9 +339,7 @@ export class Poracle {
           item.clean ? ` | ${t('clean')} ` : ''
         }${item.distance ? ` | d${item.distance}` : ''}`
       case 'quest':
-        return `${t(
-          `quest_reward_${item.reward_type}`,
-        )} | ${(function getReward() {
+        return `${(function getReward() {
           switch (item.reward_type) {
             case 2:
               return `${t(`item_${item.reward}`)}${
@@ -364,7 +362,9 @@ export class Poracle {
             default:
               return ''
           }
-        })()}${item.clean ? ` | ${t('clean')} ` : ''}${
+        })()} | ${t(
+          `quest_reward_${item.reward_type}`,
+        )}${item.clean ? ` | ${t('clean')} ` : ''}${
           item.distance ? ` | d${item.distance}` : ''
         }`
       // case 'gym': return `${t(`team_${item.team}`)} ${item.gym_id ? item.name : ''}`
