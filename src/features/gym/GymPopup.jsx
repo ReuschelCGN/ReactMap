@@ -15,7 +15,7 @@ import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import ShieldIcon from '@mui/icons-material/Shield'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism'
 import RestaurantIcon from '@mui/icons-material/Restaurant'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@mui/material/styles'
@@ -632,7 +632,7 @@ function DefendersModal({ gym, onClose }) {
                         gap: '2px',
                       }}
                     >
-                      <RestaurantIcon
+                      <VolunteerActivismIcon
                         data-background-icon="secondary"
                         sx={{ fontSize: 16 }}
                       />
