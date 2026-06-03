@@ -81,6 +81,15 @@ export const GET_ALL_STATIONS_BATTLE = gql`
   }
 `
 
+export const GET_ONE_STATION = gql`
+  query GetOneStation($id: ID!, $perm: String!) {
+    stationsSingle(id: $id, perm: $perm) {
+      lat
+      lon
+    }
+  }
+`
+
 export const GET_STATION_POKEMON = gql`
   query StationPokemon($id: ID!) {
     stationPokemon(id: $id) {
