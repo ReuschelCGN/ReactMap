@@ -133,6 +133,7 @@ const BaseGymTile = (gym) => {
     showExBadge,
     showArBadge,
     showRaidLevel,
+    showRsvpsBadge,
   ] = useStorage((s) => {
     const { userSettings, filters, zoom } = s
     return [
@@ -145,6 +146,7 @@ const BaseGymTile = (gym) => {
       userSettings.gyms.showExBadge && gym.ex_raid_eligible,
       userSettings.gyms.showArBadge && gym.ar_scan_eligible,
       userSettings.gyms.raidLevelBadges && !!raidIconUrl,
+      userSettings.gyms.showRsvpsBadge && gym.rsvps?.length > 0,
     ]
   }, basicEqualFn)
 
@@ -194,6 +196,7 @@ const BaseGymTile = (gym) => {
         showExBadge,
         showArBadge,
         showRaidLevel,
+        showRsvpsBadge,
         opacity,
         gymIconUrl,
         gymIconSize,
