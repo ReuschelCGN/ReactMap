@@ -62,7 +62,11 @@ export class Poracle {
             ? 'kecleon'
             : item.grunt_type === 'showcase'
               ? 'showcase'
-              : `i${item.real_grunt_id}`
+              : item.grunt_type === 'steel' && item.gender == 1
+                ? 'i28'
+                : item.grunt_type === 'steel' && item.gender == 2
+                  ? 'i29'
+                  : `i${item.real_grunt_id}`
       case 'lure':
         return `l${item.lure_id}`
       case 'gym':
