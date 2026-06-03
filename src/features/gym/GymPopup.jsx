@@ -292,6 +292,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                 ) : (
                   <Timer start {...gym} />
                 )}
+                {gym.rsvps?.length > 0 && <RsvpsModal gym={gym} />}
                 {Boolean(
                   gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
                 ) && <Timer start {...gym} hasHatched={hasHatched} />}
@@ -414,7 +415,7 @@ function DefendersModal({ gym, onClose }) {
           </IconButton>
         </Grid>
         <Grid
-          xs={10}
+          xs={8}
           style={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -678,6 +679,73 @@ function DefendersModal({ gym, onClose }) {
           </Grid>
         </>
       )}
+    </Grid>
+  )
+}
+
+/**
+ * Compact modal for rsvps
+ * @param {{ gym: import('@rm/types').Gym }} param0
+ */
+function RsvpsModal({ gym }) {
+  const { t } = useTranslation()
+  const rsvps = gym.rsvps || []
+
+  const formatTime = (timestamp) => {
+    const locale = localStorage.getItem('i18nextLng') || 'en'
+    return new Date(timestamp).toLocaleTimeString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  return (
+    <Grid xs={12}>
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        style={{ margin: '2px 0' }}
+      >
+        <small
+          style={{
+            fontWeight: 'bold',
+            fontSize: 12,
+            marginBottom: 4,
+          }}
+        >
+          RSVPs: ({t(`going`)} / {t(`maybe`)})
+        </small>
+        <Grid container justifyContent="center" spacing={1}>
+          {rsvps.map((rsvp) => (
+            <Grid
+              key={rsvp.timeslot}
+              xs="auto"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: '6px',
+                fontSize: 14,
+                minWidth: 50,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '2px',
+                }}
+              >
+                {t(`starts`)}:&nbsp;
+                {formatTime(rsvp.timeslot)}&nbsp;
+                <AccessTimeIcon fontSize="smaller" />
+                &nbsp;
+                {rsvp.going_count} / {rsvp.maybe_count}
+              </div>
+            </Grid>
+          ))}
+        </Grid>
+      </Grid>
     </Grid>
   )
 }
