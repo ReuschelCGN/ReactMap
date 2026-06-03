@@ -16,7 +16,7 @@ import ShieldIcon from '@mui/icons-material/Shield'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism'
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
+import RemoveModeratorIcon from '@mui/icons-material/RemoveModerator';
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@mui/material/styles'
 
@@ -612,7 +612,7 @@ function DefendersModal({ gym, onClose }) {
                         gap: '2px',
                       }}
                     >
-                      <SentimentVeryDissatisfiedIcon
+                      <RemoveModeratorIcon
                         data-background-icon="secondary"
                         sx={{ fontSize: 16 }}
                       />
