@@ -16,7 +16,7 @@ import ShieldIcon from '@mui/icons-material/Shield'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism'
-import RestaurantIcon from '@mui/icons-material/Restaurant'
+import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@mui/material/styles'
 
