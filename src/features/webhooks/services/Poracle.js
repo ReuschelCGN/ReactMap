@@ -321,9 +321,13 @@ export class Poracle {
               ? 'poke_352'
               : item.grunt_type === 'showcase'
                 ? 'showcase'
-                : item.real_grunt_id
-                  ? `grunt_${item.real_grunt_id}`
-                  : 'poke_global',
+                : item.grunt_type === 'steel' && item.gender == 1
+                  ? `grunt_28`
+                  : item.grunt_type === 'steel' && item.gender == 2
+                    ? `grunt_29`
+                    : item.real_grunt_id
+                      ? `grunt_${item.real_grunt_id}`
+                      : 'poke_global',
         )
         if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
         return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${
