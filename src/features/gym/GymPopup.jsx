@@ -16,7 +16,7 @@ import ShieldIcon from '@mui/icons-material/Shield'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism'
-import RemoveModeratorIcon from '@mui/icons-material/RemoveModerator';
+import RemoveModeratorIcon from '@mui/icons-material/RemoveModerator'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@mui/material/styles'
 
