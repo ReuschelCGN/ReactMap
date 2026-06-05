@@ -67,6 +67,7 @@ type Query {
     maxLon: Float
     filters: JSON
   ): [Station]
+  stationsSingle(id: ID, perm: String): Station
   stationPokemon(id: ID): [StationPokemon]
   tappables(
     minLat: Float
