@@ -647,7 +647,8 @@ function DefendersModal({ gym, onClose }) {
                   </DefenderSecondaryText>
 
                   <DefenderSecondaryText visualStyles={secondaryTextStyles}>
-                    {t('cp')}{currentCP}/{fullCP}{' '}
+                    {t('cp')}
+                    {currentCP}/{fullCP}{' '}
                     {formatDeployedTime(def.deployed_ms + now - updatedMs)}
                   </DefenderSecondaryText>
                 </DefenderRowLayout>
