@@ -570,7 +570,7 @@ function DefendersModal({ gym, onClose }) {
                 >
                   {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
                   <DefenderPrimaryText
-                    title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
+                    title={`${t(`poke_${def.pokemon_id}`)} {t('cp')}${currentCP}/${fullCP}`}
                     visualStyles={primaryTextStyles}
                   >
                     {t(`poke_${def.pokemon_id}`)}
@@ -647,7 +647,8 @@ function DefendersModal({ gym, onClose }) {
                   </DefenderSecondaryText>
 
                   <DefenderSecondaryText visualStyles={secondaryTextStyles}>
-                    CP{currentCP}/{fullCP}{' '}
+                    {t('cp')}
+                    {currentCP}/{fullCP}{' '}
                     {formatDeployedTime(def.deployed_ms + now - updatedMs)}
                   </DefenderSecondaryText>
                 </DefenderRowLayout>
