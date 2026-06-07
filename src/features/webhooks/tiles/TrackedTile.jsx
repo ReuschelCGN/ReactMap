@@ -74,7 +74,7 @@ export function TrackedTile({ index }) {
       </Grid2>
       <Grid2 xs={6} sm={8} md={9}>
         <Typography variant="caption">
-          {item.description || Poracle.generateDescription(item, category)}
+          {Poracle.generateDescription(item, category) || item.description}
         </Typography>
       </Grid2>
       <Grid2 xs={4} sm={3} md={2} textAlign="right">

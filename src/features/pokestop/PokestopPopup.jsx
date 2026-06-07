@@ -9,7 +9,6 @@ import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 import Check from '@mui/icons-material/Check'
-import Help from '@mui/icons-material/Help'
 import { useTranslation, Trans } from 'react-i18next'
 import { useTheme } from '@mui/material/styles'
 
@@ -576,7 +575,7 @@ const RewardInfo = ({ with_ar, ...quest }) => {
             e.target.onerror = null
             // @ts-ignore
             e.target.src =
-              'https://raw.githubusercontent.com/WatWowMap/wwm-uicons-webp/main/misc/0.webp'
+              'https://raw.githubusercontent.com/ReuschelCGN/wwm-uicons/main/background/0.png'
           }}
         />
       </NameTT>
@@ -884,11 +883,7 @@ const Invasion = ({ grunt_type, confirmed, ...invasion }) => {
         </Typography>
       </Grid>
       <Grid xs={3} style={{ alignItems: 'center', display: 'flex' }}>
-        {confirmed ? (
-          <Check fontSize="medium" color="success" />
-        ) : (
-          <Help fontSize="medium" />
-        )}
+        {confirmed && <Check fontSize="medium" color="success" />}
       </Grid>
       <Grid xs={12}>
         <table className="table-invasion">

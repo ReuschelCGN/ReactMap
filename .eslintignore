@@ -6,4 +6,3 @@ public/images/custom
 public/images/uicons
 server/src/configs/
 packages/**/*.d.ts
-AGENTS.md

@@ -32,6 +32,7 @@ const getBadgeColor = (raidLevel) => {
  *  showExBadge: boolean,
  *  showArBadge: boolean,
  *  showRaidLevel: boolean,
+ *  showRsvpsBadge: boolean,
  *  opacity: number,
  * } & import('@rm/types').Gym} params
  * @returns
@@ -45,6 +46,7 @@ export function gymMarker({
   showExBadge,
   showArBadge,
   showRaidLevel,
+  showRsvpsBadge,
   opacity,
   available_slots,
   in_battle,
@@ -141,6 +143,22 @@ export function gymMarker({
                     height: auto;
                     bottom: ${23 + gymMod.offsetY}px;
                     left: ${gymMod.offsetX * -40}%;
+                    transform: translateX(-50%);
+                  "
+                />`
+              : ''
+          }
+          ${
+            showRsvpsBadge
+              ? /* html */
+                `<img
+                  src="${Icons.getMisc('rsvps')}"
+                  alt="rsvps"
+                  style="
+                    width: ${gymIconSize / 1.4}px;
+                    height: auto;
+                    bottom: ${60 + gymMod.offsetY}px;
+                    left: ${gymMod.offsetX * 55}%;
                     transform: translateX(-50%);
                   "
                 />`

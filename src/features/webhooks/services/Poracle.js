@@ -62,7 +62,11 @@ export class Poracle {
             ? 'kecleon'
             : item.grunt_type === 'showcase'
               ? 'showcase'
-              : `i${item.real_grunt_id}`
+              : item.grunt_type === 'steel' && item.gender != 2
+                ? 'i28'
+                : item.grunt_type === 'steel' && item.gender == 2
+                  ? 'i29'
+                  : `i${item.real_grunt_id}`
       case 'lure':
         return `l${item.lure_id}`
       case 'gym':
@@ -317,9 +321,13 @@ export class Poracle {
               ? 'poke_352'
               : item.grunt_type === 'showcase'
                 ? 'showcase'
-                : item.real_grunt_id
-                  ? `grunt_${item.real_grunt_id}`
-                  : 'poke_global',
+                : item.grunt_type === 'steel' && item.gender != 2
+                  ? `grunt_28`
+                  : item.grunt_type === 'steel' && item.gender == 2
+                    ? `grunt_29`
+                    : item.real_grunt_id
+                      ? `grunt_${item.real_grunt_id}`
+                      : 'poke_global',
         )
         if (!item.gender) name = name.replace(/\(.+?\)/g, `(${t('all')})`)
         return `${name}${item.clean ? ` | ${t('clean')} ` : ''}${
@@ -331,9 +339,7 @@ export class Poracle {
           item.clean ? ` | ${t('clean')} ` : ''
         }${item.distance ? ` | d${item.distance}` : ''}`
       case 'quest':
-        return `${t(
-          `quest_reward_${item.reward_type}`,
-        )} | ${(function getReward() {
+        return `${(function getReward() {
           switch (item.reward_type) {
             case 2:
               return `${t(`item_${item.reward}`)}${
@@ -346,9 +352,9 @@ export class Poracle {
                 item.amount ? ` | x${item.amount}` : ''
               }`
             case 7:
-              return `${t(`poke_${item.reward}`)} ${t('form')}: ${t(
-                `form_${item.form}`,
-              )}`
+              return item.form == 0
+                ? `${t(`poke_${item.reward}`)}`
+                : `${t(`poke_${item.reward}`)} ${t('form')}: ${t(`form_${item.form}`)}`
             case 12:
               return `${t(`poke_${item.reward}`)}${
                 item.amount ? ` | x${item.amount}` : ''
@@ -356,7 +362,9 @@ export class Poracle {
             default:
               return ''
           }
-        })()}${item.clean ? ` | ${t('clean')} ` : ''}${
+        })()} | ${t(
+          `quest_reward_${item.reward_type}`,
+        )}${item.clean ? ` | ${t('clean')} ` : ''}${
           item.distance ? ` | d${item.distance}` : ''
         }`
       // case 'gym': return `${t(`team_${item.team}`)} ${item.gym_id ? item.name : ''}`
