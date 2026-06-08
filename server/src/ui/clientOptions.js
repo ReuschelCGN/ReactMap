@@ -100,16 +100,6 @@ function clientOptions(perms) {
         perm: ['quests'],
         category: 'markers',
       },
-      showArQuestDotBadge: {
-        type: 'bool',
-        perm: ['quests'],
-        category: 'markers',
-      },
-      showNoArQuestDotBadge: {
-        type: 'bool',
-        perm: ['quests'],
-        category: 'markers',
-      },
       showArBadge: { type: 'bool', perm: ['pokestops'], category: 'markers' },
       invasionOpacity: {
         type: 'bool',
