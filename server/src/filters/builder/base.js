@@ -15,6 +15,7 @@ const { PokemonFilter } = require('../pokemon/Frontend')
  */
 function buildDefaultFilters(perms) {
   const defaultFilters = config.getSafe('defaultFilters')
+  const map = config.getSafe('map')
 
   const base = new PokemonFilter(defaultFilters.pokemon.allPokemon)
   const custom = new PokemonFilter(
@@ -90,7 +91,9 @@ function buildDefaultFilters(perms) {
               ? defaultFilters.pokestops.eventStops
               : undefined,
             quests: perms.quests ? defaultFilters.pokestops.quests : undefined,
-            showQuestSet: defaultFilters.pokestops.questSet,
+            showQuestSet: !map.misc.enableQuestSetSelector
+              ? defaultFilters.pokestops.questSet
+              : 'without_ar',
             confirmed: perms.invasions
               ? defaultFilters.pokestops.confirmed
               : undefined,
