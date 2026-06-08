@@ -397,8 +397,6 @@
   "webhook_selection": "{{name}} Auswahl",
   "message_of_the_day": "Nachricht des Tages",
   "has_quest_indicator": "Alternative Farbe für Stops mit Quests",
-  "show_ar_quest_dot_badge": "AR Quest Punkt anzeigen",
-  "show_no_ar_quest_dot_badge": "No-AR Quest Punkt anzeigen",
   "show_ar_badge": "AR Symbol anzeigen",
   "general": "Allgemeines",
   "link_global_and_advanced": "Verknüpfe Global und Erweitert",
