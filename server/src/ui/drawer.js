@@ -1,6 +1,7 @@
 // @ts-check
 const config = require('@rm/config')
 const { state } = require('../services/state')
+
 /** @typedef {import('@rm/types').RMSlider} Slider */
 
 // TODO this will be used later in the config
@@ -115,7 +116,7 @@ function drawer(req, perms) {
                   name: 'level',
                   label: '',
                   min: 1,
-                  max: 55,
+                  max: 50,
                   perm: 'iv',
                   color: 'secondary',
                 },
