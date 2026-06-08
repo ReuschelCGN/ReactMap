@@ -1,7 +1,6 @@
 // @ts-check
 const config = require('@rm/config')
 const { state } = require('../services/state')
-
 /** @typedef {import('@rm/types').RMSlider} Slider */
 
 // TODO this will be used later in the config
@@ -26,7 +25,7 @@ function drawer(req, perms) {
             raids: perms.raids || BLOCKED,
             exEligible: perms.gyms || BLOCKED,
             inBattle: perms.gyms || BLOCKED,
-            arEligible: perms.gyms || BLOCKED,
+            arEligible: perms.gyms && mapConfig.misc.enableQuestSetSelector || BLOCKED,
             gymBadges: perms.gymBadges || BLOCKED,
           }
         : BLOCKED,
@@ -60,7 +59,7 @@ function drawer(req, perms) {
             invasions: perms.invasions || BLOCKED,
             eventStops: perms.eventStops || BLOCKED,
             lures: perms.lures || BLOCKED,
-            arEligible: perms.pokestops || BLOCKED,
+            arEligible: perms.pokestops && mapConfig.misc.enableQuestSetSelector || BLOCKED,
           }
         : BLOCKED,
     tappables:
@@ -116,7 +115,7 @@ function drawer(req, perms) {
                   name: 'level',
                   label: '',
                   min: 1,
-                  max: 50,
+                  max: 55,
                   perm: 'iv',
                   color: 'secondary',
                 },
