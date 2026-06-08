@@ -26,7 +26,8 @@ function drawer(req, perms) {
             raids: perms.raids || BLOCKED,
             exEligible: perms.gyms || BLOCKED,
             inBattle: perms.gyms || BLOCKED,
-            arEligible: (perms.gyms && mapConfig.misc.enableQuestSetSelector) || BLOCKED,
+            arEligible:
+              (perms.gyms && mapConfig.misc.enableQuestSetSelector) || BLOCKED,
             gymBadges: perms.gymBadges || BLOCKED,
           }
         : BLOCKED,
@@ -60,7 +61,9 @@ function drawer(req, perms) {
             invasions: perms.invasions || BLOCKED,
             eventStops: perms.eventStops || BLOCKED,
             lures: perms.lures || BLOCKED,
-            arEligible: (perms.pokestops && mapConfig.misc.enableQuestSetSelector) || BLOCKED,
+            arEligible:
+              (perms.pokestops && mapConfig.misc.enableQuestSetSelector) ||
+              BLOCKED,
           }
         : BLOCKED,
     tappables:
