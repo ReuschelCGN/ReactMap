@@ -532,7 +532,7 @@
       "quests": true,
       "eventStops": false,
       "showcasePokemon": true,
-      "questSet": "both",
+      "questSet": "without_ar",
       "confirmed": false,
       "excludeGrunts": false,
       "excludeLeaders": false,
