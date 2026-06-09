@@ -271,7 +271,7 @@
       "enablePortalPopupCoordsSelector": false,
       "enableStationPopupCoordsSelector": false,
       "enableTappablePopupCoordsSelector": false,
-      "enableQuestSetSelector": false,
+      "enableArFeatueres": false,
       "customFloatingIcons": [],
       "expandAllScanAreas": false,
       "enableRouteDownload": false
