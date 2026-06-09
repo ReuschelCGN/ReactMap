@@ -32,7 +32,9 @@ function clientOptions(perms) {
         category: 'markers',
       },
       showExBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
-      showArBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
+      showArBadge: map.misc.enableArFeatueres
+        ? { type: 'bool', perm: ['gyms'], category: 'markers' }
+        : undefined,
       raidLevelBadges: { type: 'bool', perm: ['raids'], category: 'markers' },
       showRsvpsBadge: { type: 'bool', perm: ['raids'], category: 'markers' },
       gymBadgeDiamonds: {
@@ -100,7 +102,9 @@ function clientOptions(perms) {
         perm: ['quests'],
         category: 'markers',
       },
-      showArBadge: { type: 'bool', perm: ['pokestops'], category: 'markers' },
+      showArBadge: map.misc.enableArFeatueres
+        ? { type: 'bool', perm: ['pokestops'], category: 'markers' }
+        : undefined,
       invasionOpacity: {
         type: 'bool',
         perm: ['invasions'],
