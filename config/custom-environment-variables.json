@@ -552,8 +552,8 @@
         "__name": "MAP_MISC_ENABLE_TAPPABLE_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
       },
-      "enableQuestSetSelector": {
-        "__name": "MAP_MISC_ENABLE_QUEST_SET_SELECTOR",
+      "enableArFeatueres": {
+        "__name": "MAP_MISC_ENABLE_AR_FEATUERES",
         "__format": "boolean"
       },
       "customFloatingIcons": {
