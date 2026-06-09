@@ -12,8 +12,8 @@ import { MultiSelectorList, SelectorListMemo } from '../components/SelectorList'
 
 const BaseQuestQuickSelect = () => {
   const enabled = useStorage((s) => !!s.filters?.pokestops?.quests)
-  const { enableQuestSetSelector } = useMemory.getState().config.misc
-  return enableQuestSetSelector ? (
+  const { enableArFeatueres } = useMemory.getState().config.misc
+  return enableArFeatueres ? (
     <CollapsibleItem open={enabled}>
       <ListItem>
         <MultiSelectorStore
