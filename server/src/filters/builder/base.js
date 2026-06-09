@@ -91,7 +91,7 @@ function buildDefaultFilters(perms) {
               ? defaultFilters.pokestops.eventStops
               : undefined,
             quests: perms.quests ? defaultFilters.pokestops.quests : undefined,
-            showQuestSet: !map.misc.enableQuestSetSelector
+            showQuestSet: !map.misc.enableArFeatueres
               ? defaultFilters.pokestops.questSet
               : 'without_ar',
             confirmed: perms.invasions
