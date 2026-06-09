@@ -27,7 +27,7 @@ function drawer(req, perms) {
             exEligible: perms.gyms || BLOCKED,
             inBattle: perms.gyms || BLOCKED,
             arEligible:
-              (perms.gyms && mapConfig.misc.enableQuestSetSelector) || BLOCKED,
+              (perms.gyms && mapConfig.misc.enableArFeatueres) || BLOCKED,
             gymBadges: perms.gymBadges || BLOCKED,
           }
         : BLOCKED,
@@ -62,7 +62,7 @@ function drawer(req, perms) {
             eventStops: perms.eventStops || BLOCKED,
             lures: perms.lures || BLOCKED,
             arEligible:
-              (perms.pokestops && mapConfig.misc.enableQuestSetSelector) ||
+              (perms.pokestops && mapConfig.misc.enableArFeatueres) ||
               BLOCKED,
           }
         : BLOCKED,
