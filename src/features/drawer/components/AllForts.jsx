@@ -17,8 +17,8 @@ import { SelectorListMemo } from './SelectorList'
 const BaseAllForts = ({ category, subItem }) => {
   const { t } = useTranslation()
   const enabled = useStorage((s) => !!s.filters?.[category]?.[subItem])
-  const { enableQuestSetSelector } = useMemory.getState().config.misc
-  return enableQuestSetSelector ? (
+  const { enableArFeatueres } = useMemory.getState().config.misc
+  return enableArFeatueres ? (
     <CollapsibleItem open={enabled}>
       <ListItem>
         <ListItemText primary={t('power_up')} />
