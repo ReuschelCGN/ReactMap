@@ -62,8 +62,7 @@ function drawer(req, perms) {
             eventStops: perms.eventStops || BLOCKED,
             lures: perms.lures || BLOCKED,
             arEligible:
-              (perms.pokestops && mapConfig.misc.enableArFeatueres) ||
-              BLOCKED,
+              (perms.pokestops && mapConfig.misc.enableArFeatueres) || BLOCKED,
           }
         : BLOCKED,
     tappables:
