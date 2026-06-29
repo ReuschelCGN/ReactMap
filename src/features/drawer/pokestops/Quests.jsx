@@ -2,7 +2,6 @@
 import * as React from 'react'
 import ListItem from '@mui/material/ListItem'
 
-import { useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { QUEST_SETS } from '@assets/constants'
 import { MultiSelectorStore } from '@components/inputs/MultiSelector'
@@ -12,19 +11,14 @@ import { MultiSelectorList, SelectorListMemo } from '../components/SelectorList'
 
 const BaseQuestQuickSelect = () => {
   const enabled = useStorage((s) => !!s.filters?.pokestops?.quests)
-  const hasDualQuestLayer = useMemory(
-    (s) => s.config.misc.questLayerMode === 'dual',
-  )
   return (
     <CollapsibleItem open={enabled}>
-      {hasDualQuestLayer && (
-        <ListItem>
-          <MultiSelectorStore
-            field="filters.pokestops.showQuestSet"
-            items={QUEST_SETS}
-          />
-        </ListItem>
-      )}
+      <ListItem>
+        <MultiSelectorStore
+          field="filters.pokestops.showQuestSet"
+          items={QUEST_SETS}
+        />
+      </ListItem>
       <MultiSelectorList tabKey="quests">
         <SelectorListMemo
           key="items"
