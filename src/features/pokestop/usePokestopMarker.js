@@ -262,10 +262,8 @@ export function usePokestopMarker({
         quest_shiny,
         quest_bread_mode = 0,
         quest_background,
-        with_ar = true,
         key,
       } = quest
-      const showQuestDot = with_ar ? showArQuestDotBadge : showNoArQuestDotBadge
       let questIcon = { url: Icons.getRewards(quest_reward_type) }
       switch (quest_reward_type) {
         case 1:
@@ -344,7 +342,6 @@ export function usePokestopMarker({
       questIcons.unshift({
         ...questIcon,
         rewardType: quest_reward_type,
-        questDotColor: showQuestDot ? (with_ar ? '#1e88e5' : '#9e9e9e') : '',
       })
       questSizes.unshift(Icons.getSize('reward', filters[key]?.size))
       popupYOffset += rewardMod.offsetY - 1
@@ -419,7 +416,6 @@ export function usePokestopMarker({
       amount: icon.amount,
       rewardType: icon.rewardType,
       backgroundUrl: icon.backgroundUrl,
-      questDotColor: icon.questDotColor,
     })
   })
 
@@ -472,15 +468,6 @@ export function usePokestopMarker({
                 />
               `
           : ''
-      const questDotHtml =
-        item.type === 'quest' && item.questDotColor
-          ? `
-                <span
-                  class="pokestop-marker__quest-dot"
-                  style="background-color: ${item.questDotColor};"
-                ></span>
-              `
-          : ''
       const backgroundStyle = item.backgroundUrl
         ? `
                 background-image: url(${item.backgroundUrl});
@@ -514,7 +501,6 @@ export function usePokestopMarker({
                 style="${opacityStyle}"
               />
               ${amountHtml}
-              ${questDotHtml}
               ${decorationHtml}
             </div>
       `

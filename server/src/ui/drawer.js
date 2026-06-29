@@ -65,9 +65,8 @@ function drawer(req, perms) {
             invasions: perms.invasions || BLOCKED,
             eventStops: perms.eventStops || BLOCKED,
             lures: perms.lures || BLOCKED,
-            arEligible: hasDualQuestLayer
-              ? perms.pokestops || BLOCKED
-              : BLOCKED,
+            arEligible:
+              (perms.pokestops && mapConfig.misc.enableArFeatueres) || BLOCKED,
           }
         : BLOCKED,
     tappables:

@@ -553,6 +553,10 @@
         "__name": "MAP_MISC_ENABLE_TAPPABLE_POPUP_COORDS_SELECTOR",
         "__format": "boolean"
       },
+      "enableArFeatueres": {
+        "__name": "MAP_MISC_ENABLE_AR_FEATUERES",
+        "__format": "boolean"
+      },
       "customFloatingIcons": {
         "__name": "MAP_MISC_CUSTOM_FLOATING_ICONS",
         "__format": "json"
@@ -832,18 +836,6 @@
       },
       "hasQuestIndicator": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_HAS_QUEST_INDICATOR",
-        "__format": "boolean"
-      },
-      "invasionRewardMarker": {
-        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INVASION_REWARD_MARKER",
-        "__format": "boolean"
-      },
-      "showArQuestDotBadge": {
-        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_SHOW_AR_QUEST_DOT_BADGE",
-        "__format": "boolean"
-      },
-      "showNoArQuestDotBadge": {
-        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_SHOW_NO_AR_QUEST_DOT_BADGE",
         "__format": "boolean"
       },
       "showArBadge": {

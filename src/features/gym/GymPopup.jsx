@@ -1012,6 +1012,7 @@ const GymInfo = ({
   const { t } = useTranslation()
   const Icons = useMemory((s) => s.Icons)
   const gymValidDataLimit = useMemory((s) => s.gymValidDataLimit)
+  const { enableArFeatueres } = useMemory.getState().config.misc
 
   return (
     <Grid
@@ -1052,7 +1053,7 @@ const GymInfo = ({
           }}
         />
       )}
-      {ar_scan_eligible && (
+      {ar_scan_eligible && enableArFeatueres && (
         <Grid
           xs={4}
           className="grid-item"

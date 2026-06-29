@@ -37,7 +37,7 @@ function clientOptions(perms) {
         category: 'markers',
       },
       showExBadge: { type: 'bool', perm: ['gyms'], category: 'markers' },
-      showArBadge: hasDualQuestLayer
+      showArBadge: map.misc.enableArFeatueres
         ? { type: 'bool', perm: ['gyms'], category: 'markers' }
         : undefined,
       raidLevelBadges: { type: 'bool', perm: ['raids'], category: 'markers' },
@@ -107,27 +107,7 @@ function clientOptions(perms) {
         perm: ['quests'],
         category: 'markers',
       },
-      invasionRewardMarker: {
-        type: 'bool',
-        perm: ['invasions'],
-        category: 'markers',
-        value: false,
-      },
-      showArQuestDotBadge: hasDualQuestLayer
-        ? {
-            type: 'bool',
-            perm: ['quests'],
-            category: 'markers',
-          }
-        : undefined,
-      showNoArQuestDotBadge: hasDualQuestLayer
-        ? {
-            type: 'bool',
-            perm: ['quests'],
-            category: 'markers',
-          }
-        : undefined,
-      showArBadge: hasDualQuestLayer
+      showArBadge: map.misc.enableArFeatueres
         ? { type: 'bool', perm: ['pokestops'], category: 'markers' }
         : undefined,
       invasionOpacity: {
