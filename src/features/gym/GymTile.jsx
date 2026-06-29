@@ -48,9 +48,6 @@ const BaseGymTile = (gym) => {
     ),
   )
   const selectPoi = useRouteStore((s) => s.selectPoi)
-  const hasDualQuestLayer = useMemory(
-    (s) => s.config.misc.questLayerMode === 'dual',
-  )
 
   const [
     hasRaid,
@@ -80,6 +77,7 @@ const BaseGymTile = (gym) => {
       gym.raid_end_timestamp >= newTs && gym.raid_level > 0
     const hasHatchedInternal =
       gym.raid_end_timestamp >= newTs && gym.raid_battle_timestamp <= newTs
+
     return [
       hasRaidInternal,
       hasHatchedInternal,
@@ -90,9 +88,7 @@ const BaseGymTile = (gym) => {
         filledSlots,
         gym.in_battle,
         userSettings.gyms.showExBadge && gym.ex_raid_eligible,
-        hasDualQuestLayer &&
-          userSettings.gyms.showArBadge &&
-          gym.ar_scan_eligible,
+        userSettings.gyms.showArBadge && gym.ar_scan_eligible,
       ),
       Icons.getSize('gym', filters.gyms.filter[gymFilterId]?.size),
       hasRaidInternal
@@ -148,9 +144,7 @@ const BaseGymTile = (gym) => {
         filters.gyms.gymBadges &&
         userSettings.gyms.gymBadgeDiamonds,
       userSettings.gyms.showExBadge && gym.ex_raid_eligible,
-      hasDualQuestLayer &&
-        userSettings.gyms.showArBadge &&
-        gym.ar_scan_eligible,
+      userSettings.gyms.showArBadge && gym.ar_scan_eligible,
       userSettings.gyms.raidLevelBadges && !!raidIconUrl,
       userSettings.gyms.showRsvpsBadge && gym.rsvps?.length > 0,
     ]
