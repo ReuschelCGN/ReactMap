@@ -122,9 +122,6 @@ export function usePokestopMarker({
     )
 
   const getOpacity = useOpacity('pokestops', 'invasion')
-  const hasDualQuestLayer = useMemory(
-    (s) => s.config.misc.questLayerMode === 'dual',
-  )
   const [
     showArBadge,
     showArQuestDotBadge,
@@ -135,17 +132,16 @@ export function usePokestopMarker({
   ] = useStorage((s) => {
     const { filters, userSettings } = s
     const pokestops = userSettings.pokestops || {}
-    const showAr = hasDualQuestLayer && pokestops.showArBadge
     return [
-      showAr,
-      hasDualQuestLayer && (pokestops.showArQuestDotBadge ?? false),
-      hasDualQuestLayer && (pokestops.showNoArQuestDotBadge ?? false),
+      pokestops.showArBadge,
+      pokestops.showArQuestDotBadge ?? false,
+      pokestops.showNoArQuestDotBadge ?? false,
       !!pokestops.invasionRewardMarker,
       Icons.getPokestops(
         hasLure ? lure_id : 0,
         hasVisibleInvasion,
         hasQuest && pokestops.hasQuestIndicator,
-        ar_scan_eligible && (showAr || !!power_up_level),
+        ar_scan_eligible && (pokestops.showArBadge || !!power_up_level),
         power_up_level,
         baseIncidentDisplay,
       ),
