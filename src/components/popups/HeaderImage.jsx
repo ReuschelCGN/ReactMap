@@ -14,6 +14,7 @@ export function HeaderImage({
 }) {
   const Icons = useMemory((s) => s.Icons)
   const src = url ? url.replace('http://', 'https://') : Icons.getPokestops(0)
+  const { enableArFeatueres } = useMemory.getState().config.misc
 
   const Image = (
     <Avatar
@@ -35,7 +36,7 @@ export function HeaderImage({
       ) : (
         Image
       )}
-      {!!arScanEligible && (
+      {!!arScanEligible && enableArFeatueres && (
         <img
           className="ar-logo"
           alt="ar"
