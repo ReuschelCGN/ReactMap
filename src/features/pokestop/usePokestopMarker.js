@@ -130,7 +130,7 @@ export function usePokestopMarker({
   ] = useStorage((s) => {
     const { filters, userSettings } = s
     return [
-      !!pokestops.invasionRewardMarker,
+      !!userSettings.pokestops.invasionRewardMarker,
       userSettings.pokestops.showArBadge,
       Icons.getPokestops(
         hasLure ? lure_id : 0,
