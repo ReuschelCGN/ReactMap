@@ -122,33 +122,29 @@ export function usePokestopMarker({
     )
 
   const getOpacity = useOpacity('pokestops', 'invasion')
-  const [
-    showArBadge,
-    showInvasionRewardMarker,
-    baseIcon,
-    baseSize,
-  ] = useStorage((s) => {
-    const { filters, userSettings } = s
-    return [
-      !!userSettings.pokestops.invasionRewardMarker,
-      userSettings.pokestops.showArBadge,
-      Icons.getPokestops(
-        hasLure ? lure_id : 0,
-        hasVisibleInvasion,
-        hasQuest && userSettings.pokestops.hasQuestIndicator,
-        ar_scan_eligible &&
-          (userSettings.pokestops.showArBadge || !!power_up_level),
-        power_up_level,
-        baseIncidentDisplay,
-      ),
-      hasLure
-        ? Icons.getSize(
-            'pokestop',
-            filters.pokestops.filter[`l${lure_id}`]?.size,
-          )
-        : Icons.getSize('pokestop', filters.pokestops.filter.s0?.size),
-    ]
-  }, basicEqualFn)
+  const [showArBadge, showInvasionRewardMarker, baseIcon, baseSize] =
+    useStorage((s) => {
+      const { filters, userSettings } = s
+      return [
+        !!userSettings.pokestops.invasionRewardMarker,
+        userSettings.pokestops.showArBadge,
+        Icons.getPokestops(
+          hasLure ? lure_id : 0,
+          hasVisibleInvasion,
+          hasQuest && userSettings.pokestops.hasQuestIndicator,
+          ar_scan_eligible &&
+            (userSettings.pokestops.showArBadge || !!power_up_level),
+          power_up_level,
+          baseIncidentDisplay,
+        ),
+        hasLure
+          ? Icons.getSize(
+              'pokestop',
+              filters.pokestops.filter[`l${lure_id}`]?.size,
+            )
+          : Icons.getSize('pokestop', filters.pokestops.filter.s0?.size),
+      ]
+    }, basicEqualFn)
   const filters = useStorage((s) => s.filters.pokestops.filter)
 
   const [invasionMod, pokestopMod, rewardMod, eventMod] = Icons.getModifiers(
