@@ -537,6 +537,9 @@ const RewardInfo = ({ with_ar, ...quest }) => {
   const { t } = useTranslation()
   const { src, amount, tt } = getRewardInfo(quest)
   const questMessage = useMemory((s) => s.config.misc.questMessage)
+  const hasDualQuestLayer = useMemory(
+    (s) => s.config.misc.questLayerMode === 'dual',
+  )
 
   const labelKeys = Array.isArray(tt) ? tt.filter(Boolean) : tt ? [tt] : []
   const translatedLabel = labelKeys.length
@@ -590,9 +593,11 @@ const RewardInfo = ({ with_ar, ...quest }) => {
           x{amount}
         </div>
       )}
-      <Typography variant="caption" className="ar-task" noWrap>
-        {questMessage || t(`ar_quest_${!!with_ar}`)}
-      </Typography>
+      {hasDualQuestLayer && (
+        <Typography variant="caption" className="ar-task" noWrap>
+          {questMessage || t(`ar_quest_${!!with_ar}`)}
+        </Typography>
+      )}
     </>
   )
 }
