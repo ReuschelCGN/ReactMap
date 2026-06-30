@@ -122,9 +122,6 @@ export function usePokestopMarker({
     )
 
   const getOpacity = useOpacity('pokestops', 'invasion')
-  const hasDualQuestLayer = useMemory(
-    (s) => s.config.misc.questLayerMode === 'dual',
-  )
   const [
     showArBadge,
     showInvasionRewardMarker,
