@@ -804,7 +804,9 @@ class Pokestop extends Model {
           ? this.hasRocketPokemonFilter(
               filters,
               invasion.slot_1_pokemon_id,
-              invasion.slot_1_form,
+              invasion.slot_1_form === 0
+                ? state.event.masterfile.pokemon[invasion.slot_1_pokemon_id]?.defaultFormId
+                : invasion.slot_1_form
             )
           : info.encounters.first.some((poke) =>
               this.hasRocketPokemonFilter(filters, poke.id, poke.form),
@@ -819,7 +821,9 @@ class Pokestop extends Model {
           ? this.hasRocketPokemonFilter(
               filters,
               invasion.slot_2_pokemon_id,
-              invasion.slot_2_form,
+              invasion.slot_2_form === 0
+                ? state.event.masterfile.pokemon[invasion.slot_2_pokemon_id]?.defaultFormId
+                : invasion.slot_2_form
             )
           : info.encounters.second.some((poke) =>
               this.hasRocketPokemonFilter(filters, poke.id, poke.form),
@@ -834,7 +838,9 @@ class Pokestop extends Model {
           ? this.hasRocketPokemonFilter(
               filters,
               invasion.slot_3_pokemon_id,
-              invasion.slot_3_form,
+              invasion.slot_3_form === 0
+                ? state.event.masterfile.pokemon[invasion.slot_3_pokemon_id]?.defaultFormId
+                : invasion.slot_3_form
             )
           : info.encounters.third.some((poke) =>
               this.hasRocketPokemonFilter(filters, poke.id, poke.form),
