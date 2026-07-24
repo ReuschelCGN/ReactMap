@@ -4,6 +4,7 @@ import { divIcon } from 'leaflet'
 import { basicEqualFn, useMemory } from '@store/useMemory'
 import { useStorage } from '@store/useStorage'
 import { useOpacity } from '@hooks/useOpacity'
+import { getRewardInfo } from '@utils/getRewardInfo'
 import { INCIDENT_DISPLAY_TYPES } from './incidentPriority'
 import { resolveShowcaseEventIcon } from './resolveShowcaseEventIcon'
 
@@ -61,21 +62,21 @@ function getInvasionRewardCandidates(invasion, gruntData) {
  * @param {{ id: number, form: number }} candidate
  * @param {import('@rm/types').AllFilters['pokestops']['filter']} filters
  * @param {import('@store/useMemory').UseMemory['Icons']} Icons
+ * @param {'invasion' | 'reward'} sizeCategory
  * @returns {number}
  */
-function getInvasionRewardSize(candidate, filters, Icons) {
+function getInvasionRewardSize(candidate, filters, Icons, sizeCategory) {
   const pokemonKey = `a${candidate.id}-${candidate.form || 0}`
   const pokemonKeySimple = `a${candidate.id}`
+  const pokemonFilter = filters[pokemonKey]
+  const simplePokemonFilter = filters[pokemonKeySimple]
 
-  if (!filters[pokemonKey]?.enabled && !filters[pokemonKeySimple]?.enabled) {
-    return 0
+  if (pokemonFilter?.enabled) {
+    return Icons.getSize(sizeCategory, pokemonFilter.size)
   }
-
-  return (
-    Icons.getSize('invasion', filters[pokemonKey]?.size) ||
-    Icons.getSize('invasion', filters[pokemonKeySimple]?.size) ||
-    Icons.getSize('invasion')
-  )
+  return simplePokemonFilter?.enabled
+    ? Icons.getSize(sizeCategory, simplePokemonFilter.size)
+    : 0
 }
 
 /**
@@ -186,17 +187,18 @@ export function usePokestopMarker({
           gruntData,
         )
         const uniqueReward = rewardCandidates.length === 1
-        const invasionIcon =
-          showInvasionRewardMarker && uniqueReward
-            ? Icons.getPokemon(
-                rewardCandidates[0].id,
-                rewardCandidates[0].form,
-                0,
-                0,
-                0,
-                1,
-              )
-            : Icons.getInvasions(invasion.grunt_type, invasion.confirmed)
+        const showRewardMarker = showInvasionRewardMarker && uniqueReward
+        const invasionSizeCategory = showRewardMarker ? 'reward' : 'invasion'
+        const invasionIcon = showRewardMarker
+          ? Icons.getPokemon(
+              rewardCandidates[0].id,
+              rewardCandidates[0].form,
+              0,
+              0,
+              0,
+              1,
+            )
+          : Icons.getInvasions(invasion.grunt_type, invasion.confirmed)
 
         invasionIcons.unshift({
           icon: invasionIcon,
@@ -205,7 +207,7 @@ export function usePokestopMarker({
 
         // Get base invasion type icon size
         const invasionTypeSize = Icons.getSize(
-          'invasion',
+          invasionSizeCategory,
           filters[`i${invasion.grunt_type}`]?.size,
         )
 
@@ -224,7 +226,12 @@ export function usePokestopMarker({
           rewardCandidates.forEach((candidate) => {
             maxRewardSize = Math.max(
               maxRewardSize,
-              getInvasionRewardSize(candidate, filters, Icons),
+              getInvasionRewardSize(
+                candidate,
+                filters,
+                Icons,
+                invasionSizeCategory,
+              ),
             )
           })
 
@@ -243,107 +250,17 @@ export function usePokestopMarker({
 
   if (hasQuest && !(hasVisibleInvasion && invasionMod?.removeQuest)) {
     quests.forEach((quest) => {
-      const {
-        quest_item_id,
-        item_amount,
-        xp_amount,
-        stardust_amount,
-        candy_pokemon_id,
-        candy_amount,
-        xl_candy_pokemon_id,
-        xl_candy_amount,
-        mega_pokemon_id,
-        mega_amount,
-        quest_reward_type,
-        quest_pokemon_id,
-        quest_form_id,
-        quest_gender_id,
-        quest_costume_id,
-        quest_shiny,
-        quest_bread_mode = 0,
-        quest_background,
-        with_ar = true,
-        key,
-      } = quest
+      const { quest_reward_type, quest_background, with_ar = true, key } = quest
       const showQuestDot = with_ar ? showArQuestDotBadge : showNoArQuestDotBadge
-      let questIcon = { url: Icons.getRewards(quest_reward_type) }
-      switch (quest_reward_type) {
-        case 1:
-          questIcon = {
-            url: Icons.getRewards(quest_reward_type, xp_amount),
-            amount: xp_amount,
-          }
-          break
-        case 2:
-          questIcon = {
-            url: Icons.getRewards(
-              quest_reward_type,
-              quest_item_id,
-              item_amount,
-            ),
-            amount: item_amount > 1 && item_amount,
-          }
-          break
-        case 3:
-          questIcon = {
-            url: Icons.getRewards(quest_reward_type, stardust_amount),
-            amount: stardust_amount,
-          }
-          break
-        case 4:
-          questIcon = {
-            url: Icons.getRewards(
-              quest_reward_type,
-              candy_pokemon_id,
-              candy_amount,
-            ),
-            amount: candy_amount,
-          }
-          break
-        case 7:
-          questIcon = {
-            url: Icons.getPokemon(
-              quest_pokemon_id,
-              quest_form_id,
-              0,
-              quest_gender_id,
-              quest_costume_id,
-              0,
-              !!quest_shiny,
-              quest_bread_mode,
-            ),
-            backgroundUrl:
-              quest_reward_type === 7
-                ? Icons.getBackground(quest_background)
-                : '',
-          }
-          break
-        case 9:
-          questIcon = {
-            url: Icons.getRewards(
-              quest_reward_type,
-              xl_candy_pokemon_id,
-              xl_candy_amount,
-            ),
-            amount: xl_candy_amount,
-          }
-          break
-        case 12:
-          questIcon = {
-            url: Icons.getRewards(
-              quest_reward_type,
-              mega_pokemon_id,
-              mega_amount,
-            ),
-            amount: mega_amount,
-          }
-          break
-        default:
-          break
-      }
+      const { src: url, amount } = getRewardInfo(quest, {
+        preferAmountIcon: true,
+      })
       questIcons.unshift({
-        ...questIcon,
-        rewardType: quest_reward_type,
+        url,
+        amount,
+        backgroundUrl:
+          quest_reward_type === 7 ? Icons.getBackground(quest_background) : '',
+        rewardType: quest_reward_type === 20 ? 12 : quest_reward_type,
         questDotColor: showQuestDot ? (with_ar ? '#1e88e5' : '#9e9e9e') : '',
       })
       questSizes.unshift(Icons.getSize('reward', filters[key]?.size))
@@ -443,14 +360,8 @@ export function usePokestopMarker({
 
   const stackMarkup = stackItems
     .map((item) => {
-      const showAmount =
-        item.type === 'quest' && item.amount
-          ? item.url.includes('stardust') || item.url.includes('experience')
-            ? item.url.includes('/0.')
-            : !item.url.includes('_a')
-          : false
       const amountHtml =
-        showAmount && item.amount
+        item.type === 'quest' && item.amount
           ? `
                 <span class="pokestop-marker__amount">
                   x${item.amount}
