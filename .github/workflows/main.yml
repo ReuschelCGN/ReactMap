@@ -3,7 +3,7 @@ on:
   push:
     branches:
       - main
-      - developnxt-noar3
+      - developnxt-noar4
 
 jobs:
   lint:
