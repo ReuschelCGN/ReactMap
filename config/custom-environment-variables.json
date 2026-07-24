@@ -492,6 +492,7 @@
         "__name": "MAP_MISC_WEBHOOK_CACHE_HRS",
         "__format": "number"
       },
+      "questLayerMode": "MAP_MISC_QUEST_LAYER_MODE",
       "questMessage": "MAP_MISC_QUEST_MESSAGE",
       "navigationControls": "MAP_MISC_NAVIGATION_CONTROLS",
       "enableFloatingProfileButton": {
@@ -831,6 +832,10 @@
       },
       "hasQuestIndicator": {
         "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_HAS_QUEST_INDICATOR",
+        "__format": "boolean"
+      },
+      "invasionRewardMarker": {
+        "__name": "CLIENT_SIDE_OPTIONS_POKESTOPS_INVASION_REWARD_MARKER",
         "__format": "boolean"
       },
       "showArQuestDotBadge": {
@@ -1244,10 +1249,6 @@
       },
       "invasionPokemon": {
         "__name": "DEFAULT_FILTERS_POKESTOPS_INVASION_POKEMON",
-        "__format": "boolean"
-      },
-      "rewardTypes": {
-        "__name": "DEFAULT_FILTERS_POKESTOPS_REWARD_TYPES",
         "__format": "boolean"
       },
       "baseMegaEnergyAmounts": {
