@@ -1,3 +1,24 @@
+## [1.48.4](https://github.com/WatWowMap/ReactMap/compare/v1.48.3...v1.48.4) (2026-07-25)
+
+
+### Bug Fixes
+
+* more robust masterfile ([e68a4f9](https://github.com/WatWowMap/ReactMap/commit/e68a4f997a6f210a6645f8e1e18df19292186733))
+
+## [1.48.3](https://github.com/WatWowMap/ReactMap/compare/v1.48.2...v1.48.3) (2026-07-24)
+
+
+### Bug Fixes
+
+* escape username ([f817d75](https://github.com/WatWowMap/ReactMap/commit/f817d758e2013e5ef6d87ecf173fb9d8b2900925))
+
+## [1.48.2](https://github.com/WatWowMap/ReactMap/compare/v1.48.1...v1.48.2) (2026-07-24)
+
+
+### Bug Fixes
+
+* **webhooks:** stop GPS ticks overwriting the saved Poracle location ([#1231](https://github.com/WatWowMap/ReactMap/issues/1231)) ([0f27862](https://github.com/WatWowMap/ReactMap/commit/0f278626684fc193d0b72d2be6c40a1f77353e27))
+
 ## [1.48.1](https://github.com/WatWowMap/ReactMap/compare/v1.48.0...v1.48.1) (2026-07-22)
 
 
