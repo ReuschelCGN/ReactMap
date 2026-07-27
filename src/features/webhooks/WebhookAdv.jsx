@@ -489,6 +489,9 @@ export function WebhookAdvanced() {
         )}${idObj.id}
       ${Object.keys(poracleValues).map(checkDefaults).join(' ')}`
       case 'i': {
+        if (poracleValues.grunt_type === 'metal') {
+          poracleValues.grunt_type = 'steel'
+        }
         const invasion = Object.keys(types).find(
           (x) => types[x].toLowerCase() === poracleValues.grunt_type,
         )

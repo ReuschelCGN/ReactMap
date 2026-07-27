@@ -11,11 +11,12 @@ import Divider from '@mui/material/Divider'
 import Collapse from '@mui/material/Collapse'
 import Typography from '@mui/material/Typography'
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
+import AccessTimeIcon from '@mui/icons-material/AccessTime'
 import ShieldIcon from '@mui/icons-material/Shield'
 import FavoriteIcon from '@mui/icons-material/Favorite'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
-import SentimentVeryDissatisfiedIcon from '@mui/icons-material/SentimentVeryDissatisfied'
-import RestaurantIcon from '@mui/icons-material/Restaurant'
+import VolunteerActivismIcon from '@mui/icons-material/VolunteerActivism'
+import RemoveModeratorIcon from '@mui/icons-material/RemoveModerator'
 import { useTranslation } from 'react-i18next'
 import { useTheme } from '@mui/material/styles'
 
@@ -292,6 +293,7 @@ export function GymPopup({ hasRaid, hasHatched, raidIconUrl, ...gym }) {
                 ) : (
                   <Timer start {...gym} />
                 )}
+                {gym.rsvps?.length > 0 && <RsvpsModal gym={gym} />}
                 {Boolean(
                   gym.raid_pokemon_id && gym.raid_battle_timestamp >= ts,
                 ) && <Timer start {...gym} hasHatched={hasHatched} />}
@@ -414,7 +416,7 @@ function DefendersModal({ gym, onClose }) {
           </IconButton>
         </Grid>
         <Grid
-          xs={10}
+          xs={8}
           style={{
             overflow: 'hidden',
             textOverflow: 'ellipsis',
@@ -568,7 +570,7 @@ function DefendersModal({ gym, onClose }) {
                 >
                   {/* First line: Pokemon name CP{currentCP}/{fullCP} */}
                   <DefenderPrimaryText
-                    title={`${t(`poke_${def.pokemon_id}`)} CP${currentCP}/${fullCP}`}
+                    title={`${t(`poke_${def.pokemon_id}`)} {t('cp')}${currentCP}/${fullCP}`}
                     visualStyles={primaryTextStyles}
                   >
                     {t(`poke_${def.pokemon_id}`)}
@@ -610,7 +612,7 @@ function DefendersModal({ gym, onClose }) {
                         gap: '2px',
                       }}
                     >
-                      <SentimentVeryDissatisfiedIcon
+                      <RemoveModeratorIcon
                         data-background-icon="secondary"
                         sx={{ fontSize: 16 }}
                       />
@@ -630,7 +632,7 @@ function DefendersModal({ gym, onClose }) {
                         gap: '2px',
                       }}
                     >
-                      <RestaurantIcon
+                      <VolunteerActivismIcon
                         data-background-icon="secondary"
                         sx={{ fontSize: 16 }}
                       />
@@ -645,7 +647,8 @@ function DefendersModal({ gym, onClose }) {
                   </DefenderSecondaryText>
 
                   <DefenderSecondaryText visualStyles={secondaryTextStyles}>
-                    CP{currentCP}/{fullCP}{' '}
+                    {t('cp')}
+                    {currentCP}/{fullCP}{' '}
                     {formatDeployedTime(def.deployed_ms + now - updatedMs)}
                   </DefenderSecondaryText>
                 </DefenderRowLayout>
@@ -678,6 +681,73 @@ function DefendersModal({ gym, onClose }) {
           </Grid>
         </>
       )}
+    </Grid>
+  )
+}
+
+/**
+ * Compact modal for rsvps
+ * @param {{ gym: import('@rm/types').Gym }} param0
+ */
+function RsvpsModal({ gym }) {
+  const { t } = useTranslation()
+  const rsvps = gym.rsvps || []
+
+  const formatTime = (timestamp) => {
+    const locale = localStorage.getItem('i18nextLng') || 'en'
+    return new Date(timestamp).toLocaleTimeString(locale, {
+      hour: '2-digit',
+      minute: '2-digit',
+    })
+  }
+
+  return (
+    <Grid xs={12}>
+      <Grid
+        container
+        direction="column"
+        alignItems="center"
+        style={{ margin: '2px 0' }}
+      >
+        <small
+          style={{
+            fontWeight: 'bold',
+            fontSize: 12,
+            marginBottom: 4,
+          }}
+        >
+          RSVPs: ({t(`going`)} / {t(`maybe`)})
+        </small>
+        <Grid container justifyContent="center" spacing={1}>
+          {rsvps.map((rsvp) => (
+            <Grid
+              key={rsvp.timeslot}
+              xs="auto"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                borderRadius: '6px',
+                fontSize: 14,
+                minWidth: 50,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '2px',
+                }}
+              >
+                {t(`starts`)}:&nbsp;
+                {formatTime(rsvp.timeslot)}&nbsp;
+                <AccessTimeIcon fontSize="smaller" />
+                &nbsp;
+                {rsvp.going_count} / {rsvp.maybe_count}
+              </div>
+            </Grid>
+          ))}
+        </Grid>
+      </Grid>
     </Grid>
   )
 }
