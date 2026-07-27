@@ -1,3 +1,88 @@
+## [1.48.4](https://github.com/WatWowMap/ReactMap/compare/v1.48.3...v1.48.4) (2026-07-25)
+
+
+### Bug Fixes
+
+* more robust masterfile ([e68a4f9](https://github.com/WatWowMap/ReactMap/commit/e68a4f997a6f210a6645f8e1e18df19292186733))
+
+## [1.48.3](https://github.com/WatWowMap/ReactMap/compare/v1.48.2...v1.48.3) (2026-07-24)
+
+
+### Bug Fixes
+
+* escape username ([f817d75](https://github.com/WatWowMap/ReactMap/commit/f817d758e2013e5ef6d87ecf173fb9d8b2900925))
+
+## [1.48.2](https://github.com/WatWowMap/ReactMap/compare/v1.48.1...v1.48.2) (2026-07-24)
+
+
+### Bug Fixes
+
+* **webhooks:** stop GPS ticks overwriting the saved Poracle location ([#1231](https://github.com/WatWowMap/ReactMap/issues/1231)) ([0f27862](https://github.com/WatWowMap/ReactMap/commit/0f278626684fc193d0b72d2be6c40a1f77353e27))
+
+## [1.48.1](https://github.com/WatWowMap/ReactMap/compare/v1.48.0...v1.48.1) (2026-07-22)
+
+
+### Bug Fixes
+
+* availability bootstrap ([520c1f1](https://github.com/WatWowMap/ReactMap/commit/520c1f157883252b558b57ff7afbff4438f6b1af))
+* no more reward types ffs ([b4e2f71](https://github.com/WatWowMap/ReactMap/commit/b4e2f71c8cafe08f0505fc88938c2ff4577dee95))
+
+# [1.48.0](https://github.com/WatWowMap/ReactMap/compare/v1.47.2...v1.48.0) (2026-07-21)
+
+
+### Features
+
+* mega branch resource icon support ([b35507f](https://github.com/WatWowMap/ReactMap/commit/b35507f086c9b6cf2ce11bc1946c74fc1feb1420))
+
+## [1.47.2](https://github.com/WatWowMap/ReactMap/compare/v1.47.1...v1.47.2) (2026-07-21)
+
+
+### Bug Fixes
+
+* pokecoin amount methinks ([9f41f72](https://github.com/WatWowMap/ReactMap/commit/9f41f72bb39e4c7b033fd08544975661f9f63bcf))
+
+## [1.47.1](https://github.com/WatWowMap/ReactMap/compare/v1.47.0...v1.47.1) (2026-07-21)
+
+
+### Bug Fixes
+
+* bounded early-exit ([b382a2c](https://github.com/WatWowMap/ReactMap/commit/b382a2c02cf2a6c42fd0b6663e203177a4af6d34))
+* quest target filtering logic ([96e59d6](https://github.com/WatWowMap/ReactMap/commit/96e59d6fab18bc5b7474f8c592eb9dd16485eacc))
+
+# [1.47.0](https://github.com/WatWowMap/ReactMap/compare/v1.46.0...v1.47.0) (2026-07-21)
+
+
+### Features
+
+* support PokéCoin quest filtering ([1d5d142](https://github.com/WatWowMap/ReactMap/commit/1d5d14266032c947a03224ef3f23b7cce0c89a51))
+
+# [1.46.0](https://github.com/WatWowMap/ReactMap/compare/v1.45.1...v1.46.0) (2026-07-11)
+
+
+### Features
+
+* mega branch resource with fallback ([8756f38](https://github.com/WatWowMap/ReactMap/commit/8756f38f964c7a330e16fb57888795e5bbd5da16))
+
+## [1.45.1](https://github.com/WatWowMap/ReactMap/compare/v1.45.0...v1.45.1) (2026-07-05)
+
+
+### Bug Fixes
+
+* **scanArea:** prevent crash when area feature has no name/key ([#1225](https://github.com/WatWowMap/ReactMap/issues/1225)) ([#1226](https://github.com/WatWowMap/ReactMap/issues/1226)) ([2df8c9e](https://github.com/WatWowMap/ReactMap/commit/2df8c9e7de2fc7e21ae9cc92e8fd0cadbfb038d6))
+
+# [1.45.0](https://github.com/WatWowMap/ReactMap/compare/v1.44.3...v1.45.0) (2026-07-05)
+
+
+### Bug Fixes
+
+* invasion reward icon size logic ([4806148](https://github.com/WatWowMap/ReactMap/commit/48061482ba81921e469f44e670acf74c0bea3405))
+
+
+### Features
+
+* client option to use invasion rewards as marker ([7b24b32](https://github.com/WatWowMap/ReactMap/commit/7b24b3208f867388dfe3b3289e62af4fdb06209f))
+* questLayerMode defaulting to non_ar ([925c8ed](https://github.com/WatWowMap/ReactMap/commit/925c8ed32dd26f1ac2ed75c257ff50bce7e6a78a))
+
 ## [1.44.3](https://github.com/WatWowMap/ReactMap/compare/v1.44.2...v1.44.3) (2026-06-18)
 
 

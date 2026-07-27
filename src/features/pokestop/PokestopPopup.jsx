@@ -397,6 +397,7 @@ const MenuActions = ({
           reward = `${t(`poke_${quest.xl_candy_pokemon_id}`)} ${t('xl')}`
           break
         case 12:
+        case 20:
           reward = `${t(`poke_${quest.mega_pokemon_id}`)} x${quest.mega_amount}`
           break
         default:
@@ -535,8 +536,11 @@ const MenuActions = ({
  */
 const RewardInfo = ({ with_ar, ...quest }) => {
   const { t } = useTranslation()
-  const { src, amount, tt } = getRewardInfo(quest)
+  const { src, amount, tt, rewardAmount } = getRewardInfo(quest)
   const questMessage = useMemory((s) => s.config.misc.questMessage)
+  const hasDualQuestLayer = useMemory(
+    (s) => s.config.misc.questLayerMode === 'dual',
+  )
 
   const labelKeys = Array.isArray(tt) ? tt.filter(Boolean) : tt ? [tt] : []
   const translatedLabel = labelKeys.length
@@ -545,23 +549,7 @@ const RewardInfo = ({ with_ar, ...quest }) => {
   const fallbackLabel = labelKeys.join(' ') || 'quest reward'
   const altLabel = (translatedLabel || fallbackLabel).trim()
 
-  const overrideAmount = Number(
-    {
-      1: quest.xp_amount,
-      2: quest.item_amount,
-      3: quest.stardust_amount,
-      4: quest.candy_amount,
-      9: quest.xl_candy_amount,
-      12: quest.mega_amount,
-    }[quest.quest_reward_type] ?? 0,
-  )
-  const altAmount =
-    typeof amount === 'number' && amount > 0
-      ? amount
-      : Number.isFinite(overrideAmount) && overrideAmount > 0
-        ? overrideAmount
-        : 0
-  const altText = altAmount > 0 ? `${altLabel} x${altAmount}` : altLabel
+  const altText = rewardAmount ? `${altLabel} x${rewardAmount}` : altLabel
 
   return (
     <>
@@ -584,15 +572,16 @@ const RewardInfo = ({ with_ar, ...quest }) => {
           className="search-amount-holder"
           style={{
             fontSize: 'medium',
-            bottom: 20,
           }}
         >
           x{amount}
         </div>
       )}
-      <Typography variant="caption" className="ar-task" noWrap>
-        {questMessage || t(`ar_quest_${!!with_ar}`)}
-      </Typography>
+      {hasDualQuestLayer && (
+        <Typography variant="caption" className="ar-task" noWrap>
+          {questMessage || t(`ar_quest_${!!with_ar}`)}
+        </Typography>
+      )}
     </>
   )
 }
