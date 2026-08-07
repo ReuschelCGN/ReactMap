@@ -10,6 +10,7 @@ const queryObj = /** @type {const} */ ({
   quests: { model: 'Pokestop', category: 'pokestops' },
   raids: { model: 'Gym', category: 'gyms' },
   nests: { model: 'Nest', category: 'nests' },
+  stations: { model: 'Station', category: 'stations' },
   tappables: { model: 'Tappable', category: 'tappables' },
 })
 

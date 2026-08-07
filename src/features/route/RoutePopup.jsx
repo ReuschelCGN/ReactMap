@@ -232,6 +232,7 @@ export function RoutePopup({ end, inline = false, ...props }) {
             <Box
               onClick={handleShortcodeCopy}
               sx={{
+                color: '#000',
                 p: '2px 8px',
                 bgcolor: 'grey.300',
                 borderRadius: 2,
