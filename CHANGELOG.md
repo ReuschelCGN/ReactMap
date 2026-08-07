@@ -1,3 +1,44 @@
+## [1.49.1](https://github.com/WatWowMap/ReactMap/compare/v1.49.0...v1.49.1) (2026-07-29)
+
+
+### Bug Fixes
+
+* move notifs to effects ([7746864](https://github.com/WatWowMap/ReactMap/commit/77468648b760f4213713e28821b3cdacf0bff2a8))
+
+# [1.49.0](https://github.com/WatWowMap/ReactMap/compare/v1.48.4...v1.49.0) (2026-07-29)
+
+
+### Bug Fixes
+
+* in mem golbat pokemon search ([8816432](https://github.com/WatWowMap/ReactMap/commit/8816432149869e9e71b78ce8467aa977bb7f7140))
+* randomize lure encounters ([3c4db92](https://github.com/WatWowMap/ReactMap/commit/3c4db92dbd0cf059a8cc2a5cb3d7b7317fd7f185))
+
+
+### Features
+
+* fort map-data consumer — gyms, stations & pokestops - with DNF filtering ([#1228](https://github.com/WatWowMap/ReactMap/issues/1228)) ([a9daf36](https://github.com/WatWowMap/ReactMap/commit/a9daf36081ac0262ee3f00dd40372299c84375fb)), closes [#1225](https://github.com/WatWowMap/ReactMap/issues/1225)
+
+## [1.48.4](https://github.com/WatWowMap/ReactMap/compare/v1.48.3...v1.48.4) (2026-07-25)
+
+
+### Bug Fixes
+
+* more robust masterfile ([e68a4f9](https://github.com/WatWowMap/ReactMap/commit/e68a4f997a6f210a6645f8e1e18df19292186733))
+
+## [1.48.3](https://github.com/WatWowMap/ReactMap/compare/v1.48.2...v1.48.3) (2026-07-24)
+
+
+### Bug Fixes
+
+* escape username ([f817d75](https://github.com/WatWowMap/ReactMap/commit/f817d758e2013e5ef6d87ecf173fb9d8b2900925))
+
+## [1.48.2](https://github.com/WatWowMap/ReactMap/compare/v1.48.1...v1.48.2) (2026-07-24)
+
+
+### Bug Fixes
+
+* **webhooks:** stop GPS ticks overwriting the saved Poracle location ([#1231](https://github.com/WatWowMap/ReactMap/issues/1231)) ([0f27862](https://github.com/WatWowMap/ReactMap/commit/0f278626684fc193d0b72d2be6c40a1f77353e27))
+
 ## [1.48.1](https://github.com/WatWowMap/ReactMap/compare/v1.48.0...v1.48.1) (2026-07-22)
 
 
