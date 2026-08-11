@@ -19,6 +19,12 @@ const {
   fetchFortById,
 } = require('../utils/evalScannerQuery')
 const { filterRTree } = require('../utils/filterRTree')
+const {
+  ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS,
+  getEnabledRocketPokemonSpecies,
+  getRocketPokemonFilterKey,
+  isRocketPokemonFilterExcluded,
+} = require('../utils/rocketPokemonFiltering')
 const { mapScanPokestop } = require('./pokestopScanMapper')
 const { getCombinedFortAvailable } = require('../utils/fortAvailable')
 const { buildPokestopDnfFilters } = require('../filters/fort/pokestop')
@@ -94,14 +100,29 @@ const REWARD_TYPES_WITH_DEDICATED_FILTERS = Object.keys(
   QUEST_REWARD_FILTER_DEFINITIONS,
 ).map(Number)
 
-// Team leaders (41-43) and Giovanni (44) never hand out a catchable rocket
-// Pokemon, so both the confirmed-invasion branch and this config-derived
-// fallback exclude them.
-const ROCKET_LEADER_GRUNT_TYPE_MIN = 41
-const ROCKET_LEADER_GRUNT_TYPE_MAX = 44
+const ROCKET_REWARD_POSITIONS = [
+  {
+    name: 'first',
+    enabled: 'firstReward',
+    pokemonId: 'slot_1_pokemon_id',
+    form: 'slot_1_form',
+  },
+  {
+    name: 'second',
+    enabled: 'secondReward',
+    pokemonId: 'slot_2_pokemon_id',
+    form: 'slot_2_form',
+  },
+  {
+    name: 'third',
+    enabled: 'thirdReward',
+    pokemonId: 'slot_3_pokemon_id',
+    form: 'slot_3_form',
+  },
+]
 
 /**
- * Adds config-derived `a${id}-${form}` rocket-encounter fallback keys to
+ * Adds config-derived Rocket encounter fallback keys to
  * `availableSet`, mirroring the SQL `rocketPokemon` case (originally inline
  * here, now shared so the SQL path and the `/api/pokestop/available`
  * endpoint path stay byte-identical). Gated on
@@ -114,35 +135,53 @@ const applyRocketPokemonFallback = (availableSet) => {
   // Always include potential rocket Pokemon from state.event.invasions as backup
   Object.entries(state.event.invasions).forEach(([gruntType, invasionInfo]) => {
     if (!invasionInfo) return
-    // Exclude team leaders (41-43) and Giovanni (44)
-    const gruntTypeNum = parseInt(gruntType, 10)
-    if (
-      gruntTypeNum >= ROCKET_LEADER_GRUNT_TYPE_MIN &&
-      gruntTypeNum <= ROCKET_LEADER_GRUNT_TYPE_MAX
-    )
-      return
+    if (isRocketPokemonFilterExcluded(gruntType)) return
 
-    // Add all potential first slot rewards
-    if (invasionInfo.firstReward && invasionInfo.encounters.first) {
-      invasionInfo.encounters.first.forEach((poke) => {
-        availableSet.add(`a${poke.id}-${poke.form}`)
+    ROCKET_REWARD_POSITIONS.forEach(({ name, enabled }) => {
+      if (!invasionInfo[enabled]) return
+      invasionInfo.encounters[name]?.forEach((poke) => {
+        availableSet.add(getRocketPokemonFilterKey(poke.id, poke.form))
       })
-    }
-
-    // Add all potential second slot rewards
-    if (invasionInfo.secondReward && invasionInfo.encounters.second) {
-      invasionInfo.encounters.second.forEach((poke) => {
-        availableSet.add(`a${poke.id}-${poke.form}`)
-      })
-    }
-
-    // Add all potential third slot rewards
-    if (invasionInfo.thirdReward && invasionInfo.encounters.third) {
-      invasionInfo.encounters.third.forEach((poke) => {
-        availableSet.add(`a${poke.id}-${poke.form}`)
-      })
-    }
+    })
   })
+}
+
+/**
+ * @param {number|string} gruntType
+ * @param {number[]} pokemonIds
+ */
+const invasionHasMatchingRocketPokemon = (gruntType, pokemonIds) =>
+  !isRocketPokemonFilterExcluded(gruntType) &&
+  ROCKET_REWARD_POSITIONS.some(
+    ({ name, enabled }) =>
+      state.event.invasions[gruntType]?.[enabled] &&
+      state.event.invasions[gruntType]?.encounters[name]?.some((pokemon) =>
+        pokemonIds.includes(pokemon.id),
+      ),
+  )
+
+/**
+ * @param {(number|string)[]} pokemonIds
+ * @returns {Record<string, string[]>}
+ */
+const getMatchingRocketGruntsByPosition = (pokemonIds) => {
+  const selected = new Set(pokemonIds.map(Number))
+  const matching = Object.fromEntries(
+    ROCKET_REWARD_POSITIONS.map(({ name }) => [name, []]),
+  )
+
+  Object.entries(state.event.invasions).forEach(([gruntType, info]) => {
+    if (!info || isRocketPokemonFilterExcluded(gruntType)) return
+    ROCKET_REWARD_POSITIONS.forEach(({ name, enabled }) => {
+      if (
+        info[enabled] &&
+        info.encounters[name]?.some((poke) => selected.has(Number(poke.id)))
+      ) {
+        matching[name].push(gruntType)
+      }
+    })
+  })
+  return matching
 }
 
 const questProps = {
@@ -158,17 +197,8 @@ const questProps = {
   quest_title: true,
 }
 const questPropsAlt = {}
-const madQuestProps = {
-  quest_form_id: true,
-  quest_costume_id: true,
-  quest_item_amount: true,
-  quest_task: true,
-  with_ar: true,
-  stardust_amount: true,
-}
 Object.keys(questProps).forEach((key) => {
   questPropsAlt[`alternative_${key}`] = true
-  madQuestProps[key] = true
 })
 const invasionProps = {
   incident_expire_timestamp: true,
@@ -183,11 +213,6 @@ const invasionProps = {
   slot_3_form: true,
 }
 
-const MADE_UP_MAD_INVASIONS = [352]
-const MAD_GRUNT_MAP = {
-  352: 8,
-}
-
 class Pokestop extends Model {
   static get tableName() {
     return 'pokestop'
@@ -197,46 +222,29 @@ class Pokestop extends Model {
    *
    * @param {import('objection').QueryBuilder<Pokestop>} query
    * @param {boolean} hasMultiInvasions
-   * @param {boolean} isMad
    * @param {boolean} multiInvasionMs
    */
-  static joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs) {
+  static joinIncident(query, hasMultiInvasions, multiInvasionMs) {
     if (hasMultiInvasions) {
-      if (isMad) {
-        query
-          .leftJoin('pokestop_incident', (join) => {
-            join
-              .on('pokestop.pokestop_id', '=', 'pokestop_incident.pokestop_id')
-              .andOn('incident_expiration', '>=', raw('UTC_TIMESTAMP()'))
-          })
-          .select([
-            'incident_id AS incidentId',
-            'pokestop_incident.character_display AS grunt_type',
-            'pokestop_incident.incident_display_type AS display_type',
-          ])
-      } else {
-        query
-          .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
-          .select([
-            '*',
-            'pokestop.updated',
-            'pokestop.id AS id',
-            'incident.id AS incidentId',
-            raw(
-              multiInvasionMs
-                ? 'FLOOR(incident.updated_ms / 1000) AS incident_updated'
-                : 'incident.updated AS incident_updated',
-            ),
-            raw(
-              multiInvasionMs
-                ? 'FLOOR(incident.expiration_ms / 1000) AS incident_expire_timestamp'
-                : 'incident.expiration AS incident_expire_timestamp',
-            ),
-            'incident.character AS grunt_type',
-          ])
-      }
-    } else if (isMad) {
-      query.select('incident_grunt_type AS grunt_type')
+      query
+        .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
+        .select([
+          '*',
+          'pokestop.updated',
+          'pokestop.id AS id',
+          'incident.id AS incidentId',
+          raw(
+            multiInvasionMs
+              ? 'FLOOR(incident.updated_ms / 1000) AS incident_updated'
+              : 'incident.updated AS incident_updated',
+          ),
+          raw(
+            multiInvasionMs
+              ? 'FLOOR(incident.expiration_ms / 1000) AS incident_expire_timestamp'
+              : 'incident.expiration AS incident_expire_timestamp',
+          ),
+          'incident.character AS grunt_type',
+        ])
     }
     return query
   }
@@ -245,12 +253,10 @@ class Pokestop extends Model {
     perms,
     args,
     {
-      isMad,
       hasAltQuests,
       hasMultiInvasions,
       multiInvasionMs,
       hasRewardAmount,
-      hasLayerColumn,
       hasPowerUp,
       hasConfirmed,
       mem,
@@ -288,50 +294,19 @@ class Pokestop extends Model {
     const effectiveOnlyArEligible = isDualQuestLayerMode() && onlyArEligible
     const effectiveQuestLayer = resolveQuestLayerSelection(
       args.filters.onlyShowQuestSet,
-      { isMad, hasAltQuests, hasLayerColumn },
+      { hasAltQuests },
     )
 
     const query = this.query()
-    if (isMad) {
-      query
-        .leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
-        .select([
-          '*',
-          'pokestop.pokestop_id AS id',
-          'latitude AS lat',
-          'longitude AS lon',
-          'active_fort_modifier AS lure_id',
-          'image AS url',
-          'is_ar_scan_eligible AS ar_scan_eligible',
-          'quest_stardust AS stardust_amount',
-          'quest_condition AS quest_conditions',
-          'quest_reward AS quest_rewards',
-          'quest_pokemon_form_id AS quest_form_id',
-          'quest_pokemon_costume_id AS quest_costume_id',
-          raw('UNIX_TIMESTAMP(last_modified)').as('last_modified_timestamp'),
-          raw('UNIX_TIMESTAMP(lure_expiration)').as('lure_expire_timestamp'),
-          raw('UNIX_TIMESTAMP(last_updated)').as('updated'),
-          raw('UNIX_TIMESTAMP(incident_expiration)').as(
-            'incident_expire_timestamp',
-          ),
-        ])
-      if (hasLayerColumn) {
-        query.select('layer AS with_ar')
-      }
-      if (hideOldPokestops) {
-        query.whereRaw(
-          `UNIX_TIMESTAMP(last_updated) > ${ts - stopValidDataLimit * 86400}`,
-        )
-      }
-    } else if (hideOldPokestops) {
+    if (hideOldPokestops) {
       query.where('pokestop.updated', '>', ts - stopValidDataLimit * 86400)
     }
-    Pokestop.joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs)
+    Pokestop.joinIncident(query, hasMultiInvasions, multiInvasionMs)
     applyManualIdFilter(query, {
       manualId: args.filters.onlyManualId,
-      latColumn: isMad ? 'latitude' : 'pokestop.lat',
-      lonColumn: isMad ? 'longitude' : 'pokestop.lon',
-      idColumn: isMad ? 'pokestop.pokestop_id' : 'pokestop.id',
+      latColumn: 'pokestop.lat',
+      lonColumn: 'pokestop.lon',
+      idColumn: 'pokestop.id',
       bounds: {
         minLat: args.minLat,
         maxLat: args.maxLat,
@@ -340,7 +315,7 @@ class Pokestop extends Model {
       },
     })
 
-    if (!getAreaSql(query, areaRestrictions, onlyAreas, isMad)) {
+    if (!getAreaSql(query, areaRestrictions, onlyAreas)) {
       return []
     }
 
@@ -413,12 +388,8 @@ class Pokestop extends Model {
         if (onlyLures && lurePerms) {
           stops.orWhere((lure) => {
             lure
-              .whereIn(isMad ? 'active_fort_modifier' : 'lure_id', lures)
-              .andWhere(
-                isMad ? 'lure_expiration' : 'lure_expire_timestamp',
-                '>=',
-                isMad ? this.knex().fn.now() : ts,
-              )
+              .whereIn('lure_id', lures)
+              .andWhere('lure_expire_timestamp', '>=', ts)
           })
         }
         if (onlyQuests && questPerms) {
@@ -446,10 +417,7 @@ class Pokestop extends Model {
                 questTypes.orWhere((dust) => {
                   dust
                     .where('quest_reward_type', 3)
-                    .whereIn(
-                      isMad ? 'quest_stardust' : 'quest_reward_amount',
-                      stardust,
-                    )
+                    .whereIn('quest_reward_amount', stardust)
                 })
                 if (hasAltQuests) {
                   questTypes.orWhere((dust) => {
@@ -486,10 +454,7 @@ class Pokestop extends Model {
                 questTypes.orWhere((exp) => {
                   exp
                     .where('quest_reward_type', 1)
-                    .whereIn(
-                      isMad ? 'quest_stardust' : 'quest_reward_amount',
-                      xp,
-                    )
+                    .whereIn('quest_reward_amount', xp)
                 })
                 if (hasAltQuests) {
                   questTypes.orWhere((exp) => {
@@ -529,14 +494,9 @@ class Pokestop extends Model {
                     mega
                       .whereIn(
                         'quest_reward_type',
-                        isMad
-                          ? [MEGA_RESOURCE_REWARD_TYPE]
-                          : TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
+                        TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
                       )
-                      .andWhere(
-                        isMad ? 'quest_item_amount' : 'quest_reward_amount',
-                        amount,
-                      )
+                      .andWhere('quest_reward_amount', amount)
                       .andWhere('quest_pokemon_id', pokeId)
                   })
                   if (hasAltQuests) {
@@ -554,9 +514,7 @@ class Pokestop extends Model {
                   questTypes.orWhere((mega) => {
                     mega.whereIn(
                       'quest_reward_type',
-                      isMad
-                        ? [MEGA_RESOURCE_REWARD_TYPE]
-                        : TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
+                      TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
                     )
                     if (hasRewardAmount) {
                       mega
@@ -566,20 +524,12 @@ class Pokestop extends Model {
                       mega
                         .andWhere(
                           raw(
-                            `json_extract(${
-                              isMad ? 'quest_reward' : 'quest_rewards'
-                            }, "$[0].${
-                              isMad ? 'mega_resource' : 'info'
-                            }.pokemon_id") = ${pokeId}`,
+                            `json_extract(quest_rewards, "$[0].info.pokemon_id") = ${pokeId}`,
                           ),
                         )
                         .andWhere(
                           raw(
-                            `json_extract(${
-                              isMad ? 'quest_reward' : 'quest_rewards'
-                            }, "$[0].${
-                              isMad ? 'mega_resource' : 'info'
-                            }.amount") = ${amount}`,
+                            `json_extract(quest_rewards, "$[0].info.amount") = ${amount}`,
                           ),
                         )
                     }
@@ -627,11 +577,7 @@ class Pokestop extends Model {
                       .where('quest_reward_type', 4)
                       .where(
                         raw(
-                          `json_extract(${
-                            isMad ? 'quest_reward' : 'quest_rewards'
-                          }, "$[0].${
-                            isMad ? 'candy' : 'info'
-                          }.pokemon_id") = ${poke}`,
+                          `json_extract(quest_rewards, "$[0].info.pokemon_id") = ${poke}`,
                         ),
                       )
                   })
@@ -664,11 +610,7 @@ class Pokestop extends Model {
                       .where('quest_reward_type', 9)
                       .where(
                         raw(
-                          `json_extract(${
-                            isMad ? 'quest_reward' : 'quest_rewards'
-                          }, "$[0].${
-                            isMad ? 'xl_candy' : 'info'
-                          }.pokemon_id") = ${poke}`,
+                          `json_extract(quest_rewards, "$[0].info.pokemon_id") = ${poke}`,
                         ),
                       )
                   })
@@ -704,72 +646,69 @@ class Pokestop extends Model {
         if (onlyInvasions && invasionPerms) {
           if (hasMultiInvasions) {
             stops.orWhere((invasion) => {
-              if (isMad) {
-                invasion.whereRaw('incident_expiration > UTC_TIMESTAMP()')
-              } else {
-                invasion.andWhere(
-                  multiInvasionMs ? 'expiration_ms' : 'expiration',
-                  '>=',
-                  ts * (multiInvasionMs ? 1000 : 1),
-                )
-              }
+              invasion.andWhere(
+                multiInvasionMs ? 'expiration_ms' : 'expiration',
+                '>=',
+                ts * (multiInvasionMs ? 1000 : 1),
+              )
               if (hasConfirmed && onlyConfirmed) {
                 invasion.andWhere('confirmed', onlyConfirmed)
               }
               invasion.andWhere((subQuery) => {
                 // Case (a): Include if the invasion character/grunt type is checked
-                subQuery.whereIn(
-                  isMad ? 'character_display' : 'character',
-                  invasions,
-                )
+                subQuery.whereIn('character', invasions)
 
                 // Case (b): Include if invasion has potential rewards that are checked
                 if (rocketPokemon.length) {
+                  const matchingGruntsByPosition =
+                    getMatchingRocketGruntsByPosition(rocketPokemon)
+
                   // For confirmed invasions, check actual Pokemon slots
                   if (hasConfirmed)
                     subQuery.orWhere((confirmedQuery) => {
                       confirmedQuery
                         .whereNotIn(
-                          isMad ? 'character_display' : 'character',
-                          [41, 42, 43, 44],
+                          'character',
+                          ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS,
                         )
                         .andWhere('confirmed', 1)
                         .andWhere((pokemonQuery) => {
-                          pokemonQuery
-                            .whereIn('slot_1_pokemon_id', rocketPokemon)
-                            .orWhereIn('slot_2_pokemon_id', rocketPokemon)
-                            .orWhereIn('slot_3_pokemon_id', rocketPokemon)
+                          ROCKET_REWARD_POSITIONS.forEach(
+                            ({ name, pokemonId }) => {
+                              pokemonQuery.orWhereIn(pokemonId, rocketPokemon)
+                              if (matchingGruntsByPosition[name].length) {
+                                // Confirmation only makes populated slots
+                                // authoritative. A missing slot is still unknown,
+                                // so keep rows whose event lineup can reward the
+                                // selected Pokemon in that same position.
+                                pokemonQuery.orWhere((missingSlotQuery) => {
+                                  missingSlotQuery
+                                    .whereIn(
+                                      'character',
+                                      matchingGruntsByPosition[name],
+                                    )
+                                    .andWhere((missingPokemonQuery) => {
+                                      missingPokemonQuery
+                                        .whereNull(pokemonId)
+                                        .orWhere(pokemonId, 0)
+                                    })
+                                })
+                              }
+                            },
+                          )
                         })
                     })
 
                   // For unconfirmed invasions, check if their potential rewards match
                   // Get all grunt types that have potential rewards matching the filter
-                  const gruntTypesWithMatchingRewards = []
-                  Object.entries(state.event.invasions).forEach(
-                    ([gruntType, info]) => {
-                      if (!info) return
-                      // Exclude team leaders (41-43) and Giovanni (44)
-                      const gruntTypeNum = parseInt(gruntType, 10)
-                      if (gruntTypeNum >= 41 && gruntTypeNum <= 44) return
-
-                      if (
-                        [
-                          ...(info.firstReward ? info.encounters.first : []),
-                          ...(info.secondReward ? info.encounters.second : []),
-                          ...(info.thirdReward ? info.encounters.third : []),
-                        ].some((poke) =>
-                          rocketPokemon.includes(String(poke.id)),
-                        )
-                      ) {
-                        gruntTypesWithMatchingRewards.push(gruntType)
-                      }
-                    },
-                  )
+                  const gruntTypesWithMatchingRewards = [
+                    ...new Set(Object.values(matchingGruntsByPosition).flat()),
+                  ]
 
                   if (gruntTypesWithMatchingRewards.length > 0) {
                     subQuery.orWhere((unconfirmedQuery) => {
                       unconfirmedQuery.whereIn(
-                        isMad ? 'character_display' : 'character',
+                        'character',
                         gruntTypesWithMatchingRewards,
                       )
                       if (hasConfirmed)
@@ -783,34 +722,32 @@ class Pokestop extends Model {
                 }
               })
               if (onlyExcludeGrunts) {
-                invasion.whereNotIn(
-                  isMad ? 'character_display' : 'character',
-                  state.event.rocketGruntIDs,
-                )
+                invasion.whereNotIn('character', state.event.rocketGruntIDs)
               }
 
               if (onlyExcludeLeaders) {
-                invasion.whereNotIn(
-                  isMad ? 'character_display' : 'character',
-                  state.event.rocketLeaderIDs,
-                )
+                invasion.whereNotIn('character', state.event.rocketLeaderIDs)
               }
             })
           } else {
+            const matchingGrunts = rocketPokemon.length
+              ? [
+                  ...new Set(
+                    Object.values(
+                      getMatchingRocketGruntsByPosition(rocketPokemon),
+                    ).flat(),
+                  ),
+                ]
+              : []
             stops.orWhere((invasion) => {
-              invasion.whereIn(
-                isMad ? 'incident_grunt_type' : 'grunt_type',
-                invasions,
-              )
-              if (isMad) {
-                invasion.whereRaw('incident_expiration > UTC_TIMESTAMP()')
-                invasion.whereNotIn(
-                  'incident_grunt_type',
-                  MADE_UP_MAD_INVASIONS,
-                )
-              } else {
-                invasion.andWhere('expiration', '>=', ts)
-              }
+              invasion
+                // Legacy/non-incident schemas have no observed lineup slots.
+                // Use event-info grunt candidates as a safe SQL superset and
+                // let secondaryFilter apply the exact Rocket reward filter.
+                .whereIn('grunt_type', [
+                  ...new Set([...invasions, ...matchingGrunts]),
+                ])
+                .andWhere('incident_expire_timestamp', '>=', ts)
               if (hasConfirmed) {
                 invasion.andWhere('confirmed', onlyConfirmed)
               }
@@ -819,36 +756,19 @@ class Pokestop extends Model {
         }
         if (effectiveOnlyArEligible && pokestopPerms) {
           stops.orWhere((ar) => {
-            ar.where(isMad ? 'is_ar_scan_eligible' : 'ar_scan_eligible', 1)
+            ar.where('ar_scan_eligible', 1)
           })
         }
         if (onlyEventStops && eventStopPerms && displayTypes.length) {
           stops.orWhere((event) => {
-            if (isMad && !hasMultiInvasions) {
-              event
-                .where((gruntType) => {
-                  gruntType
-                    .whereIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
-                    .orWhere('character_display', 0)
-                })
-                .whereRaw('incident_expiration > UTC_TIMESTAMP()')
-            } else {
-              event
-                .whereIn(
-                  isMad ? 'incident_display_type' : 'incident.display_type',
-                  displayTypes,
-                )
-                .andWhere(isMad ? 'character_display' : 'character', 0)
-            }
-            if (isMad && hasMultiInvasions) {
-              event.whereRaw('incident_expiration > UTC_TIMESTAMP()')
-            } else {
-              event.where(
+            event
+              .whereIn('incident.display_type', displayTypes)
+              .andWhere('character', 0)
+              .where(
                 multiInvasionMs ? 'expiration_ms' : 'expiration',
                 '>=',
                 ts * (multiInvasionMs ? 1000 : 1),
               )
-            }
           })
         }
       })
@@ -946,11 +866,9 @@ class Pokestop extends Model {
           const final = this.secondaryFilter(
             mapped,
             args.filters,
-            false,
             ts,
             midnight,
             perms,
-            hasMultiInvasions,
             // The endpoint scan always returns confirmed lineup data, so treat
             // it as confirmed-capable regardless of the source's schema flag
             // (which the SQL fallback below still relies on).
@@ -986,17 +904,13 @@ class Pokestop extends Model {
     }
     const results = await query
 
-    const normalized = isMad
-      ? this.mapMAD(results, ts)
-      : this.mapRDM(results, ts)
+    const normalized = this.mapRDM(results, ts)
     const finalResults = this.secondaryFilter(
       normalized,
       args.filters,
-      isMad,
       ts,
       midnight,
       perms,
-      hasMultiInvasions,
       hasConfirmed,
       effectiveOnlyArEligible,
       effectiveQuestLayer,
@@ -1009,24 +923,14 @@ class Pokestop extends Model {
     fields.forEach((field) => (target[field] = source[field]))
   }
 
-  static getIncidentDisplayType(incident, isMad, hasMultiInvasions) {
-    return isMad && !hasMultiInvasions
-      ? MAD_GRUNT_MAP[incident.grunt_type] || 8
-      : incident.display_type
-  }
-
-  static getIncidentBlocker(incidents, isMad, hasMultiInvasions) {
+  static getIncidentBlocker(incidents) {
     const blocker = {
       displayType: 0,
       expireTimestamp: 0,
     }
 
     ;(incidents || []).forEach((incident) => {
-      const displayType = this.getIncidentDisplayType(
-        incident,
-        isMad,
-        hasMultiInvasions,
-      )
+      const displayType = incident.display_type
       // Showcase expiry is tracked separately on the client so local timer
       // updates can fall through to the next hidden blocker without a refetch.
       if (
@@ -1044,19 +948,32 @@ class Pokestop extends Model {
     }
   }
 
-  static hasRocketPokemonFilter(filters, pokemonId, formId) {
+  static hasRocketPokemonFilter(
+    filters,
+    pokemonId,
+    formId,
+    enabledRocketPokemonSpecies,
+  ) {
     if (!pokemonId) return false
-    return !!(
-      filters[`a${pokemonId}-${formId ?? 0}`] || filters[`a${pokemonId}`]
+    const speciesKey = getRocketPokemonFilterKey(pokemonId)
+    const exactKey = getRocketPokemonFilterKey(pokemonId, formId)
+    if (filters[exactKey] || filters[speciesKey]) return true
+
+    // An unknown community form is a potential match for any selected exact
+    // form of that species. A known form never matches a different exact form.
+    return (
+      exactKey === speciesKey &&
+      (
+        enabledRocketPokemonSpecies || getEnabledRocketPokemonSpecies(filters)
+      ).has(Number(pokemonId))
     )
   }
 
   static invasionMatchesFilters(
     invasion,
     filters,
-    isMad,
-    hasMultiInvasions,
     hasConfirmed,
+    enabledRocketPokemonSpecies,
   ) {
     const gruntType = Number(invasion.grunt_type ?? 0)
     const info = state.event.invasions[gruntType]
@@ -1078,59 +995,34 @@ class Pokestop extends Model {
       return false
     }
     if (
-      isMad &&
-      !hasMultiInvasions &&
-      MADE_UP_MAD_INVASIONS.includes(gruntType)
+      !isRocketPokemonFilterExcluded(gruntType) &&
+      ROCKET_REWARD_POSITIONS.some(({ name, enabled, pokemonId, form }) => {
+        if (!info[enabled]) return false
+        // Trust each observed slot independently. Confirmed incidents can still
+        // have partial lineups, so an absent slot falls back to event info.
+        if (
+          hasConfirmed &&
+          invasion.confirmed &&
+          Number(invasion[pokemonId]) > 0
+        ) {
+          return this.hasRocketPokemonFilter(
+            filters,
+            invasion[pokemonId],
+            invasion[form],
+            enabledRocketPokemonSpecies,
+          )
+        }
+        return info.encounters[name]?.some((poke) =>
+          this.hasRocketPokemonFilter(
+            filters,
+            poke.id,
+            poke.form,
+            enabledRocketPokemonSpecies,
+          ),
+        )
+      })
     ) {
-      return false
-    }
-
-    const isLeaderOrGiovanni = gruntType >= 41 && gruntType <= 44
-    if (!isLeaderOrGiovanni) {
-      if (
-        info.firstReward &&
-        (hasConfirmed && invasion.confirmed
-          ? this.hasRocketPokemonFilter(
-              filters,
-              invasion.slot_1_pokemon_id,
-              invasion.slot_1_form,
-            )
-          : info.encounters.first.some((poke) =>
-              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
-            ))
-      ) {
-        return true
-      }
-
-      if (
-        info.secondReward &&
-        (hasConfirmed && invasion.confirmed
-          ? this.hasRocketPokemonFilter(
-              filters,
-              invasion.slot_2_pokemon_id,
-              invasion.slot_2_form,
-            )
-          : info.encounters.second.some((poke) =>
-              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
-            ))
-      ) {
-        return true
-      }
-
-      if (
-        info.thirdReward &&
-        (hasConfirmed && invasion.confirmed
-          ? this.hasRocketPokemonFilter(
-              filters,
-              invasion.slot_3_pokemon_id,
-              invasion.slot_3_form,
-            )
-          : info.encounters.third.some((poke) =>
-              this.hasRocketPokemonFilter(filters, poke.id, poke.form),
-            ))
-      ) {
-        return true
-      }
+      return true
     }
 
     return !!(
@@ -1144,17 +1036,16 @@ class Pokestop extends Model {
   static secondaryFilter(
     queryResults,
     filters,
-    isMad,
     ts,
     midnight,
     perms,
-    hasMultiInvasions,
     hasConfirmed,
     effectiveOnlyArEligible,
     effectiveQuestLayer,
     resultLimit,
   ) {
     const filteredResults = []
+    const enabledRocketPokemonSpecies = getEnabledRocketPokemonSpecies(filters)
     for (
       let i = 0;
       i < queryResults.length && filteredResults.length < resultLimit;
@@ -1163,7 +1054,7 @@ class Pokestop extends Model {
       const pokestop = queryResults[i]
       const canViewIncidentMetadata = perms.eventStops || perms.invasions
       const incidentBlocker = canViewIncidentMetadata
-        ? this.getIncidentBlocker(pokestop.invasions, isMad, hasMultiInvasions)
+        ? this.getIncidentBlocker(pokestop.invasions)
         : null
       const filtered = {
         showcase_expiry: canViewIncidentMetadata
@@ -1205,12 +1096,7 @@ class Pokestop extends Model {
           showcaseData.contest_entries = []
         }
         filtered.events = pokestop.invasions
-          .filter((event) =>
-            isMad && !hasMultiInvasions
-              ? MADE_UP_MAD_INVASIONS.includes(event.grunt_type) ||
-                !event.grunt_type
-              : !event.grunt_type,
-          )
+          .filter((event) => !event.grunt_type)
           .map((event) => ({
             event_expire_timestamp: event.incident_expire_timestamp,
             showcase_pokemon_id:
@@ -1228,11 +1114,7 @@ class Pokestop extends Model {
               event.display_type === 9
                 ? pokestop.showcase_ranking_standard
                 : null,
-            display_type: this.getIncidentDisplayType(
-              event,
-              isMad,
-              hasMultiInvasions,
-            ),
+            display_type: event.display_type,
           }))
           .filter((event) =>
             event.showcase_pokemon_id
@@ -1254,9 +1136,8 @@ class Pokestop extends Model {
           this.invasionMatchesFilters(
             invasion,
             filters,
-            isMad,
-            hasMultiInvasions,
             hasConfirmed,
+            enabledRocketPokemonSpecies,
           ),
         )
       }
@@ -1283,17 +1164,12 @@ class Pokestop extends Model {
               (effectiveQuestLayer === 'without_ar' && !quest.with_ar))
           ) {
             const newQuest = {}
-            if (isMad) {
-              this.parseMadRewards(quest)
-            } else {
-              this.parseRdmRewards(quest)
-            }
+            this.parseRdmRewards(quest)
             const fields = [
               'quest_type',
               'quest_timestamp',
               'quest_target',
               'quest_conditions',
-              'quest_task',
               'quest_reward_type',
               'quest_rewards',
               'with_ar',
@@ -1347,54 +1223,6 @@ class Pokestop extends Model {
     return filteredResults
   }
 
-  static mapMAD(queryResults, ts) {
-    const filtered = {}
-    for (let i = 0; i < queryResults.length; i += 1) {
-      const result = queryResults[i]
-      if (!result.enabled || result.deleted) continue
-      const quest = {}
-      const invasion = {}
-
-      if (filtered[result.id]) {
-        Object.keys(madQuestProps).forEach(
-          (field) => (quest[field] = result[field]),
-        )
-        Object.keys(invasionProps).forEach(
-          (field) => (invasion[field] = result[field]),
-        )
-      } else {
-        filtered[result.id] = { quests: [], invasions: [] }
-        Object.keys(result).forEach((field) => {
-          if (madQuestProps[field]) {
-            quest[field] = result[field]
-          } else if (invasionProps[field]) {
-            invasion[field] = result[field]
-          } else {
-            filtered[result.id][field] = result[field]
-          }
-          if (result.with_ar === undefined) {
-            quest.with_ar = true
-          }
-        })
-      }
-      if (
-        typeof invasion.grunt_type === 'number' &&
-        invasion.incident_expire_timestamp >= ts &&
-        !filtered[result.id].invasions.find(
-          (q) => q.grunt_type === invasion.grunt_type,
-        )
-      ) {
-        filtered[result.id].invasions.push(invasion)
-      }
-      if (
-        !filtered[result.id].quests.find((q) => q.with_ar === quest.with_ar)
-      ) {
-        filtered[result.id].quests.push(quest)
-      }
-    }
-    return Object.values(filtered)
-  }
-
   static mapRDM(queryResults, ts) {
     const filtered = {}
     for (let i = 0; i < queryResults.length; i += 1) {
@@ -1444,12 +1272,10 @@ class Pokestop extends Model {
    * @returns
    */
   static async getAvailable({
-    isMad,
     hasAltQuests,
     hasMultiInvasions,
     multiInvasionMs,
     hasRewardAmount,
-    hasLayerColumn,
     hasConfirmed,
     hasShowcaseData,
     hasShowcaseForm,
@@ -1463,8 +1289,7 @@ class Pokestop extends Model {
     // network error) it falls through to the SQL block below: a DUAL source
     // (endpoint + DB) runs the SQL fallback on its bound knex, while a
     // pure-endpoint source has no bound knex, so this.query() throws and the
-    // caller's Promise.allSettled drops it (contributing nothing). The SQL
-    // block also serves mem:'' (DB / MAD) sources directly.
+    // caller's Promise.allSettled drops it (contributing nothing).
     if (mem) {
       try {
         // From the combined /api/fort/available (see Gym.getAvailable) — no
@@ -1514,21 +1339,9 @@ class Pokestop extends Model {
     const finalList = new Set()
     const conditions = {}
     const queries = {}
-    const questLayer = resolveQuestLayerSelection('both', {
-      isMad,
-      hasAltQuests,
-      hasLayerColumn,
-    })
-    const hasMadQuestLayer = isMad && hasLayerColumn
-    const shouldIncludeBaseQuests =
-      questLayer !== 'without_ar' || hasMadQuestLayer
+    const questLayer = resolveQuestLayerSelection('both', { hasAltQuests })
+    const shouldIncludeBaseQuests = questLayer !== 'without_ar'
     const shouldIncludeAltQuests = hasAltQuests && questLayer !== 'with_ar'
-    const applyMadQuestLayer = (query) => {
-      if (hasMadQuestLayer && questLayer !== 'both') {
-        query.where('layer', questLayer === 'with_ar' ? 1 : 0)
-      }
-      return query
-    }
 
     const process = (key, title, target) => {
       if (title) {
@@ -1544,7 +1357,7 @@ class Pokestop extends Model {
     // items
     queries.items = this.query()
       .select('quest_item_id', 'quest_title', 'quest_target')
-      .from(isMad ? 'trs_quest' : 'pokestop')
+      .from('pokestop')
       .where('quest_reward_type', 2)
       .groupBy('quest_item_id', 'quest_title', 'quest_target')
     if (hasAltQuests) {
@@ -1564,152 +1377,113 @@ class Pokestop extends Model {
     // items
 
     // stardust
-    if (isMad) {
-      queries.stardust = this.query()
-        .select('quest_stardust AS amount', 'quest_title', 'quest_target')
-        .from('trs_quest')
-        .where('quest_stardust', '>', 0)
+    queries.stardust = this.query().where('quest_reward_type', 3)
+    if (hasRewardAmount) {
+      queries.stardust
+        .select('quest_reward_amount AS amount', 'quest_title', 'quest_target')
+        .where('quest_reward_amount', '>', 0)
         .groupBy('amount', 'quest_title', 'quest_target')
     } else {
-      queries.stardust = this.query().where('quest_reward_type', 3)
-      if (hasRewardAmount) {
-        queries.stardust
-          .select(
-            'quest_reward_amount AS amount',
-            'quest_title',
-            'quest_target',
-          )
-          .where('quest_reward_amount', '>', 0)
-          .groupBy('amount', 'quest_title', 'quest_target')
-      } else {
-        queries.stardust
-          .select('quest_title', 'quest_target')
-          .distinct(
-            raw('json_extract(quest_rewards, "$[0].info.amount")').as('amount'),
-          )
-      }
-      if (hasAltQuests) {
-        queries.stardustAlt = this.query().where(
-          'alternative_quest_reward_type',
-          3,
+      queries.stardust
+        .select('quest_title', 'quest_target')
+        .distinct(
+          raw('json_extract(quest_rewards, "$[0].info.amount")').as('amount'),
         )
-        if (hasRewardAmount) {
-          queries.stardustAlt
-            .select(
-              'alternative_quest_reward_amount AS amount',
-              'alternative_quest_title AS quest_title',
-              'alternative_quest_target AS quest_target',
-            )
-            .where('alternative_quest_reward_amount', '>', 0)
-            .groupBy(
-              'amount',
-              'alternative_quest_title',
-              'alternative_quest_target',
-            )
-        } else {
-          queries.stardustAlt
-            .select(
-              'alternative_quest_title AS quest_title',
-              'alternative_quest_target AS quest_target',
-            )
-            .distinct(
-              raw(
-                'json_extract(alternative_quest_rewards, "$[0].info.amount")',
-              ).as('amount'),
-            )
-        }
+    }
+    if (hasAltQuests) {
+      queries.stardustAlt = this.query().where(
+        'alternative_quest_reward_type',
+        3,
+      )
+      if (hasRewardAmount) {
+        queries.stardustAlt
+          .select(
+            'alternative_quest_reward_amount AS amount',
+            'alternative_quest_title AS quest_title',
+            'alternative_quest_target AS quest_target',
+          )
+          .where('alternative_quest_reward_amount', '>', 0)
+          .groupBy(
+            'amount',
+            'alternative_quest_title',
+            'alternative_quest_target',
+          )
+      } else {
+        queries.stardustAlt
+          .select(
+            'alternative_quest_title AS quest_title',
+            'alternative_quest_target AS quest_target',
+          )
+          .distinct(
+            raw(
+              'json_extract(alternative_quest_rewards, "$[0].info.amount")',
+            ).as('amount'),
+          )
       }
     }
     // stardust
 
     // xp
-    if (isMad) {
-      queries.xp = this.query()
-        .select('quest_stardust AS amount', 'quest_title', 'quest_target')
-        .from('trs_quest')
-        .where('quest_reward_type', 1)
-        .groupBy('quest_stardust', 'quest_title', 'quest_target')
+    queries.xp = this.query().where('quest_reward_type', 1)
+    if (hasRewardAmount) {
+      queries.xp
+        .select('quest_reward_amount AS amount', 'quest_title', 'quest_target')
+        .where('quest_reward_amount', '>', 0)
+        .groupBy('amount', 'quest_title', 'quest_target')
     } else {
-      queries.xp = this.query().where('quest_reward_type', 1)
+      queries.xp
+        .select('quest_title', 'quest_target')
+        .distinct(
+          raw('json_extract(quest_rewards, "$[0].info.amount")').as('amount'),
+        )
+    }
+    if (hasAltQuests) {
+      queries.xpAlt = this.query().where('alternative_quest_reward_type', 1)
       if (hasRewardAmount) {
-        queries.xp
+        queries.xpAlt
           .select(
-            'quest_reward_amount AS amount',
-            'quest_title',
-            'quest_target',
+            'alternative_quest_reward_amount AS amount',
+            'alternative_quest_title AS quest_title',
+            'alternative_quest_target AS quest_target',
           )
-          .where('quest_reward_amount', '>', 0)
-          .groupBy('amount', 'quest_title', 'quest_target')
+          .where('alternative_quest_reward_amount', '>', 0)
+          .groupBy(
+            'amount',
+            'alternative_quest_title',
+            'alternative_quest_target',
+          )
       } else {
-        queries.xp
-          .select('quest_title', 'quest_target')
-          .distinct(
-            raw('json_extract(quest_rewards, "$[0].info.amount")').as('amount'),
+        queries.xpAlt
+          .select(
+            'alternative_quest_title AS quest_title',
+            'alternative_quest_target AS quest_target',
           )
-      }
-      if (hasAltQuests) {
-        queries.xpAlt = this.query().where('alternative_quest_reward_type', 1)
-        if (hasRewardAmount) {
-          queries.xpAlt
-            .select(
-              'alternative_quest_reward_amount AS amount',
-              'alternative_quest_title AS quest_title',
-              'alternative_quest_target AS quest_target',
-            )
-            .where('alternative_quest_reward_amount', '>', 0)
-            .groupBy(
-              'amount',
-              'alternative_quest_title',
-              'alternative_quest_target',
-            )
-        } else {
-          queries.xpAlt
-            .select(
-              'alternative_quest_title AS quest_title',
-              'alternative_quest_target AS quest_target',
-            )
-            .distinct(
-              raw(
-                'json_extract(alternative_quest_rewards, "$[0].info.amount")',
-              ).as('amount'),
-            )
-        }
+          .distinct(
+            raw(
+              'json_extract(alternative_quest_rewards, "$[0].info.amount")',
+            ).as('amount'),
+          )
       }
     }
     // xp
 
     // mega
     queries.mega = this.query()
-      .from(isMad ? 'trs_quest' : 'pokestop')
-      .whereIn(
-        'quest_reward_type',
-        isMad
-          ? [MEGA_RESOURCE_REWARD_TYPE]
-          : TEMP_EVOLUTION_RESOURCE_REWARD_TYPES,
-      )
+      .from('pokestop')
+      .whereIn('quest_reward_type', TEMP_EVOLUTION_RESOURCE_REWARD_TYPES)
     if (hasRewardAmount) {
       queries.mega
         .select('quest_title', 'quest_target')
-        .distinct(
-          `${isMad ? 'quest_item_amount' : 'quest_reward_amount'} AS amount`,
-        )
+        .distinct('quest_reward_amount AS amount')
         .distinct('quest_pokemon_id AS id')
     } else {
       queries.mega
         .select('quest_title', 'quest_target')
         .distinct(
-          raw(
-            `json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${
-              isMad ? 'mega_resource' : 'info'
-            }.pokemon_id")`,
-          ).as('id'),
+          raw('json_extract(quest_rewards, "$[0].info.pokemon_id")').as('id'),
         )
         .distinct(
-          raw(
-            `json_extract(${isMad ? 'quest_reward' : 'quest_rewards'}, "$[0].${
-              isMad ? 'mega_resource' : 'info'
-            }.amount")`,
-          ).as('amount'),
+          raw('json_extract(quest_rewards, "$[0].info.amount")').as('amount'),
         )
     }
     if (hasAltQuests) {
@@ -1749,7 +1523,7 @@ class Pokestop extends Model {
     queries.candy = this.query()
       .select('quest_title', 'quest_target')
       .distinct('quest_pokemon_id AS id')
-      .from(isMad ? 'trs_quest' : 'pokestop')
+      .from('pokestop')
       .where('quest_reward_type', 4)
     if (hasAltQuests) {
       queries.candyAlt = this.query()
@@ -1766,7 +1540,7 @@ class Pokestop extends Model {
     queries.xlCandy = this.query()
       .select('quest_title', 'quest_target')
       .distinct('quest_pokemon_id AS id')
-      .from(isMad ? 'trs_quest' : 'pokestop')
+      .from('pokestop')
       .where('quest_reward_type', 9)
     if (hasAltQuests) {
       queries.xlCandyAlt = this.query()
@@ -1780,89 +1554,46 @@ class Pokestop extends Model {
     // xl candy
 
     // pokemon
-    if (isMad) {
-      queries.pokemon = this.query()
+    queries.pokemon = this.query()
+      .distinct('quest_pokemon_id')
+      .select(
+        raw('json_extract(quest_rewards, "$[0].info.form_id")').as('form'),
+        'quest_title',
+        'quest_target',
+      )
+      .where('quest_reward_type', 7)
+    if (hasAltQuests) {
+      queries.pokemonAlt = this.query()
+        .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
         .select(
-          'quest_pokemon_id',
-          'quest_pokemon_form_id AS form',
-          'quest_title',
-          'quest_target',
+          raw(
+            'json_extract(alternative_quest_rewards, "$[0].info.form_id")',
+          ).as('form'),
+          'alternative_quest_title AS quest_title',
+          'alternative_quest_target AS quest_target',
         )
-        .from('trs_quest')
-        .where('quest_reward_type', 7)
-        .groupBy(
-          'quest_pokemon_id',
-          'quest_pokemon_form_id',
-          'quest_title',
-          'quest_target',
-        )
-    } else {
-      queries.pokemon = this.query()
-        .distinct('quest_pokemon_id')
-        .select(
-          raw('json_extract(quest_rewards, "$[0].info.form_id")').as('form'),
-          'quest_title',
-          'quest_target',
-        )
-        .where('quest_reward_type', 7)
-      if (hasAltQuests) {
-        queries.pokemonAlt = this.query()
-          .distinct('alternative_quest_pokemon_id AS quest_pokemon_id')
-          .select(
-            raw(
-              'json_extract(alternative_quest_rewards, "$[0].info.form_id")',
-            ).as('form'),
-            'alternative_quest_title AS quest_title',
-            'alternative_quest_target AS quest_target',
-          )
-          .where('alternative_quest_reward_type', 7)
-      }
+        .where('alternative_quest_reward_type', 7)
     }
     // pokemon
 
     // invasions
     if (hasMultiInvasions) {
-      if (isMad) {
-        queries.invasions = this.query()
-          .leftJoin(
-            'pokestop_incident',
-            'pokestop.pokestop_id',
-            'pokestop_incident.pokestop_id',
-          )
-          .select(
-            'pokestop_incident.character_display AS grunt_type',
-            'pokestop_incident.incident_display_type as display_type',
-          )
-          .where('pokestop_incident.incident_display_type', '>', 0)
-          .whereRaw('incident_expiration > UTC_TIMESTAMP()')
-          .orderBy('pokestop_incident.character_display')
-      } else {
-        queries.invasions = this.query()
-          .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
-          .select('incident.character AS grunt_type', 'incident.display_type')
-          .where(
-            multiInvasionMs ? 'expiration_ms' : 'incident.expiration',
-            '>=',
-            ts * (multiInvasionMs ? 1000 : 1),
-          )
-          .groupBy('incident.character', 'incident.display_type')
-          .orderBy('incident.character', 'incident.display_type')
-      }
-    } else if (isMad) {
       queries.invasions = this.query()
-        .distinct('incident_grunt_type AS grunt_type')
-        .where('incident_grunt_type', '>', 0)
-        .whereRaw('incident_expiration > UTC_TIMESTAMP()')
-        .orderBy('grunt_type')
+        .leftJoin('incident', 'pokestop.id', 'incident.pokestop_id')
+        .select('incident.character AS grunt_type', 'incident.display_type')
+        .where(
+          multiInvasionMs ? 'expiration_ms' : 'incident.expiration',
+          '>=',
+          ts * (multiInvasionMs ? 1000 : 1),
+        )
+        .groupBy('incident.character', 'incident.display_type')
+        .orderBy('incident.character', 'incident.display_type')
     } else {
       queries.invasions = this.query()
-        .distinct(isMad ? 'incident_grunt_type AS grunt_type' : 'grunt_type')
-        .where(isMad ? 'incident_grunt_type' : 'grunt_type', '>', 0)
+        .distinct('grunt_type')
+        .where('grunt_type', '>', 0)
         .andWhere('incident_expire_timestamp', '>=', ts)
         .orderBy('grunt_type')
-    }
-    if (isMad && !hasMultiInvasions) {
-      queries.invasions.whereNotIn('incident_grunt_type', MADE_UP_MAD_INVASIONS)
     }
     if (hasConfirmed) {
       queries.rocketPokemon = this.query()
@@ -1875,9 +1606,18 @@ class Pokestop extends Model {
           'slot_3_pokemon_id',
           'slot_3_form',
         ])
-        .whereNotNull('slot_1_pokemon_id')
-        .whereNotNull('slot_2_pokemon_id')
-        .whereNotNull('slot_3_pokemon_id')
+        .where('confirmed', 1)
+        .andWhere(
+          multiInvasionMs ? 'expiration_ms' : 'expiration',
+          '>=',
+          ts * (multiInvasionMs ? 1000 : 1),
+        )
+        .where((slots) =>
+          slots
+            .where('slot_1_pokemon_id', '>', 0)
+            .orWhere('slot_2_pokemon_id', '>', 0)
+            .orWhere('slot_3_pokemon_id', '>', 0),
+        )
         .groupBy([
           'character',
           'slot_1_pokemon_id',
@@ -1898,14 +1638,10 @@ class Pokestop extends Model {
 
     // lures
     queries.lures = this.query()
-      .select(isMad ? 'active_fort_modifier AS lure_id' : 'lure_id')
-      .andWhere(
-        isMad ? 'lure_expiration' : 'lure_expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
-      .groupBy(isMad ? 'active_fort_modifier' : 'lure_id')
-      .orderBy(isMad ? 'active_fort_modifier' : 'lure_id')
+      .select('lure_id')
+      .andWhere('lure_expire_timestamp', '>=', ts)
+      .groupBy('lure_id')
+      .orderBy('lure_id')
     // lures
 
     // showcase
@@ -1924,8 +1660,6 @@ class Pokestop extends Model {
       (key) => {
         if (!shouldIncludeBaseQuests) {
           delete queries[key]
-        } else if (queries[key]) {
-          applyMadQuestLayer(queries[key])
         }
         if (!shouldIncludeAltQuests) {
           delete queries[`${key}Alt`]
@@ -1941,14 +1675,12 @@ class Pokestop extends Model {
 
     const genericQuestQueries = []
     if (shouldIncludeBaseQuests) {
-      const genericQuestQuery = applyMadQuestLayer(
-        this.query()
-          .from(isMad ? 'trs_quest' : 'pokestop')
-          .select('quest_reward_type', 'quest_title', 'quest_target')
-          .whereNotNull('quest_reward_type')
-          .whereNotIn('quest_reward_type', REWARD_TYPES_WITH_DEDICATED_FILTERS)
-          .groupBy('quest_reward_type', 'quest_title', 'quest_target'),
-      )
+      const genericQuestQuery = this.query()
+        .from('pokestop')
+        .select('quest_reward_type', 'quest_title', 'quest_target')
+        .whereNotNull('quest_reward_type')
+        .whereNotIn('quest_reward_type', REWARD_TYPES_WITH_DEDICATED_FILTERS)
+        .groupBy('quest_reward_type', 'quest_title', 'quest_target')
       genericQuestQueries.push(genericQuestQuery)
     }
     if (shouldIncludeAltQuests) {
@@ -2041,29 +1773,35 @@ class Pokestop extends Model {
         case 'rocketPokemon':
           if (hasConfirmed) {
             rewards.forEach((reward) => {
-              // Exclude team leaders (41-43) and Giovanni (44)
-              if (reward.grunt_type >= 41 && reward.grunt_type <= 44) return
+              if (isRocketPokemonFilterExcluded(reward.grunt_type)) return
 
               const fullGrunt = state.event.invasions[reward.grunt_type]
-              if (fullGrunt?.firstReward) {
+              if (fullGrunt?.firstReward && reward.slot_1_pokemon_id > 0) {
                 finalList.add(
-                  `a${reward.slot_1_pokemon_id}-${reward.slot_1_form}`,
+                  getRocketPokemonFilterKey(
+                    reward.slot_1_pokemon_id,
+                    reward.slot_1_form,
+                  ),
                 )
               }
-              if (fullGrunt?.secondReward) {
+              if (fullGrunt?.secondReward && reward.slot_2_pokemon_id > 0) {
                 finalList.add(
-                  `a${reward.slot_2_pokemon_id}-${reward.slot_2_form}`,
+                  getRocketPokemonFilterKey(
+                    reward.slot_2_pokemon_id,
+                    reward.slot_2_form,
+                  ),
                 )
               }
-              if (fullGrunt?.thirdReward) {
+              if (fullGrunt?.thirdReward && reward.slot_3_pokemon_id > 0) {
                 finalList.add(
-                  `a${reward.slot_3_pokemon_id}-${reward.slot_3_form}`,
+                  getRocketPokemonFilterKey(
+                    reward.slot_3_pokemon_id,
+                    reward.slot_3_form,
+                  ),
                 )
               }
             })
           }
-
-          applyRocketPokemonFallback(finalList)
           break
         case 'showcase':
           if (hasShowcaseData) {
@@ -2093,6 +1831,8 @@ class Pokestop extends Model {
           break
       }
     })
+
+    applyRocketPokemonFallback(finalList)
 
     genericQuests.forEach((reward) =>
       process(
@@ -2154,76 +1894,26 @@ class Pokestop extends Model {
     return quest
   }
 
-  static parseMadRewards = (quest) => {
-    if (quest.quest_reward_type) {
-      const { item, exp, candy, pokecoin, xl_candy, mega_resource } =
-        JSON.parse(quest.quest_rewards)[0]
-      switch (quest.quest_reward_type) {
-        case 1:
-          quest.xp_amount = exp
-          break
-        case 2:
-          Object.keys(item).forEach((x) => (quest[`item_${x}`] = item[x]))
-          break
-        case 4:
-          Object.keys(candy).forEach((x) => (quest[`candy_${x}`] = candy[x]))
-          break
-        case 9:
-          Object.keys(xl_candy).forEach(
-            (x) => (quest[`xl_candy_${x}`] = candy[x]),
-          )
-          break
-        case 12:
-          Object.keys(mega_resource).forEach(
-            (x) => (quest[`mega_${x}`] = mega_resource[x]),
-          )
-          break
-        case 8:
-          quest.quest_reward_amount = pokecoin
-          break
-        default:
-          break
-      }
-    }
-    return quest
-  }
-
-  static async search(perms, args, { isMad }, distance, bbox) {
+  static async search(perms, args, _ctx, distance, bbox) {
     const { onlyAreas = [], search = '' } = args
     const query = this.query()
-      .select([
-        'name',
-        isMad ? 'pokestop_id AS id' : 'id',
-        isMad ? 'latitude AS lat' : 'lat',
-        isMad ? 'longitude AS lon' : 'lon',
-        isMad ? 'image AS url' : 'url',
-        distance,
-      ])
-      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
+      .select(['name', 'id', 'lat', 'lon', 'url', distance])
+      .whereBetween('lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
       .whereILike('name', `%${search}%`)
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
-    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
     return query
   }
 
-  static async searchQuests(
-    perms,
-    args,
-    { isMad, hasAltQuests, hasLayerColumn },
-    distance,
-    bbox,
-  ) {
+  static async searchQuests(perms, args, { hasAltQuests }, distance, bbox) {
     const { search, onlyAreas = [], locale, lat, lon } = args
     const questLayer = resolveQuestLayerSelection(args.questLayer, {
-      isMad,
       hasAltQuests,
-      hasLayerColumn,
     })
-    const hasMadQuestLayer = isMad && hasLayerColumn
     const searchResultsLimit = config.getSafe('api.searchResultsLimit')
     const midnight = getUserMidnight({ lat, lon })
     const pokemonIds = Object.keys(state.event.masterfile.pokemon).filter(
@@ -2255,7 +1945,7 @@ class Pokestop extends Model {
     )
     const rewardTypes = [
       ...new Set(
-        !isMad && matchingRewardTypes.includes(`${MEGA_RESOURCE_REWARD_TYPE}`)
+        matchingRewardTypes.includes(`${MEGA_RESOURCE_REWARD_TYPE}`)
           ? [...matchingRewardTypes, `${TEMP_EVO_BRANCH_RESOURCE_REWARD_TYPE}`]
           : matchingRewardTypes,
       ),
@@ -2265,13 +1955,13 @@ class Pokestop extends Model {
       return []
     }
     const queries = []
-    if (questLayer !== 'without_ar' || hasMadQuestLayer) {
+    if (questLayer !== 'without_ar') {
       const query = this.query()
         .select([
-          isMad ? 'pokestop_id AS id' : 'id',
-          isMad ? 'latitude AS lat' : 'lat',
-          isMad ? 'longitude AS lon' : 'lon',
-          isMad ? 'quest_reward AS quest_rewards' : 'quest_rewards',
+          'id',
+          'lat',
+          'lon',
+          'quest_rewards',
           distance,
           'name',
           'quest_pokemon_id',
@@ -2280,11 +1970,8 @@ class Pokestop extends Model {
           'quest_title',
           'quest_target',
         ])
-        .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
-        .andWhereBetween(isMad ? 'longitude' : 'lon', [
-          bbox.minLon,
-          bbox.maxLon,
-        ])
+        .whereBetween('lat', [bbox.minLat, bbox.maxLat])
+        .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
         .andWhere('quest_timestamp', '>=', midnight || 0)
         .andWhere((quests) => {
           if (pokemonIds.length === 1) {
@@ -2305,22 +1992,7 @@ class Pokestop extends Model {
         })
         .limit(config.getSafe('api.searchResultsLimit'))
         .orderBy('distance')
-      if (isMad) {
-        query
-          .leftJoin('trs_quest', 'pokestop.pokestop_id', 'trs_quest.GUID')
-          .select([
-            'quest_stardust AS stardust_amount',
-            'quest_pokemon_form_id AS quest_form_id',
-            'quest_pokemon_costume_id AS quest_costume_id',
-          ])
-        if (hasLayerColumn) {
-          query.select('layer AS with_ar')
-          if (questLayer !== 'both') {
-            query.andWhere('layer', questLayer === 'with_ar' ? 1 : 0)
-          }
-        }
-      }
-      if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+      if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
         return []
       }
       queries.push(query)
@@ -2362,9 +2034,7 @@ class Pokestop extends Model {
         })
         .limit(searchResultsLimit)
         .orderBy('distance')
-      if (
-        !getAreaSql(altQuestQuery, perms.areaRestrictions, onlyAreas, isMad)
-      ) {
+      if (!getAreaSql(altQuestQuery, perms.areaRestrictions, onlyAreas)) {
         return []
       }
       queries.push(altQuestQuery)
@@ -2388,14 +2058,10 @@ class Pokestop extends Model {
     mapped.sort((a, b) => a.distance - b.distance)
     if (mapped.length > searchResultsLimit) mapped.length = searchResultsLimit
 
-    return mapped
-      .map((result) =>
-        isMad ? this.parseMadRewards(result) : this.parseRdmRewards(result),
-      )
-      .filter(Boolean)
+    return mapped.map((result) => this.parseRdmRewards(result)).filter(Boolean)
   }
 
-  static async searchLures(perms, args, { isMad }, distance, bbox) {
+  static async searchLures(perms, args, _ctx, distance, bbox) {
     const { search, onlyAreas = [], locale } = args
     const ts = Math.floor(Date.now() / 1000)
 
@@ -2412,28 +2078,14 @@ class Pokestop extends Model {
           .includes(search),
       )
     const query = this.query()
-      .select([
-        '*',
-        isMad ? 'pokestop_id AS id' : 'id',
-        isMad ? 'latitude AS lat' : 'lat',
-        isMad ? 'longitude AS lon' : 'lon',
-        isMad ? 'active_fort_modifier AS lure_id' : 'lure_id',
-        isMad
-          ? 'lure_expiration AS lure_expire_timestamp'
-          : 'lure_expire_timestamp',
-        distance,
-      ])
-      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
-      .andWhere(
-        isMad ? 'lure_expiration' : 'lure_expire_timestamp',
-        '>=',
-        isMad ? this.knex().fn.now() : ts,
-      )
-      .whereIn(isMad ? 'active_fort_modifier' : 'lure_id', lureIds)
+      .select(['*', distance])
+      .whereBetween('lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
+      .andWhere('lure_expire_timestamp', '>=', ts)
+      .whereIn('lure_id', lureIds)
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
-    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
     const results = await query
@@ -2443,7 +2095,7 @@ class Pokestop extends Model {
   static async searchInvasions(
     perms,
     args,
-    { isMad, hasMultiInvasions, multiInvasionMs, hasConfirmed },
+    { hasMultiInvasions, multiInvasionMs, hasConfirmed },
     distance,
     bbox,
   ) {
@@ -2458,8 +2110,10 @@ class Pokestop extends Model {
         .toLowerCase()
         .includes(search),
     )
-    const validMons = new Set(
-      state.event.available.pokestops.filter((a) => a.startsWith('a')),
+    const validPokemonIds = new Set(
+      state.event.available.pokestops
+        .filter((key) => key.startsWith('a'))
+        .map((key) => key.slice(1).split('-')[0]),
     )
     const pokemonIds = Object.keys(state.event.masterfile.pokemon)
       .filter(
@@ -2469,59 +2123,109 @@ class Pokestop extends Model {
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
             .toLowerCase()
-            .includes(search) &&
-          (validMons.has(`a${pkmn}-0`) ||
-            Object.keys(state.event.masterfile.pokemon[pkmn].forms || {}).some(
-              (form) => validMons.has(`a${pkmn}-${form}`),
-            )),
+            .includes(search) && validPokemonIds.has(pkmn),
       )
       .map((x) => +x)
+    const pokemonInvasions = Object.keys(state.event.invasions).filter(
+      (gruntType) => invasionHasMatchingRocketPokemon(gruntType, pokemonIds),
+    )
     if (!invasions.length && !pokemonIds.length) {
       return []
     }
     const query = this.query()
-      .whereBetween(isMad ? 'latitude' : 'lat', [bbox.minLat, bbox.maxLat])
-      .andWhereBetween(isMad ? 'longitude' : 'lon', [bbox.minLon, bbox.maxLon])
+      .whereBetween('lat', [bbox.minLat, bbox.maxLat])
+      .andWhereBetween('lon', [bbox.minLon, bbox.maxLon])
       .limit(config.getSafe('api.searchResultsLimit'))
       .orderBy('distance')
 
-    Pokestop.joinIncident(query, hasMultiInvasions, isMad, multiInvasionMs)
+    Pokestop.joinIncident(query, hasMultiInvasions, multiInvasionMs)
     query.select(distance)
 
-    if (isMad) {
-      query.whereRaw('incident_expiration > UTC_TIMESTAMP()')
-    } else {
-      query.andWhere('expiration', '>=', ts)
-    }
-    if (invasions.length) {
-      query.whereIn(isMad ? 'character_display' : 'character', invasions)
-    }
+    const characterColumn = hasMultiInvasions ? 'character' : 'grunt_type'
+    query.andWhere(
+      hasMultiInvasions
+        ? multiInvasionMs
+          ? 'expiration_ms'
+          : 'expiration'
+        : 'incident_expire_timestamp',
+      '>=',
+      ts * (hasMultiInvasions && multiInvasionMs ? 1000 : 1),
+    )
     if (hasConfirmed && pokemonIds.length) {
-      query.where((subQuery) => {
-        subQuery
-          .whereIn('slot_1_pokemon_id', pokemonIds)
-          .orWhereIn('slot_2_pokemon_id', pokemonIds)
-          .orWhereIn('slot_3_pokemon_id', pokemonIds)
+      const matchingGruntsByPosition =
+        getMatchingRocketGruntsByPosition(pokemonIds)
+      query.where((searchQuery) => {
+        const addPokemonSearch = (pokemonQuery) => {
+          pokemonQuery.where((confirmedQuery) => {
+            confirmedQuery
+              .whereNotIn(
+                characterColumn,
+                ROCKET_POKEMON_FILTER_EXCLUDED_CHARACTERS,
+              )
+              .andWhere('confirmed', 1)
+              .andWhere((slotQuery) => {
+                ROCKET_REWARD_POSITIONS.forEach(({ name, pokemonId }) => {
+                  slotQuery.orWhereIn(pokemonId, pokemonIds)
+                  if (matchingGruntsByPosition[name].length) {
+                    slotQuery.orWhere((missingSlotQuery) => {
+                      missingSlotQuery
+                        .whereIn(
+                          characterColumn,
+                          matchingGruntsByPosition[name],
+                        )
+                        .andWhere((missingPokemonQuery) => {
+                          missingPokemonQuery
+                            .whereNull(pokemonId)
+                            .orWhere(pokemonId, 0)
+                        })
+                    })
+                  }
+                })
+              })
+          })
+          if (pokemonInvasions.length) {
+            pokemonQuery.orWhere((unconfirmedQuery) => {
+              unconfirmedQuery
+                .whereIn(characterColumn, pokemonInvasions)
+                .andWhere((confirmationQuery) => {
+                  confirmationQuery
+                    .where('confirmed', 0)
+                    .orWhereNull('confirmed')
+                })
+            })
+          }
+        }
+        if (invasions.length) {
+          searchQuery
+            .whereIn(characterColumn, invasions)
+            .orWhere(addPokemonSearch)
+        } else {
+          searchQuery.where(addPokemonSearch)
+        }
       })
+    } else {
+      const searchCharacters = [...new Set([...invasions, ...pokemonInvasions])]
+      if (searchCharacters.length) {
+        query.whereIn(characterColumn, searchCharacters)
+      }
     }
-    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
     const results = await query
+    const pokemonFilters = Object.fromEntries(
+      pokemonIds.map((pokemonId) => [getRocketPokemonFilterKey(pokemonId), {}]),
+    )
     return pokemonIds.length
-      ? results.filter(({ grunt_type }) =>
-          ['first', 'second', 'third'].some(
-            (pos) =>
-              state.event.invasions[grunt_type]?.[`${pos}Reward`] &&
-              state.event.invasions[grunt_type]?.encounters[pos]?.some((pkmn) =>
-                pokemonIds.includes(pkmn.id),
-              ),
-          ),
+      ? results.filter(
+          (invasion) =>
+            invasions.includes(String(invasion.grunt_type)) ||
+            this.invasionMatchesFilters(invasion, pokemonFilters, hasConfirmed),
         )
       : results
   }
 
-  static async getOne(id, { isMad, mem, secret, httpAuth }) {
+  static async getOne(id, { mem, secret, httpAuth }) {
     if (mem) {
       try {
         const one = await fetchFortById(
@@ -2541,16 +2245,10 @@ class Pokestop extends Model {
         )
       }
     }
-    return this.query()
-      .select([
-        isMad ? 'latitude AS lat' : 'lat',
-        isMad ? 'longitude AS lon' : 'lon',
-      ])
-      .where(isMad ? 'pokestop_id' : 'id', id)
-      .first()
+    return this.query().select(['lat', 'lon']).where('id', id).first()
   }
 
-  static async getSubmissions(perms, args, { isMad, hasShowcaseData }) {
+  static async getSubmissions(perms, args, { hasShowcaseData }) {
     const {
       filters: { onlyAreas = [], onlyIncludeSponsored = true },
       minLat,
@@ -2559,33 +2257,18 @@ class Pokestop extends Model {
       maxLon,
     } = args
     const query = this.query()
-      .whereBetween(`lat${isMad ? 'itude' : ''}`, [
-        minLat - 0.025,
-        maxLat + 0.025,
-      ])
-      .andWhereBetween(`lon${isMad ? 'gitude' : ''}`, [
-        minLon - 0.025,
-        maxLon + 0.025,
-      ])
-    if (isMad) {
-      query.select([
-        'pokestop_id AS id',
-        'enabled',
-        'latitude AS lat',
-        'longitude AS lon',
-      ])
-    } else {
-      query.select(['id', 'lat', 'lon', 'enabled', 'deleted', 'partner_id'])
-      if (!onlyIncludeSponsored) {
-        query.andWhere((poi) => {
-          poi.whereNull('partner_id').orWhere('partner_id', 0)
-        })
-      }
-      if (hasShowcaseData) {
-        query.select('showcase_expiry')
-      }
+      .whereBetween('lat', [minLat - 0.025, maxLat + 0.025])
+      .andWhereBetween('lon', [minLon - 0.025, maxLon + 0.025])
+      .select(['id', 'lat', 'lon', 'enabled', 'deleted', 'partner_id'])
+    if (!onlyIncludeSponsored) {
+      query.andWhere((poi) => {
+        poi.whereNull('partner_id').orWhere('partner_id', 0)
+      })
     }
-    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas, isMad)) {
+    if (hasShowcaseData) {
+      query.select('showcase_expiry')
+    }
+    if (!getAreaSql(query, perms.areaRestrictions, onlyAreas)) {
       return []
     }
     const results = await query
@@ -2598,7 +2281,7 @@ class Pokestop extends Model {
    * @param {import('@rm/types').DbContext} ctx
    * @returns {Promise<{ hasConfirmedInvasions: boolean }>}
    */
-  static async getFilterContext({ isMad, hasConfirmed, mem }) {
+  static async getFilterContext({ hasConfirmed, mem }) {
     // Check if rocket Pokemon filtering should be forced via config
     const fallback = config.getSafe('map.misc.fallbackRocketPokemonFiltering')
 
@@ -2614,7 +2297,7 @@ class Pokestop extends Model {
     if (mem) return { hasConfirmedInvasions: true }
 
     // Use original behavior when config is disabled
-    if (isMad || !hasConfirmed) return { hasConfirmedInvasions: false }
+    if (!hasConfirmed) return { hasConfirmedInvasions: false }
     const result = await this.query()
       .from('incident')
       .count('id', { as: 'total' })

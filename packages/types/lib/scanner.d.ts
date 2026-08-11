@@ -23,7 +23,6 @@ export interface Device {
   lat: number
   lon: number
   type: string
-  isMad: boolean
   route: any // JSON
   radius: number
 }
@@ -132,7 +131,6 @@ export interface Quest {
   quest_template: string
   quest_reward_type: number
   quest_reward_amount: number
-  quest_task: string
   quest_item_id: number
   quest_title: string
   item_amount: number
@@ -161,12 +159,12 @@ export interface Invasion {
   grunt_type: number
   incident_expire_timestamp: number
   confirmed: boolean
-  slot_1_pokemon_id: number
-  slot_1_form: number
-  slot_2_pokemon_id: number
-  slot_2_form: number
-  slot_3_pokemon_id: number
-  slot_3_form: number
+  slot_1_pokemon_id: number | null
+  slot_1_form: number | null
+  slot_2_pokemon_id: number | null
+  slot_2_form: number | null
+  slot_3_pokemon_id: number | null
+  slot_3_form: number | null
 }
 
 export interface ShowcaseEntry extends PokemonDisplay {
