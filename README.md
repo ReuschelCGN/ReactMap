@@ -59,10 +59,6 @@ Pokemon GO Map frontend built with React.
 
 - Join the [Discord](https://discord.gg/EYYsKPVawn)!
 
-## Deprecated Features
-
-- Basic and Intermediate Pokemon filters: The logics are too complicated for any human to understand so they will not receive any further updates unless an obvious bug is found.
-
 ## Credits
 
 - [MapJS](https://github.com/WatWowMap/MapJS)
