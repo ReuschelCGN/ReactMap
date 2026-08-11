@@ -14,7 +14,7 @@ import { RoutePopup } from './RoutePopup'
 
 const POSITIONS = /** @type {const} */ (['start', 'end'])
 
-const LINE_OPACITY = 0.33
+const LINE_OPACITY = 0.68
 const MARKER_OPACITY = LINE_OPACITY * 2
 
 const BaseRouteTile = ({ route, orientation = 'forward' }) => {
@@ -70,7 +70,7 @@ const BaseRouteTile = ({ route, orientation = 'forward' }) => {
   const [color, darkened] = React.useMemo(
     () => [
       `#${displayRoute.image_border_color}`,
-      darken(`#${displayRoute.image_border_color}`, 0.2),
+      darken(`#${displayRoute.image_border_color}`, 0.65),
     ],
     [displayRoute.image_border_color],
   )
