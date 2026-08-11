@@ -376,7 +376,6 @@
       "interactionRanges": false,
       "lureRange": false,
       "customRange": 0,
-      "madQuestText": false,
       "hasQuestIndicator": true,
       "invasionRewardMarker": false,
       "showArQuestDotBadge": false,
@@ -657,8 +656,6 @@
       "pokemon": false,
       "gmf": true,
       "scanNextInstance": "scanNext",
-      "scanNextDevice": "Device01",
-      "scanNextSleeptime": 5,
       "userCooldownSeconds": 0,
       "cooldownBypass": {
         "discordRoles": [],
