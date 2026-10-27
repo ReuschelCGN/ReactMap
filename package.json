@@ -237,7 +237,7 @@
     "@rainb0w-clwn/passport-telegram-official/express/path-to-regexp": "0.1.13"
   },
   "engines": {
-    "node": ">=22.22.0",
+    "node": ">=22.23.4",
     "yarn": "^1.22.x"
   }
 }
