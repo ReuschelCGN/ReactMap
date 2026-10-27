@@ -1125,7 +1125,16 @@ const RaidInfo = ({
       </Grid>
 
       <Grid>
-        <Typography variant="caption" align="center" sx={{ pb: 0.5 }} noWrap>
+        <Typography 
+          variant="caption" 
+          align="center" 
+          sx={{ 
+            pb: 0.5, 
+            width: '100%',
+            display: 'block',
+            wordBreak: 'break-word'
+          }}
+        >
           {getFormDisplay(
             raid_pokemon_id,
             raid_pokemon_form,
