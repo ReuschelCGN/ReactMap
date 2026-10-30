@@ -118,8 +118,9 @@ function SelectorList({
                   return key.startsWith('t')
                 case 'tappables':
                   return (
-                    ['q', 'c', 'x', 'm'].some((prefix) => key.startsWith(prefix)) &&
-                    key !== 'q0'
+                    ['q', 'c', 'x', 'm'].some((prefix) =>
+                      key.startsWith(prefix),
+                    ) && key !== 'q0'
                   )
                 default:
                   return Number.isInteger(Number(key.charAt(0)))
