@@ -261,6 +261,10 @@ class DbManager extends Logger {
     const [hasShortcode] = await schema('route')
       .columnInfo()
       .then((columns) => ['shortcode' in columns])
+    const hasTappableRewards = await schema('tappable')
+      .columnInfo()
+      .then((columns) => 'reward_type' in columns)
+      .catch(() => false)
 
     let hasPokemonShinyStats
     try {
@@ -294,6 +298,7 @@ class DbManager extends Logger {
       hasShortcode,
       hasPokemonShinyStats,
       hasPokemonBackground,
+      hasTappableRewards,
     }
   }
 
