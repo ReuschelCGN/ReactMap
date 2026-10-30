@@ -15,6 +15,7 @@ import { TooltipWrapper } from '@components/ToolTipWrapper'
 
 import { TappablePopup } from './TappablePopup'
 import { getTappableDisplaySettings } from './displayRules'
+import { getTappableReward } from './rewards'
 
 /**
  * @param {import('@rm/types').Tappable} tappable
@@ -65,11 +66,14 @@ const BaseTappableTile = (tappable) => {
   const useRewardPrimary = displaySettings.map.rewardAsPrimary
 
   const { icon, rewardIcon } = React.useMemo(() => {
-    if (!Icons || !tappable.item_id) {
+    const reward = getTappableReward(tappable)
+    if (!Icons || !reward) {
       return { icon: null, rewardIcon: '', size: 24 }
     }
-    const filterKey = `q${tappable.item_id}`
-    const tappableSize = Icons.getSize('tappable', itemFilters[filterKey]?.size)
+    const tappableSize = Icons.getSize(
+      'tappable',
+      itemFilters[reward.filterKey]?.size,
+    )
     const tappableIcon = Icons.getTappable(tappable.type)
     const [tappableMod, rewardMod] = Icons.getModifiers('tappable', 'reward')
     const popupAnchor = [
@@ -79,8 +83,8 @@ const BaseTappableTile = (tappable) => {
         (tappableMod?.popupY || 0),
     ]
     const tappableReward = Icons.getRewards(
-      2,
-      tappable.item_id,
+      reward.questRewardType,
+      reward.id,
       tappable.count || 1,
     )
     const count = tappable.count || 1
@@ -113,18 +117,18 @@ const BaseTappableTile = (tappable) => {
     if (!tappableIcon) {
       return { icon: null, rewardIcon: '', size: tappableSize }
     }
-    const defaultRewardSize = Icons.getSize('reward')
+    const defaultRewardSize = 24
     const hasCount = count > 1
     const rewardSize = hasCount ? defaultRewardSize : 25
     const textHeight = hasCount ? 14 : 0
-    const paddingX = hasCount ? 10 : (30 - rewardSize) / 2
-    const paddingTop = hasCount ? 8 : 4
-    const paddingBottom = hasCount ? 8 : 4
+    const paddingX = (30 - rewardSize) / 2
+    const paddingTop = 4
+    const paddingBottom = 4
     const bubbleWidth = hasCount ? rewardSize + paddingX * 2 : 30
     const bubbleHeight = paddingTop + rewardSize + textHeight + paddingBottom
-    const tailHeight = hasCount ? 16 : 12
+    const tailHeight = hasCount ? 12 : 12
     const tailWidth = Math.min(hasCount ? 24 : 16, bubbleWidth * 0.45)
-    const svgHeight = bubbleHeight + tailHeight
+    const svgHeight = bubbleHeight + tailHeight - 8
     const cornerRadius = hasCount ? 12 : 9
     const bubbleCenterX = bubbleWidth / 2
     const rewardX = paddingX
@@ -218,7 +222,9 @@ const BaseTappableTile = (tappable) => {
     Icons,
     itemFilters,
     tappable.type,
+    tappable.reward_type,
     tappable.item_id,
+    tappable.reward_pokemon_id,
     tappable.count,
     opacity,
     bubbleFill,
