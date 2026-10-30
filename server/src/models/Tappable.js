@@ -140,9 +140,7 @@ class Tappable extends Model {
 
     const query = this.query().select(getSelectColumns(hasTappableRewards))
 
-    if (
-      !getAreaSql(query, perms.areaRestrictions, [], 'tappable')
-    ) {
+    if (!getAreaSql(query, perms.areaRestrictions, [], 'tappable')) {
       return []
     }
 
