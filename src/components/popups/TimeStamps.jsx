@@ -11,7 +11,7 @@ import { ExtraInfo } from './ExtraInfo'
  * @param {{ time?: number, children: string, xs?: number }} props
  * @returns
  */
-export const TimeStamp = ({ time, children, xs = 6 }) => {
+export const TimeStamp = ({ time, children, xs = 12 }) => {
   const { i18n } = useTranslation()
 
   if (!time) return null
