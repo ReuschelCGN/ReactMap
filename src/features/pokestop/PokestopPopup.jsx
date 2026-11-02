@@ -805,7 +805,7 @@ const Footer = ({ lat, lon }) => {
  * @param {import('@rm/types').Pokestop} props
  * @returns
  */
-const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
+const ExtraInfo = ({ updated, lat, lon }) => {
   const open = useStorage((s) => s.popups.extras)
   const enablePokestopPopupCoords = useStorage(
     (s) => s.userSettings.pokestops.enablePokestopPopupCoords,
@@ -815,7 +815,6 @@ const ExtraInfo = ({ last_modified_timestamp, updated, lat, lon }) => {
     <Collapse in={open} timeout="auto" unmountOnExit sx={{ width: '100%' }}>
       <Grid container alignItems="center" justifyContent="center">
         <TimeStamp time={updated}>last_seen</TimeStamp>
-        <TimeStamp time={last_modified_timestamp}>last_modified</TimeStamp>
         {enablePokestopPopupCoords && (
           <Grid xs={12} textAlign="center">
             <Coords lat={lat} lon={lon} />
